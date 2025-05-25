@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
+import { signup as apiSignup } from '../services/api'; // Import the signup function
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Signup = () => {
@@ -103,27 +104,20 @@ const Signup = () => {
     setSubmissionError('');
 
     try {
-      logout();
-      const response = await fetch('http://localhost:5000/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ firstName, lastName, email, password, phoneNumber }),
-      });
+      logout(); // Assuming this is intentional to clear any existing session.
+      // Replace fetch call with apiSignup
+      await apiSignup(firstName, lastName, email, password, phoneNumber);
+      // apiSignup will throw an error if not successful, which is caught below.
+      // If successful, it means registration was okay.
 
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success('Registered successfully! Please login.');
-        navigate('/login');
-      } else {
-        setSubmissionError(data.message || 'Failed to register');
-        toast.error(data.message || 'Failed to register');
-      }
+      toast.success('Registered successfully! Please login.');
+      navigate('/login');
     } catch (error) {
-      setSubmissionError('An error occurred. Please ensure the backend server is running and try again.');
-      toast.error('An error occurred. Please ensure the backend server is running and try again.');
+      // apiSignup already calls toast.error. We just need to set our local submission error.
+      // Ensure error.message is a string.
+      const message = typeof error.message === 'string' ? error.message : 'An unexpected error occurred.';
+      // Remove "Signup failed: " prefix if present for cleaner UI, similar to Login page.
+      setSubmissionError(message.replace('Signup failed: ', ''));
     } finally {
       setIsLoading(false);
     }

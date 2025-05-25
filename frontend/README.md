@@ -1,70 +1,92 @@
-# Getting Started with Create React App
+# Job Aggregator Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+This frontend provides the user interface for the Job Aggregator application. It allows users to search for jobs, register and log in to their accounts, view detailed job descriptions, and manage their profiles. It communicates with the backend API to fetch and display job data and handle user authentication.
 
-In the project directory, you can run:
+## Prerequisites
 
-### `npm start`
+*   **Node.js and npm (or yarn):** Ensure you have a recent version of Node.js installed, which includes npm. Alternatively, you can use yarn.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Setup & Installation
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+1.  **Navigate to the Frontend Directory:**
+    If you have cloned the main repository, navigate to the `frontend` directory:
+    ```bash
+    cd <repository_name>/frontend
+    ```
+    (If you've already cloned, just ensure you are in the `frontend` directory.)
 
-### `npm test`
+2.  **Configure Environment Variables:**
+    Create a `.env` file in the `frontend` directory. This file is used to store environment-specific variables, primarily the backend API URL.
+    ```bash
+    touch .env
+    ```
+    Add the following variable to your `.env` file:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    ```env
+    REACT_APP_API_URL=http://localhost:5000/api
+    ```
 
-### `npm run build`
+    *   `REACT_APP_API_URL`: This variable specifies the base URL for the backend API. If your backend is running on a different port or domain, update this value accordingly. For example, if your backend is at `https://api.example.com`, use `REACT_APP_API_URL=https://api.example.com/api`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3.  **Install Dependencies:**
+    In the `frontend` directory, run:
+    ```bash
+    npm install
+    ```
+    Or, if you are using yarn:
+    ```bash
+    yarn install
+    ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Running the Application
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+To start the frontend development server, run the following command from the `frontend` directory:
 
-### `npm run eject`
+```bash
+npm start
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Or, if you are using yarn:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+yarn start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+This command starts the React development server (usually using Create React App scripts). The application will typically open automatically in your default web browser at `http://localhost:3000`. The server watches for file changes and automatically reloads the application.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Project Structure
 
-## Learn More
+The frontend application is organized with the following directory structure:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+*   `public/`: Contains static assets such as `index.html` (the main HTML page), favicons, and images.
+*   `src/`: Contains the main source code for the React application.
+    *   `components/`: Reusable UI components that are used across different parts of the application (e.g., buttons, navigation bars, job cards).
+    *   `pages/`: Page-level components that represent different views or routes in the application (e.g., HomePage, LoginPage, SignupPage, JobDetailsPage).
+    *   `services/`: Contains modules for making API calls to the backend. For example, `api.js` defines functions for fetching jobs, user authentication, etc.
+    *   `context/`: Holds React Context API implementations for global state management. For instance, `AuthContext.js` manages user authentication state.
+    *   `utils/`: Includes utility functions and helpers that can be reused throughout the application (e.g., date formatting, validation functions).
+    *   `App.js`: The main application component, responsible for routing and overall layout.
+    *   `index.js`: The entry point of the React application, which renders the `App` component into the DOM.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Key Features
 
-### Code Splitting
+*   **User Authentication:** Secure user registration and login functionality.
+*   **Job Search & Filtering:** Users can search for jobs based on keywords, locations, and job types.
+*   **View Job Details:** Users can click on a job listing to view more detailed information about the position.
+*   **Responsive Design:** The interface is designed to be usable across various devices and screen sizes.
+*   **Toast Notifications:** User-friendly notifications for actions like login success/failure, registration, etc.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Environment Variables
 
-### Analyzing the Bundle Size
+The following environment variables are used by the application (defined in the `.env` file):
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+*   **`REACT_APP_API_URL`**
+    *   **Description:** Specifies the base URL for the backend API.
+    *   **Example:** `REACT_APP_API_URL=http://localhost:5000/api`
+    *   **Usage:** This is used by the API service modules (e.g., `src/services/api.js`) to make requests to the correct backend endpoints.
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This README provides a guide for setting up and running the Job Aggregator frontend. Refer to the source code for more detailed insights into specific components and functionalities.
