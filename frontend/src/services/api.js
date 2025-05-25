@@ -46,7 +46,7 @@ export const fetchJobById = async (id) => {
 export const login = async (email, password) => {
   try {
     console.log('Sending login request with email:', email);
-    const response = await fetch(`${API_URL}/login`, {
+    const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ export const login = async (email, password) => {
 export const signup = async (firstName, lastName, email, password, phoneNumber) => {
   try {
     console.log('Sending signup request with email:', email);
-    const response = await fetch(`${API_URL}/register`, {
+    const response = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
