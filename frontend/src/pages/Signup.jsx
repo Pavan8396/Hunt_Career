@@ -3,6 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { signup as apiSignup } from '../services/api'; // Import the signup function
+=======
+// import { signup as apiSignup } from '../../services/api'; // Import the signup function
+// >>>>>>> main
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Signup = () => {
