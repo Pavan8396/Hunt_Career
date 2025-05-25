@@ -1,7 +1,3 @@
-// const express = require("express");
-// const cors = require("cors");
-// const jwt = require("jsonwebtoken");
-// const bcrypt = require("bcryptjs");
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken"); // Still needed for JWT operations if any are left, but authController handles its own
