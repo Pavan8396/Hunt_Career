@@ -2,7 +2,10 @@ import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
-import { login as apiLogin } from '../../services/api'; // Import the login function
+import { login as apiLogin } from '../services/api'; // Import the login function
+// =======
+// import { login as apiLogin } from '../../services/api'; // Import the login function
+// >>>>>>> main
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
