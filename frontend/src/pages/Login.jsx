@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
+import { login as apiLogin } from '../../services/api'; // Import the login function
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
@@ -59,22 +60,23 @@ const Login = () => {
     setErrorMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      // Replace fetch call with apiLogin
+      const data = await apiLogin(email, password);
+      // The login function from api.js already returns JSON data directly
+      // and throws an error if response is not ok.
 
-      const data = await response.json();
-      if (response.ok) {
-        login(data.token, data.user?.name || email.split('@')[0]);
-        toast.success('Logged in successfully!');
-        navigate('/');
-      } else {
-        setError(data.message || 'Failed to login');
-      }
+      // Call AuthContext login
+      login(data.token, data.user?.name || email.split('@')[0]);
+      toast.success('Logged in successfully!');
+      navigate('/');
     } catch (error) {
-      setError('An error occurred. Please ensure the backend server is running and try again.');
+      // apiLogin already calls toast.error, so we just need to set our local error message.
+      // Ensure error.message is a string.
+      const message = typeof error.message === 'string' ? error.message : 'An unexpected error occurred.';
+      // The error message from apiLogin might already be user-friendly.
+      // If it's a generic "Login failed: Network Error" or similar, we might want a more specific one.
+      // For now, let's use the message from the caught error, which should be descriptive.
+      setError(message.replace('Login failed: ', '')); // Remove prefix if present for cleaner UI
     } finally {
       setIsLoading(false);
     }
