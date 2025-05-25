@@ -1,9 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-// const express = require("express"); // Removed duplicate
-const cors = require("cors");
 const jwt = require("jsonwebtoken"); // Still needed for JWT operations if any are left, but authController handles its own
 const bcrypt = require("bcryptjs"); // Still needed for bcrypt operations if any are left, but authController handles its own
 // const { connectToMongo, getDb } = require('./config/db'); // connectToMongo removed, getDb used by middleware/controllers
