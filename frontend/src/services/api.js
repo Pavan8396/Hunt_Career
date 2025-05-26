@@ -54,19 +54,21 @@ export const login = async (email, password) => {
       body: JSON.stringify({ email, password }),
     });
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Login failed: ${errorText || response.statusText}`);
+      let errorMessage = 'Login failed';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
     }
     const data = await response.json();
     console.log('Login response:', data);
     return data;
   } catch (error) {
-    const errorMessage = error.message.includes('failed')
-      ? error.message
-      : `Login failed: ${error.message}`;
-    console.error('Login error:', errorMessage);
-    toast.error(errorMessage);
-    throw new Error(errorMessage);
+    console.error('Login error:', error.message);
+    throw new Error(error.message);
   }
 };
 
@@ -81,8 +83,14 @@ export const signup = async (firstName, lastName, email, password, phoneNumber) 
       body: JSON.stringify({ firstName, lastName, email, password, phoneNumber }),
     });
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Signup failed: ${errorText || response.statusText}`);
+      let errorMessage = 'Signup failed';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
     }
     const data = await response.json();
     console.log('Signup response:', data);
@@ -91,8 +99,8 @@ export const signup = async (firstName, lastName, email, password, phoneNumber) 
     const errorMessage = error.message.includes('failed')
       ? error.message
       : `Signup failed: ${error.message}`;
-    console.error('Signup error:', errorMessage);
-    toast.error(errorMessage);
-    throw new Error(errorMessage);
+    console.error('Signup error:', error.message);
+    toast.error(error.message);
+    throw new Error(error.message);
   }
 };
