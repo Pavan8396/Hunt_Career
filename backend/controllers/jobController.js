@@ -53,14 +53,22 @@ const getJobById = async (req, res) => {
 
 const createJob = async (req, res) => {
   try {
-    console.log('Creating job with body:', req.body);
-    console.log('User:', req.user);
+    console.log('Received request to create job with body:', req.body);
+    console.log('User from token:', req.user);
+
+    if (!req.user || !req.user.id) {
+      console.error('Authentication error: user or user.id is missing from the request.');
+      return res.status(401).json({ message: 'Authentication error: user not found.' });
+    }
+
     const newJob = new Job({
       ...req.body,
-      employer: req.user.id, // from token
+      employer: req.user.id,
     });
+
+    console.log('Attempting to save new job:', newJob);
     const savedJob = await newJob.save();
-    console.log('Job created successfully:', savedJob);
+    console.log('Job saved successfully:', savedJob);
     res.status(201).json(savedJob);
   } catch (error) {
     console.error('Error creating job:', error);

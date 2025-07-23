@@ -57,12 +57,17 @@ const Navbar = () => {
   };
 
   const handleConfirmLogout = () => {
+    const type = userType;
     logout();
     setIsDropdownOpen(false);
     setIsMobileMenuOpen(false);
     setShowConfirm(false);
     toast.success('Logged out successfully!');
-    navigate('/login');
+    if (type === 'employer') {
+      navigate('/employer/login');
+    } else {
+      navigate('/login');
+    }
   };
 
   const handleCancelLogout = () => {
@@ -109,15 +114,13 @@ const Navbar = () => {
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                   {userType === 'employer' ? (
-                    <>
-                      <Link
-                        to="/employer/dashboard"
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
-                    </>
+                    <Link
+                      to="/employer/dashboard"
+                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
                   ) : (
                     <>
                       <Link
