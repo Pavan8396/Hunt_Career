@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getEmployerJobs, getApplicationsForJob, shortlistCandidate } from '../services/api';
+import { getEmployerJobs, getApplicationsForJob } from '../services/api';
 import PostJob from '../components/PostJob';
-import { toast } from 'react-toastify';
 
 const EmployerDashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -35,17 +34,6 @@ const EmployerDashboard = () => {
     }
   };
 
-  const handleShortlist = async (chatId) => {
-    try {
-      await shortlistCandidate(chatId, token);
-      toast.success('Candidate shortlisted!');
-      // Refresh applications for the job
-      handleViewApplications(selectedJob);
-    } catch (error) {
-      toast.error('Failed to shortlist candidate.');
-    }
-  };
-
   return (
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Employer Dashboard</h1>
@@ -72,17 +60,9 @@ const EmployerDashboard = () => {
                     <h4 className="text-md font-semibold">Applications</h4>
                     {applications[job._id] && applications[job._id].length > 0 ? (
                       applications[job._id].map((app) => (
-                        <div key={app._id} className="p-2 border-t flex justify-between items-center">
-                          <div>
-                            <p>{app.jobSeeker.name}</p>
-                            <p>{app.jobSeeker.email}</p>
-                          </div>
-                          <button
-                            onClick={() => handleShortlist(app.chatId)}
-                            className="px-2 py-1 bg-green-600 text-white rounded"
-                          >
-                            Shortlist
-                          </button>
+                        <div key={app._id} className="p-2 border-t">
+                          <p>{app.jobSeeker.name}</p>
+                          <p>{app.jobSeeker.email}</p>
                         </div>
                       ))
                     ) : (
