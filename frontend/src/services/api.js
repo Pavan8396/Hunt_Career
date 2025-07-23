@@ -72,6 +72,80 @@ export const login = async (email, password) => {
   }
 };
 
+export const employerSignup = async (companyName, email, password) => {
+  try {
+    const response = await api.post('/employer/register', { companyName, email, password });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || 'Signup failed';
+    toast.error(`Signup failed: ${errorMessage}`);
+    throw new Error(`Signup failed: ${errorMessage}`);
+  }
+};
+
+export const employerLogin = async (email, password) => {
+  try {
+    const response = await api.post('/employer/login', { email, password });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+    toast.error(`Login failed: ${errorMessage}`);
+    throw new Error(`Login failed: ${errorMessage}`);
+  }
+};
+
+export const createJob = async (jobData, token) => {
+  try {
+    const response = await api.post('/jobs', jobData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || 'Failed to create job';
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
+export const getEmployerJobs = async (token) => {
+  try {
+    const response = await api.get('/jobs/employer', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch employer jobs';
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
+export const getApplicationsForJob = async (jobId, token) => {
+  try {
+    const response = await api.get(`/applications/job/${jobId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch applications';
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
+export const shortlistCandidate = async (chatId, token) => {
+  try {
+    const response = await api.put(`/chat/${chatId}/shortlist`, {}, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || 'Failed to shortlist candidate';
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
 export const signup = async (firstName, lastName, email, password, phoneNumber) => {
   try {
     console.log('Sending signup request with email:', email);
