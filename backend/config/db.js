@@ -5,6 +5,7 @@ const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017";
 let db;
 
 const connectToMongo = async () => {
+  console.log('Connecting to MongoDB with URI:', mongoUri);
   const client = new MongoClient(mongoUri);
   try {
     await client.connect();
