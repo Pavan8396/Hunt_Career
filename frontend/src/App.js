@@ -9,6 +9,7 @@ import Signup from './pages/Signup';
 import EmployerLogin from './pages/EmployerLogin';
 import EmployerSignup from './pages/EmployerSignup';
 import EmployerDashboard from './pages/EmployerDashboard';
+import UserTypeSelection from './pages/UserTypeSelection';
 import Layout from './components/Layout';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
@@ -25,12 +26,13 @@ function App() {
         <Router>
           <Layout>
             <Routes>
+              <Route path="/" element={<UserTypeSelection />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/employer/login" element={<EmployerLogin />} />
               <Route path="/employer/signup" element={<EmployerSignup />} />
               <Route path="/employer/dashboard" element={<ProtectedRoute><EmployerDashboard /></ProtectedRoute>} />
-              <Route path="/" element={<Home />} />
               <Route
                 path="/saved"
                 element={
