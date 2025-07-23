@@ -1,0 +1,104 @@
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
+import { getEmployerJobs, getApplicationsForJob, shortlistCandidate } from '../services/api';
+import PostJob from '../components/PostJob';
+import { toast } from 'react-toastify';
+
+const EmployerDashboard = () => {
+  const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState({});
+  const [selectedJob, setSelectedJob] = useState(null);
+  const { token } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const employerJobs = await getEmployerJobs(token);
+        setJobs(employerJobs);
+      } catch (error) {
+        console.error('Failed to fetch employer jobs:', error);
+      }
+    };
+
+    if (token) {
+      fetchJobs();
+    }
+  }, [token]);
+
+  const handleViewApplications = async (jobId) => {
+    try {
+      const jobApplications = await getApplicationsForJob(jobId, token);
+      setApplications({ ...applications, [jobId]: jobApplications });
+      setSelectedJob(jobId);
+    } catch (error) {
+      console.error('Failed to fetch applications:', error);
+    }
+  };
+
+  const handleShortlist = async (chatId) => {
+    try {
+      await shortlistCandidate(chatId, token);
+      toast.success('Candidate shortlisted!');
+      // Refresh applications for the job
+      handleViewApplications(selectedJob);
+    } catch (error) {
+      toast.error('Failed to shortlist candidate.');
+    }
+  };
+
+  return (
+    <div className="p-4 max-w-6xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Employer Dashboard</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Post a New Job</h2>
+          <PostJob />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Your Posted Jobs</h2>
+          {jobs.length > 0 ? (
+            jobs.map((job) => (
+              <div key={job._id} className="p-4 border rounded mb-4">
+                <h3 className="text-lg font-semibold">{job.title}</h3>
+                <p>{job.company}</p>
+                <button
+                  onClick={() => handleViewApplications(job._id)}
+                  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
+                >
+                  View Applications
+                </button>
+                {selectedJob === job._id && (
+                  <div className="mt-4">
+                    <h4 className="text-md font-semibold">Applications</h4>
+                    {applications[job._id] && applications[job._id].length > 0 ? (
+                      applications[job._id].map((app) => (
+                        <div key={app._id} className="p-2 border-t flex justify-between items-center">
+                          <div>
+                            <p>{app.jobSeeker.name}</p>
+                            <p>{app.jobSeeker.email}</p>
+                          </div>
+                          <button
+                            onClick={() => handleShortlist(app.chatId)}
+                            className="px-2 py-1 bg-green-600 text-white rounded"
+                          >
+                            Shortlist
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No applications yet.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>You haven't posted any jobs yet.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default EmployerDashboard;
