@@ -18,4 +18,11 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-module.exports = { authenticateToken };
+const isEmployer = (req, res, next) => {
+  if (req.user.type !== 'employer') {
+    return res.status(403).json({ message: 'Forbidden: Access denied' });
+  }
+  next();
+};
+
+module.exports = { authenticateToken, isEmployer };

@@ -50,4 +50,28 @@ const getJobById = async (req, res) => {
   }
 };
 
-module.exports = { getJobs, getJobById };
+const Job = require('../models/jobModel');
+
+const createJob = async (req, res) => {
+  try {
+    const newJob = new Job({
+      ...req.body,
+      employer: req.user.id, // from token
+    });
+    const savedJob = await newJob.save();
+    res.status(201).json(savedJob);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const getEmployerJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.user.id });
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getJobs, getJobById, createJob, getEmployerJobs };
