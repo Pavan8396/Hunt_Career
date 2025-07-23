@@ -66,9 +66,9 @@ const Login = () => {
       // and throws an error if response is not ok.
 
       // Call AuthContext login
-      login(data.token, data.user?.name || email.split('@')[0]);
+      login(data.token, data.user?.name || email.split('@')[0], 'user');
       toast.success('Logged in successfully!');
-      navigate('/');
+      navigate('/home');
     } catch (error) {
       // apiLogin already calls toast.error, so we just need to set our local error message.
       // Ensure error.message is a string.
