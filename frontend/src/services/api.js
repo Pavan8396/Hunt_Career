@@ -74,75 +74,159 @@ export const login = async (email, password) => {
 
 export const employerSignup = async (companyName, email, password) => {
   try {
-    const response = await api.post('/employer/register', { companyName, email, password });
-    return response.data;
+    const response = await fetch(`${API_URL}/employer/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ companyName, email, password }),
+    });
+    if (!response.ok) {
+      let errorMessage = 'Signup failed';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message || 'Signup failed';
-    toast.error(`Signup failed: ${errorMessage}`);
-    throw new Error(`Signup failed: ${errorMessage}`);
+    toast.error(`Signup failed: ${error.message}`);
+    throw new Error(`Signup failed: ${error.message}`);
   }
 };
 
 export const employerLogin = async (email, password) => {
   try {
-    const response = await api.post('/employer/login', { email, password });
-    return response.data;
+    const response = await fetch(`${API_URL}/employer/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    if (!response.ok) {
+      let errorMessage = 'Login failed';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message || 'Login failed';
-    toast.error(`Login failed: ${errorMessage}`);
-    throw new Error(`Login failed: ${errorMessage}`);
+    toast.error(`Login failed: ${error.message}`);
+    throw new Error(`Login failed: ${error.message}`);
   }
 };
 
 export const createJob = async (jobData, token) => {
   try {
-    const response = await api.post('/jobs', jobData, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await fetch(`${API_URL}/jobs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(jobData),
     });
-    return response.data;
+    if (!response.ok) {
+      let errorMessage = 'Failed to create job';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message || 'Failed to create job';
-    toast.error(errorMessage);
-    throw new Error(errorMessage);
+    toast.error(error.message);
+    throw new Error(error.message);
   }
 };
 
 export const getEmployerJobs = async (token) => {
   try {
-    const response = await api.get('/jobs/employer', {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await fetch(`${API_URL}/jobs/employer`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-    return response.data;
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch employer jobs';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch employer jobs';
-    toast.error(errorMessage);
-    throw new Error(errorMessage);
+    toast.error(error.message);
+    throw new Error(error.message);
   }
 };
 
 export const getApplicationsForJob = async (jobId, token) => {
   try {
-    const response = await api.get(`/applications/job/${jobId}`, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await fetch(`${API_URL}/applications/job/${jobId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-    return response.data;
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch applications';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch applications';
-    toast.error(errorMessage);
-    throw new Error(errorMessage);
+    toast.error(error.message);
+    throw new Error(error.message);
   }
 };
 
 export const shortlistCandidate = async (chatId, token) => {
   try {
-    const response = await api.put(`/chat/${chatId}/shortlist`, {}, {
-      headers: { Authorization: `Bearer ${token}` },
+    const response = await fetch(`${API_URL}/chat/${chatId}/shortlist`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-    return response.data;
+    if (!response.ok) {
+      let errorMessage = 'Failed to shortlist candidate';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
   } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message || 'Failed to shortlist candidate';
-    toast.error(errorMessage);
-    throw new Error(errorMessage);
+    toast.error(error.message);
+    throw new Error(error.message);
   }
 };
 
