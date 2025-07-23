@@ -1,32 +1,27 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!sessionStorage.getItem('token'));
-  const [username, setUsername] = useState(sessionStorage.getItem('username') || '');
-  const [userType, setUserType] = useState(sessionStorage.getItem('userType') || '');
+  const [isAuthenticated, setIsAuthenticated] = useState(!!sessionStorage.getItem('token')); // Changed to sessionStorage
+  const [username, setUsername] = useState(sessionStorage.getItem('username') || ''); // Changed to sessionStorage
 
-  const login = (token, user, type = 'user') => {
-    sessionStorage.setItem('token', token);
-    sessionStorage.setItem('username', user);
-    sessionStorage.setItem('userType', type);
+  const login = (token, user) => {
+    sessionStorage.setItem('token', token); // Changed to sessionStorage
+    sessionStorage.setItem('username', user); // Changed to sessionStorage
     setIsAuthenticated(true);
     setUsername(user);
-    setUserType(type);
   };
 
   const logout = () => {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('username');
-    sessionStorage.removeItem('userType');
+    sessionStorage.removeItem('token'); // Changed to sessionStorage
+    sessionStorage.removeItem('username'); // Changed to sessionStorage
     setIsAuthenticated(false);
     setUsername('');
-    setUserType('');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, username, userType, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, username, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
