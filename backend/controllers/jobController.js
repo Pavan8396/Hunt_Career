@@ -53,13 +53,17 @@ const getJobById = async (req, res) => {
 
 const createJob = async (req, res) => {
   try {
+    console.log('Creating job with body:', req.body);
+    console.log('User:', req.user);
     const newJob = new Job({
       ...req.body,
       employer: req.user.id, // from token
     });
     const savedJob = await newJob.save();
+    console.log('Job created successfully:', savedJob);
     res.status(201).json(savedJob);
   } catch (error) {
+    console.error('Error creating job:', error);
     res.status(400).json({ message: error.message });
   }
 };

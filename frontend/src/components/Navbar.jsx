@@ -10,7 +10,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
-  const { isAuthenticated, username, logout } = useContext(AuthContext);
+  const { isAuthenticated, username, userType, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
@@ -73,7 +73,7 @@ const Navbar = () => {
     <nav className="bg-blue-600 text-white p-4 shadow-md dark:bg-gray-800">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo/Brand */}
-        <Link to="/" className="text-xl font-bold hover:text-gray-200 transition">
+        <Link to={isAuthenticated && userType === 'employer' ? '/employer/dashboard' : '/'} className="text-xl font-bold hover:text-gray-200 transition">
           Hunt-Career
         </Link>
 
@@ -108,20 +108,34 @@ const Navbar = () => {
 
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-                  <Link
-                    to="/"
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    to="/saved"
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    Saved Jobs
-                  </Link>
+                  {userType === 'employer' ? (
+                    <>
+                      <Link
+                        to="/employer/dashboard"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/home"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Home
+                      </Link>
+                      <Link
+                        to="/saved"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Saved Jobs
+                      </Link>
+                    </>
+                  )}
                   <Link
                     to="/about"
                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -179,20 +193,32 @@ const Navbar = () => {
           >
             {isAuthenticated ? (
               <>
-                <Link
-                  to="/"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/saved"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Saved Jobs
-                </Link>
+                {userType === 'employer' ? (
+                  <Link
+                    to="/employer/dashboard"
+                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/home"
+                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Home
+                    </Link>
+                    <Link
+                      to="/saved"
+                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Saved Jobs
+                    </Link>
+                  </>
+                )}
                 <Link
                   to="/about"
                   className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
