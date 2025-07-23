@@ -1,13 +1,25 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 const UserTypeSelection = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, userType } = useContext(AuthContext);
 
-  const handleSelection = (userType) => {
-    if (userType === 'job_seeker') {
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (userType === 'employer') {
+        navigate('/employer/dashboard');
+      } else {
+        navigate('/home');
+      }
+    }
+  }, [isAuthenticated, userType, navigate]);
+
+  const handleSelection = (selectedType) => {
+    if (selectedType === 'job_seeker') {
       navigate('/home');
-    } else if (userType === 'employer') {
+    } else if (selectedType === 'employer') {
       navigate('/employer/login');
     }
   };
