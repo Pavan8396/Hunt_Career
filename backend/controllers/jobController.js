@@ -1,6 +1,6 @@
 const { escapeRegex } = require('../utils/regexUtils');
 const jobService = require('../services/jobService');
-const Job = require('../models/jobModel');
+const { getDb } = require('../config/db');
 
 const getJobs = async (req, res) => {
   const { search, locations, jobTypes } = req.query;
@@ -53,23 +53,12 @@ const getJobById = async (req, res) => {
 
 const createJob = async (req, res) => {
   try {
-    console.log('Received request to create job with body:', req.body);
-    console.log('User from token:', req.user);
-
-    if (!req.user || !req.user.id) {
-      console.error('Authentication error: user or user.id is missing from the request.');
-      return res.status(401).json({ message: 'Authentication error: user not found.' });
-    }
-
-    const newJob = new Job({
+    const db = getDb();
+    const result = await db.collection('jobs').insertOne({
       ...req.body,
       employer: req.user.id,
     });
-
-    console.log('Attempting to save new job:', newJob);
-    const savedJob = await newJob.save();
-    console.log('Job saved successfully:', savedJob);
-    res.status(201).json(savedJob);
+    res.status(201).json({ message: 'Job created successfully', jobId: result.insertedId });
   } catch (error) {
     console.error('Error creating job:', error);
     res.status(400).json({ message: error.message });
@@ -78,7 +67,8 @@ const createJob = async (req, res) => {
 
 const getEmployerJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.user.id });
+    const db = getDb();
+    const jobs = await db.collection('jobs').find({ employer: req.user.id }).toArray();
     res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
