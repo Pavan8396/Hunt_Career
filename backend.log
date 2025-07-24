@@ -1,5 +1,3 @@
 
 > hunt-career-backend@1.0.0 start
 > node index.js
-
-Connecting to MongoDB with URI: mongodb://127.0.0.1:27017
