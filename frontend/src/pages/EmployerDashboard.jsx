@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getEmployerJobs, getApplicationsForJob } from '../services/api';
+import { getEmployerJobs, getApplicationsForJob, deleteJob } from '../services/api';
 import PostJob from '../components/PostJob';
 
 const EmployerDashboard = () => {
@@ -9,16 +9,16 @@ const EmployerDashboard = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const { token } = useContext(AuthContext);
 
-  const fetchJobs = async () => {
-    try {
-      const employerJobs = await getEmployerJobs(token);
-      setJobs(employerJobs);
-    } catch (error) {
-      console.error('Failed to fetch employer jobs:', error);
-    }
-  };
-
   useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const employerJobs = await getEmployerJobs(token);
+        setJobs(employerJobs);
+      } catch (error) {
+        console.error('Failed to fetch employer jobs:', error);
+      }
+    };
+
     if (token) {
       fetchJobs();
     }
@@ -37,6 +37,14 @@ const EmployerDashboard = () => {
   const handleDeleteJob = async (jobId) => {
     try {
       await deleteJob(jobId, token);
+      const fetchJobs = async () => {
+        try {
+          const employerJobs = await getEmployerJobs(token);
+          setJobs(employerJobs);
+        } catch (error) {
+          console.error('Failed to fetch employer jobs:', error);
+        }
+      };
       fetchJobs();
     } catch (error) {
       console.error('Failed to delete job:', error);
