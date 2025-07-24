@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { saveJob, removeJob, isJobSaved } from '../utils/localStorageHelpers';
 
 const JobCard = ({
-  id,
+  _id,
   title,
   company,
   job_type,
@@ -19,8 +19,8 @@ const JobCard = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    setSaved(isJobSaved(id));
-  }, [id]);
+    setSaved(isJobSaved(_id));
+  }, [_id]);
 
   const handleSaveClick = (e) => {
     e.stopPropagation();
@@ -31,7 +31,7 @@ const JobCard = ({
   const handleConfirm = () => {
     if (confirmAction === 'save') {
       saveJob({
-        id,
+        _id,
         title,
         company,
         job_type,
@@ -42,7 +42,7 @@ const JobCard = ({
       setNotification({ message: `Job "${title}" saved!`, type: 'success' });
       toast.success(`Job "${title}" saved!`);
     } else if (confirmAction === 'unsave') {
-      removeJob(id);
+      removeJob(_id);
       setSaved(false);
       setNotification({ message: `Job "${title}" unsaved!`, type: 'info' });
       toast.info(`Job "${title}" unsaved!`);
@@ -59,7 +59,7 @@ const JobCard = ({
   };
 
   const handleCardClick = () => {
-    navigate(`/jobs/${id}`);
+    navigate(`/jobs/${_id}`);
   };
 
   const handleKeyDown = (e) => {
@@ -170,7 +170,7 @@ const JobCard = ({
 };
 
 JobCard.propTypes = {
-  id: PropTypes.string.isRequired,
+  _id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   company: PropTypes.string.isRequired,
   job_type: PropTypes.string.isRequired,
