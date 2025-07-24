@@ -1,6 +1,8 @@
 const { escapeRegex } = require('../utils/regexUtils');
 const jobService = require('../services/jobService');
 const { getDb } = require('../config/db');
+const Job = require('../models/jobModel');
+const Employer = require('../models/employerModel');
 
 const getJobs = async (req, res) => {
   const { search, locations, jobTypes } = req.query;
@@ -50,9 +52,6 @@ const getJobById = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch job" });
   }
 };
-
-const Job = require('../models/jobModel');
-const Employer = require('../models/employerModel');
 
 const createJob = async (req, res) => {
   try {

@@ -1,13 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getEmployerJobs, getApplicationsForJob, deleteJob } from '../services/api';
+import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
 import PostJob from '../components/PostJob';
+import Chat from '../components/Chat';
 
 const EmployerDashboard = () => {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState({});
   const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedApplicant, setSelectedApplicant] = useState(null);
   const { token } = useContext(AuthContext);
+
+  const handleShortlist = async (applicationId) => {
+    try {
+      await shortlistCandidate(applicationId, token);
+      handleViewApplications(selectedJob);
+    } catch (error) {
+      console.error('Failed to shortlist candidate:', error);
+    }
+  };
 
   const fetchJobs = React.useCallback(async () => {
     try {
@@ -77,9 +88,28 @@ const EmployerDashboard = () => {
                     <h4 className="text-md font-semibold">Applications</h4>
                     {applications[job._id] && applications[job._id].length > 0 ? (
                       applications[job._id].map((app) => (
-                        <div key={app._id} className="p-2 border-t">
-                          <p>{app.jobSeeker.name}</p>
-                          <p>{app.jobSeeker.email}</p>
+                        <div key={app._id} className="p-2 border-t flex justify-between items-center">
+                          <div>
+                            <p>{app.applicant.firstName} {app.applicant.lastName}</p>
+                            <p>{app.applicant.email}</p>
+                          </div>
+                          <div>
+                            {app.status !== 'shortlisted' ? (
+                              <button
+                                onClick={() => handleShortlist(app._id)}
+                                className="px-2 py-1 bg-green-600 text-white rounded text-sm"
+                              >
+                                Shortlist
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setSelectedApplicant(app.applicant)}
+                                className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
+                              >
+                                Chat
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -93,6 +123,9 @@ const EmployerDashboard = () => {
             <p>You haven't posted any jobs yet.</p>
           )}
         </div>
+        {selectedApplicant && (
+          <Chat applicant={selectedApplicant} employer={true} />
+        )}
       </div>
     </div>
   );

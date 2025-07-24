@@ -230,6 +230,58 @@ export const getApplicationsForJob = async (jobId, token) => {
   }
 };
 
+export const shortlistCandidate = async (applicationId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/applications/shortlist/${applicationId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      let errorMessage = 'Failed to shortlist candidate';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    toast.error(error.message);
+    throw new Error(error.message);
+  }
+};
+
+export const applyForJob = async (jobId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/applications/apply/${jobId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      let errorMessage = 'Failed to apply for job';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error)_ {
+    toast.error(error.message);
+    throw new Error(error.message);
+  }
+};
+
 export const signup = async (firstName, lastName, email, password, phoneNumber) => {
   try {
     console.log('Sending signup request with email:', email);

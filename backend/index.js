@@ -2,9 +2,15 @@ const app = require('./app');
 const { PORT } = require('./config/env');
 const { connectToMongo } = require('./config/db');
 
+const http = require('http');
+const initSocket = require('./socket');
+
 const startServer = async () => {
   await connectToMongo(); // Ensure DB connection before starting server
-  const server = app.listen(PORT, () => {
+  const server = http.createServer(app);
+  initSocket(server);
+
+  server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
   });
 
