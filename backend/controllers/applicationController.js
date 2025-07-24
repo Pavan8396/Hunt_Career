@@ -1,6 +1,6 @@
 const Application = require('../models/applicationModel');
 const Job = require('../models/jobModel');
-const User = require('../models/userModel');
+const { getDb } = require('../config/db');
 
 exports.applyForJob = async (req, res) => {
   try {
@@ -46,7 +46,7 @@ exports.shortlistCandidate = async (req, res) => {
 
 exports.getApplicationsForJob = async (req, res) => {
   try {
-    const applications = await Application.find({ job: req.params.jobId }).populate('applicant');
+    const applications = await Application.find({ job: req.params.jobId });
     res.json(applications);
   } catch (error) {
     res.status(500).json({ message: error.message });
