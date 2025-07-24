@@ -34,13 +34,27 @@ const EmployerDashboard = () => {
     }
   };
 
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
+
   const handleDeleteJob = async (jobId) => {
+    setConfirmAction(() => () => deleteJobAction(jobId));
+    setShowConfirm(true);
+  };
+
+  const deleteJobAction = async (jobId) => {
     try {
       await deleteJob(jobId, token);
       fetchJobs();
     } catch (error) {
       console.error('Failed to delete job:', error);
     }
+    setShowConfirm(false);
+  };
+
+  const handleCancel = () => {
+    setShowConfirm(false);
+    setConfirmAction(null);
   };
 
   return (
@@ -94,6 +108,34 @@ const EmployerDashboard = () => {
           )}
         </div>
       </div>
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              Confirm Delete
+            </h3>
+            <p className="text-gray-600 dark:text-gray-200 mb-6">
+              Are you sure you want to delete this job?
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition"
+                aria-label="Cancel"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAction}
+                className="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700 transition"
+                aria-label="Confirm Delete"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
