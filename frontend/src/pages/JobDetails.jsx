@@ -174,17 +174,21 @@ const JobDetails = () => {
             {saved ? 'Unsave' : 'Save'}
           </button>
 
-          {job.apply_url && (
-            <a
-              href={job.apply_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block text-sm text-center px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded hover:bg-blue-700 transition dark:bg-blue-800 dark:border-gray-500 dark:hover:bg-blue-700 dark:text-white"
-              onClick={(e) => e.stopPropagation()}
+          {applied ? (
+            <button
+              onClick={() => navigate(`/chat/${job.employer}`)}
+              className="inline-block text-sm text-center px-4 py-2 bg-green-600 text-white border border-green-600 rounded hover:bg-green-700 transition dark:bg-green-800 dark:border-gray-500 dark:hover:bg-green-700 dark:text-white"
+            >
+              Message Employer
+            </button>
+          ) : (
+            <button
+              onClick={handleApply}
+              className={`inline-block text-sm text-center px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded hover:bg-blue-700 transition dark:bg-blue-800 dark:border-gray-500 dark:hover:bg-blue-700 dark:text-white`}
               aria-label="Apply for this job"
             >
               Apply
-            </a>
+            </button>
           )}
         </div>
 
