@@ -5,7 +5,7 @@ import {
   removeJob,
   isJobSaved,
 } from '../utils/localStorageHelpers';
-import { fetchJobById } from '../services/api';
+import { fetchJobById, applyForJob } from '../services/api';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'react-toastify';
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa';
