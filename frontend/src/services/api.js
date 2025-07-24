@@ -72,6 +72,32 @@ export const login = async (email, password) => {
   }
 };
 
+export const deleteJob = async (jobId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/jobs/${jobId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      let errorMessage = 'Failed to delete job';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    toast.error(error.message);
+    throw new Error(error.message);
+  }
+};
+
 export const employerSignup = async (companyName, email, password) => {
   try {
     const response = await fetch(`${API_URL}/employer/register`, {

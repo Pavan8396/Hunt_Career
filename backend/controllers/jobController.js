@@ -80,4 +80,20 @@ const getEmployerJobs = async (req, res) => {
   }
 };
 
-module.exports = { getJobs, getJobById, createJob, getEmployerJobs };
+const deleteJob = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+    if (job.employer.toString() !== req.user.id) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+    await job.remove();
+    res.json({ message: 'Job removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getJobs, getJobById, createJob, getEmployerJobs, deleteJob };

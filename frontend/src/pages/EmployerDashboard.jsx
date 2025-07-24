@@ -34,6 +34,15 @@ const EmployerDashboard = () => {
     }
   };
 
+  const handleDeleteJob = async (jobId) => {
+    try {
+      await deleteJob(jobId, token);
+      fetchJobs();
+    } catch (error) {
+      console.error('Failed to delete job:', error);
+    }
+  };
+
   return (
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Employer Dashboard</h1>
@@ -49,12 +58,20 @@ const EmployerDashboard = () => {
               <div key={job._id} className="p-4 border rounded mb-4">
                 <h3 className="text-lg font-semibold">{job.title}</h3>
                 <p>{job.company}</p>
-                <button
-                  onClick={() => handleViewApplications(job._id)}
-                  className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
-                >
-                  View Applications
-                </button>
+                <div className="flex space-x-2 mt-2">
+                  <button
+                    onClick={() => handleViewApplications(job._id)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                  >
+                    View Applications
+                  </button>
+                  <button
+                    onClick={() => handleDeleteJob(job._id)}
+                    className="px-4 py-2 bg-red-600 text-white rounded"
+                  >
+                    Delete
+                  </button>
+                </div>
                 {selectedJob === job._id && (
                   <div className="mt-4">
                     <h4 className="text-md font-semibold">Applications</h4>
