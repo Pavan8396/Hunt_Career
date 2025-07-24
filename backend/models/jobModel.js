@@ -11,6 +11,6 @@ const jobSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-const Job = mongoose.model('Job', jobSchema);
+const Job = mongoose.model('Job', jobSchema, 'Jobs');
 
 module.exports = Job;

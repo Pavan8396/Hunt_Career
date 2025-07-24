@@ -52,6 +52,7 @@ const getJobById = async (req, res) => {
 };
 
 const Job = require('../models/jobModel');
+const Employer = require('../models/employerModel');
 
 const createJob = async (req, res) => {
   try {
@@ -60,6 +61,9 @@ const createJob = async (req, res) => {
       employer: req.user.id,
     });
     const savedJob = await newJob.save();
+    const employer = await Employer.findById(req.user.id);
+    employer.postedJobs.push(savedJob._id);
+    await employer.save();
     res.status(201).json(savedJob);
   } catch (error) {
     console.error('Error creating job:', error);
@@ -69,9 +73,8 @@ const createJob = async (req, res) => {
 
 const getEmployerJobs = async (req, res) => {
   try {
-    const db = getDb();
-    const jobs = await db.collection('jobs').find({ employer: req.user.id }).toArray();
-    res.json(jobs);
+    const employer = await Employer.findById(req.user.id).populate('postedJobs');
+    res.json(employer.postedJobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
