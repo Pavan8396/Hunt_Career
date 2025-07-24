@@ -40,7 +40,7 @@ const EmployerDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <h2 className="text-xl font-semibold mb-4">Post a New Job</h2>
-          <PostJob />
+          <PostJob onJobPosted={fetchJobs} />
         </div>
         <div>
           <h2 className="text-xl font-semibold mb-4">Your Posted Jobs</h2>

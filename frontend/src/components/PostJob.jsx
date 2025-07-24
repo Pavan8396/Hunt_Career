@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { createJob } from '../services/api';
 
-const PostJob = () => {
+const PostJob = ({ onJobPosted }) => {
   const [formData, setFormData] = useState({
     title: '',
     company: '',
@@ -33,6 +33,9 @@ const PostJob = () => {
         candidate_required_location: '',
         job_type: 'Full-Time',
       });
+      if (onJobPosted) {
+        onJobPosted();
+      }
     } catch (error) {
       toast.error('Failed to post job.');
     } finally {
