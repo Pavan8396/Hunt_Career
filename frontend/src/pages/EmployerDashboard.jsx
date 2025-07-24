@@ -9,16 +9,16 @@ const EmployerDashboard = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const { token } = useContext(AuthContext);
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const employerJobs = await getEmployerJobs(token);
-        setJobs(employerJobs);
-      } catch (error) {
-        console.error('Failed to fetch employer jobs:', error);
-      }
-    };
+  const fetchJobs = async () => {
+    try {
+      const employerJobs = await getEmployerJobs(token);
+      setJobs(employerJobs);
+    } catch (error) {
+      console.error('Failed to fetch employer jobs:', error);
+    }
+  };
 
+  useEffect(() => {
     if (token) {
       fetchJobs();
     }
