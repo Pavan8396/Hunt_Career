@@ -10,6 +10,7 @@ import UserTypeSelection from './pages/UserTypeSelection';
 import EmployerLogin from './pages/EmployerLogin';
 import EmployerSignup from './pages/EmployerSignup';
 import EmployerDashboard from './pages/EmployerDashboard';
+import ChatPage from './pages/ChatPage';
 import Layout from './components/Layout';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
@@ -74,6 +75,14 @@ function App() {
                     <h1 className="text-2xl font-bold dark:text-gray-200">Privacy Policy</h1>
                     <p className="dark:text-gray-300">Your privacy matters to us.</p>
                   </div>
+                }
+              />
+              <Route
+                path="/chat/:employerId"
+                element={
+                  <ProtectedRoute>
+                    <ChatPage />
+                  </ProtectedRoute>
                 }
               />
               <Route path="*" element={<div className="p-4 text-center dark:text-gray-200">404 - Page Not Found</div>} />
