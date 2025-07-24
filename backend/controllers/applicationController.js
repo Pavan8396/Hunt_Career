@@ -11,7 +11,7 @@ exports.applyForJob = async (req, res) => {
 
     const existingApplication = await Application.findOne({
       job: req.params.jobId,
-      applicant: req.user.id,
+      applicant: req.user._id,
     });
 
     if (existingApplication) {
@@ -20,7 +20,7 @@ exports.applyForJob = async (req, res) => {
 
     const application = new Application({
       job: req.params.jobId,
-      applicant: req.user.id,
+      applicant: req.user._id,
     });
 
     await application.save();
