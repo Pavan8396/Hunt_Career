@@ -367,7 +367,8 @@ const Home = () => {
         {!isLoading && currentJobs.length > 0 ? (
           currentJobs.map((job) => (
             <JobCard
-              key={job.id}
+              key={job._id}
+              id={job._id}
               {...job}
               onSave={() => {
                 showNotification(`Job "${job.title}" saved!`);
