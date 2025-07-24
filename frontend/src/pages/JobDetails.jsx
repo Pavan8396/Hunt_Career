@@ -21,6 +21,19 @@ const JobDetails = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
 
+  const [applied, setApplied] = useState(false);
+
+  const handleApply = async () => {
+    try {
+      const token = sessionStorage.getItem('token');
+      await applyForJob(job._id, token);
+      setApplied(true);
+      toast.success('Application submitted successfully!');
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   useEffect(() => {
     const loadJob = async () => {
       setLoading(true);
@@ -28,7 +41,7 @@ const JobDetails = () => {
       try {
         const foundJob = await fetchJobById(id);
         setJob(foundJob);
-        setSaved(isJobSaved(id));
+        setSaved(isJobSaved(foundJob._id));
       } catch (err) {
         setError('Failed to load job details. Please ensure the backend server is running and try again.');
       } finally {
@@ -50,7 +63,7 @@ const JobDetails = () => {
       setNotification({ message: `Job "${job.title}" saved!`, type: 'success' });
       toast.success(`Job "${job.title}" saved!`);
     } else if (confirmAction === 'unsave') {
-      removeJob(id);
+      removeJob(job._id);
       setSaved(false);
       setNotification({ message: `Job "${job.title}" unsaved!`, type: 'info' });
       toast.info(`Job "${job.title}" unsaved!`);
