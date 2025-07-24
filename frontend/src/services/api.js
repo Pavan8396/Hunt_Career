@@ -276,7 +276,7 @@ export const applyForJob = async (jobId, token) => {
     }
     const data = await response.json();
     return data;
-  } catch (error)_ {
+  } catch (error) {
     toast.error(error.message);
     throw new Error(error.message);
   }
