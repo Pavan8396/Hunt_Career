@@ -29,7 +29,7 @@ const getJobs = async (req, res) => {
       query.job_type = { $in: typeArray };
     }
 
-    const jobs = await jobService.findAllJobs(query);
+    const jobs = await Job.find(query);
     res.status(200).json(jobs);
   } catch (err) {
     console.error("Fetch jobs error:", err.message);
@@ -39,7 +39,7 @@ const getJobs = async (req, res) => {
 
 const getJobById = async (req, res) => {
   try {
-    const job = await jobService.findJobById(req.params.id);
+    const job = await Job.findById(req.params.id);
     if (job) {
       res.json(job);
     } else {
@@ -51,14 +51,16 @@ const getJobById = async (req, res) => {
   }
 };
 
+const Job = require('../models/jobModel');
+
 const createJob = async (req, res) => {
   try {
-    const db = getDb();
-    const result = await db.collection('jobs').insertOne({
+    const newJob = new Job({
       ...req.body,
       employer: req.user.id,
     });
-    res.status(201).json({ message: 'Job created successfully', jobId: result.insertedId });
+    const savedJob = await newJob.save();
+    res.status(201).json(savedJob);
   } catch (error) {
     console.error('Error creating job:', error);
     res.status(400).json({ message: error.message });
