@@ -1,5 +1,4 @@
 const express = require('express');
-const express = require('express');
 const { applyForJob, getApplicationsForJob, shortlistCandidate } = require('../controllers/applicationController');
 const { ensureDb } = require('../middleware/dbMiddleware');
 const { authenticateToken, isEmployer } = require('../middleware/authMiddleware');
