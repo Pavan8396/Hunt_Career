@@ -62,27 +62,26 @@ const Home = () => {
     fetchInitialData();
   }, []);
 
-  const loadJobs = async (search = searchTerm) => {
-    setIsLoading(true);
-    setError(null);
-    const startTime = Date.now();
-    try {
-      const jobData = await fetchJobs(search.trim(), location.map(loc => loc), jobType);
-      setJobs(jobData || []); // Ensure jobData is an array, even if empty
-    } catch (error) {
-      setError(`Failed to load jobs: ${error.message}. Please ensure the backend server is running and try again.`);
-      setJobs([]);
-    } finally {
-      const elapsedTime = Date.now() - startTime;
-      const remainingTime = 500 - elapsedTime;
-      if (remainingTime > 0) {
-        await new Promise(resolve => setTimeout(resolve, remainingTime));
-      }
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadJobs = async (search = searchTerm) => {
+      setIsLoading(true);
+      setError(null);
+      const startTime = Date.now();
+      try {
+        const jobData = await fetchJobs(search.trim(), location.map(loc => loc), jobType);
+        setJobs(jobData || []); // Ensure jobData is an array, even if empty
+      } catch (error) {
+        setError(`Failed to load jobs: ${error.message}. Please ensure the backend server is running and try again.`);
+        setJobs([]);
+      } finally {
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = 500 - elapsedTime;
+        if (remainingTime > 0) {
+          await new Promise(resolve => setTimeout(resolve, remainingTime));
+        }
+        setIsLoading(false);
+      }
+    };
     loadJobs();
     setCurrentPage(1);
   }, [location, jobType, searchTerm]);
