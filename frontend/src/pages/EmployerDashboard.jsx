@@ -9,20 +9,20 @@ const EmployerDashboard = () => {
   const [selectedJob, setSelectedJob] = useState(null);
   const { token } = useContext(AuthContext);
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const employerJobs = await getEmployerJobs(token);
-        setJobs(employerJobs);
-      } catch (error) {
-        console.error('Failed to fetch employer jobs:', error);
-      }
-    };
+  const fetchJobs = React.useCallback(async () => {
+    try {
+      const employerJobs = await getEmployerJobs(token);
+      setJobs(employerJobs);
+    } catch (error) {
+      console.error('Failed to fetch employer jobs:', error);
+    }
+  }, [token]);
 
+  useEffect(() => {
     if (token) {
       fetchJobs();
     }
-  }, [token]);
+  }, [token, fetchJobs]);
 
   const handleViewApplications = async (jobId) => {
     try {
@@ -37,14 +37,6 @@ const EmployerDashboard = () => {
   const handleDeleteJob = async (jobId) => {
     try {
       await deleteJob(jobId, token);
-      const fetchJobs = async () => {
-        try {
-          const employerJobs = await getEmployerJobs(token);
-          setJobs(employerJobs);
-        } catch (error) {
-          console.error('Failed to fetch employer jobs:', error);
-        }
-      };
       fetchJobs();
     } catch (error) {
       console.error('Failed to delete job:', error);
