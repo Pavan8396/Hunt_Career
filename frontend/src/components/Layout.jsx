@@ -3,9 +3,9 @@ import Navbar from './Navbar';
 
 const Layout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
       <Navbar />
-      <main>{children}</main>
+      <main className="flex-grow overflow-y-auto">{children}</main>
     </div>
   );
 };
