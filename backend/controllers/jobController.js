@@ -66,6 +66,12 @@ const createJob = async (req, res) => {
     });
     const savedJob = await newJob.save();
     const employer = await Employer.findById(req.user._id);
+    if (!employer) {
+      // This case is unlikely if the JWT is valid, but it's good practice.
+      // We might also want to delete the job we just created to not have orphaned data.
+      await Job.findByIdAndDelete(savedJob._id);
+      return res.status(404).json({ message: "Employer not found." });
+    }
     employer.postedJobs.push(savedJob._id);
     await employer.save();
     res.status(201).json(savedJob);
@@ -78,6 +84,9 @@ const createJob = async (req, res) => {
 const getEmployerJobs = async (req, res) => {
   try {
     const employer = await Employer.findById(req.user._id).populate('postedJobs');
+    if (!employer) {
+      return res.status(404).json({ message: "Employer not found." });
+    }
     res.json(employer.postedJobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
