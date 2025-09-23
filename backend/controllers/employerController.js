@@ -72,10 +72,7 @@ const getEmployerApplications = async (req, res) => {
   try {
     const jobs = await Job.find({ employer: req.user._id });
     const jobIds = jobs.map(job => job._id);
-    const applications = await Application.find({ job: { $in: jobIds } }).populate(
-      'applicant',
-      'firstName lastName email'
-    );
+    const applications = await Application.find({ job: { $in: jobIds } });
     res.json(applications);
   } catch (error) {
     res.status(500).json({ message: error.message });

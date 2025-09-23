@@ -1,30 +1,19 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getEmployerJobs, getEmployerApplications, deleteJob, shortlistCandidate } from '../services/api';
+import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
 import Chat from '../components/Chat';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
-  const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState({});
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const { token } = useContext(AuthContext);
 
-  const fetchApplications = React.useCallback(async () => {
-    if (token) {
-      try {
-        const employerApplications = await getEmployerApplications(token);
-        setApplications(employerApplications);
-      } catch (error) {
-        console.error('Failed to fetch employer applications:', error);
-      }
-    }
-  }, [token]);
-
   const handleShortlist = async (applicationId) => {
     try {
       await shortlistCandidate(applicationId, token);
-      fetchApplications();
+      handleViewApplications(selectedJob);
     } catch (error) {
       console.error('Failed to shortlist candidate:', error);
     }
@@ -42,9 +31,18 @@ const PostedJobsPage = () => {
   useEffect(() => {
     if (token) {
       fetchJobs();
-      fetchApplications();
     }
-  }, [token, fetchJobs, fetchApplications]);
+  }, [token, fetchJobs]);
+
+  const handleViewApplications = async (jobId) => {
+    try {
+      const jobApplications = await getApplicationsForJob(jobId, token);
+      setApplications({ ...applications, [jobId]: jobApplications });
+      setSelectedJob(jobId);
+    } catch (error) {
+      console.error('Failed to fetch applications:', error);
+    }
+  };
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -80,10 +78,10 @@ const PostedJobsPage = () => {
               <p>{job.company}</p>
               <div className="flex space-x-2 mt-2">
                 <button
-                  onClick={() => setSelectedJob(selectedJob === job._id ? null : job._id)}
+                  onClick={() => handleViewApplications(job._id)}
                   className="px-4 py-2 bg-blue-600 text-white rounded"
                 >
-                  {selectedJob === job._id ? 'Hide' : 'View'} Applications
+                  View Applications
                 </button>
                 <button
                   onClick={() => handleDeleteJob(job._id)}
@@ -93,46 +91,52 @@ const PostedJobsPage = () => {
                 </button>
               </div>
               {selectedJob === job._id && (() => {
-                const jobApplications = applications.filter(app => app.job === job._id);
-                const validApplications =
-                  jobApplications.filter((app) => app.applicant) || [];
+                const jobApplications = applications[job._id] || [];
 
                 return (
                   <div className="mt-4">
                     <h4 className="text-md font-semibold">
-                      Applications ({validApplications.length})
+                      Applications ({jobApplications.length})
                     </h4>
-                    {validApplications.length > 0 ? (
-                      validApplications.map((app) => (
+                    {jobApplications.length > 0 ? (
+                      jobApplications.map((app) => (
                         <div
                           key={app._id}
                           className="p-2 border-t flex justify-between items-center"
                         >
-                          <div>
-                            <p>
-                              {app.applicant.firstName} {app.applicant.lastName}
+                          {app.applicant ? (
+                            <>
+                              <div>
+                                <p>
+                                  {app.applicant.firstName} {app.applicant.lastName}
+                                </p>
+                                <p>{app.applicant.email}</p>
+                              </div>
+                              <div>
+                                {app.status !== "shortlisted" ? (
+                                  <button
+                                    onClick={() => handleShortlist(app._id)}
+                                    className="px-2 py-1 bg-green-600 text-white rounded text-sm"
+                                  >
+                                    Shortlist
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      setSelectedApplicant(app.applicant)
+                                    }
+                                    className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
+                                  >
+                                    Chat
+                                  </button>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <p className="text-red-500">
+                              Applicant details not available.
                             </p>
-                            <p>{app.applicant.email}</p>
-                          </div>
-                          <div>
-                            {app.status !== "shortlisted" ? (
-                              <button
-                                onClick={() => handleShortlist(app._id)}
-                                className="px-2 py-1 bg-green-600 text-white rounded text-sm"
-                              >
-                                Shortlist
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() =>
-                                  setSelectedApplicant(app.applicant)
-                                }
-                                className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
-                              >
-                                Chat
-                              </button>
-                            )}
-                          </div>
+                          )}
                         </div>
                       ))
                     ) : (
