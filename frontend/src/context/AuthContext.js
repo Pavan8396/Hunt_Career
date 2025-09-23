@@ -9,6 +9,10 @@ export const AuthProvider = ({ children }) => {
   const [userType, setUserType] = useState(sessionStorage.getItem('userType') || '');
 
   const login = (newToken, userData, type = 'user') => {
+    if (!userData) {
+      console.error("Login function called with undefined userData.");
+      return;
+    }
     sessionStorage.setItem('token', newToken);
     sessionStorage.setItem('user', JSON.stringify(userData));
     sessionStorage.setItem('userType', type);

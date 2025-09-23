@@ -5,7 +5,7 @@ import { getEmployerJobs, getEmployerApplications } from '../services/api';
 const EmployerDashboard = () => {
   const [jobs, setJobs] = useState([]);
   const [totalApplications, setTotalApplications] = useState(0);
-  const { token } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -26,11 +26,9 @@ const EmployerDashboard = () => {
     }
   }, [token]);
 
-  const { username } = useContext(AuthContext);
-
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Welcome, {username}!</h1>
+      <h1 className="text-3xl font-bold mb-6">Welcome, {user?.name || 'Employer'}!</h1>
 
       {/* Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">

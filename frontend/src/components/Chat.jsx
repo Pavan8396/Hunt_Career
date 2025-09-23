@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import io from 'socket.io-client';
+import { AuthContext } from '../context/AuthContext';
 
 const Chat = ({ applicant, employer }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
+  const { user } = useContext(AuthContext);
   const socket = io('http://localhost:5000');
-  const user = JSON.parse(sessionStorage.getItem('user'));
+
+  // Ensure user and applicant objects are available before creating roomId
+  if (!user || !applicant) {
+    return null; // Or a loading/error state
+  }
 
   const roomId = [user._id, applicant._id].sort().join('_');
 
