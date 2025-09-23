@@ -10,29 +10,23 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
-  const { isAuthenticated, username, userType, logout } = useContext(AuthContext);
+  const { isAuthenticated, user, userType, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const [userInitials, setUserInitials] = useState('');
 
-  // Compute user initials based on username
+  // Compute user initials based on user
   useEffect(() => {
-    if (isAuthenticated) {
-      if (username.toLowerCase() === 'upavan') {
-        setUserInitials('PU');
-      } else if (username.toLowerCase() === 'sushma nagaraj') {
-        setUserInitials('SN');
-      } else {
-        const nameParts = username.split(' ');
-        const initials =
-          nameParts.length > 1
-            ? `${nameParts[0][0]}${nameParts[1][0]}`
-            : username.slice(0, 2).toUpperCase();
-        setUserInitials(initials);
-      }
+    if (isAuthenticated && user) {
+      const nameParts = user.name ? user.name.split(' ') : [];
+      const initials =
+        nameParts.length > 1
+          ? `${nameParts[0][0]}${nameParts[1][0]}`
+          : user.name ? user.name.slice(0, 2).toUpperCase() : 'U';
+      setUserInitials(initials);
     }
-  }, [isAuthenticated, username]);
+  }, [isAuthenticated, user]);
 
   // Handle outside clicks to close dropdown and mobile menu
   useEffect(() => {
