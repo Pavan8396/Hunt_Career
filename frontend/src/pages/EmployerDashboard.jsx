@@ -1,15 +1,31 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
+import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate, getEmployerApplications } from '../services/api';
 import PostJob from '../components/PostJob';
 import Chat from '../components/Chat';
 
 const EmployerDashboard = () => {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState({});
+  const [totalApplications, setTotalApplications] = useState(0);
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const { token } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchTotalApplications = async () => {
+      try {
+        const allApplications = await getEmployerApplications(token);
+        setTotalApplications(allApplications.length);
+      } catch (error) {
+        console.error('Failed to fetch total applications:', error);
+      }
+    };
+
+    if (token) {
+      fetchTotalApplications();
+    }
+  }, [token]);
 
   const handleShortlist = async (applicationId) => {
     try {
@@ -69,18 +85,32 @@ const EmployerDashboard = () => {
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Employer Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Post a New Job</h2>
+    <div className="p-4 max-w-7xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Employer Dashboard</h1>
+
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300">Total Jobs Posted</h3>
+          <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">{jobs.length}</p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300">Total Applications</h3>
+          <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">{totalApplications}</p>
+        </div>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex items-center justify-center">
           <PostJob onJobPosted={fetchJobs} />
         </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
-          <h2 className="text-xl font-semibold mb-4">Your Posted Jobs</h2>
-          {jobs.length > 0 ? (
-            jobs.map((job) => (
-              <div key={job._id} className="p-4 border rounded mb-4">
+          <h2 className="text-2xl font-semibold mb-4">Your Posted Jobs</h2>
+          <div className="space-y-4">
+            {jobs.length > 0 ? (
+              jobs.map((job) => (
+                <div key={job._id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
                 <h3 className="text-lg font-semibold">{job.title}</h3>
                 <p>{job.company}</p>
                 <div className="flex space-x-2 mt-2">

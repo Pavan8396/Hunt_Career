@@ -46,7 +46,10 @@ exports.shortlistCandidate = async (req, res) => {
 
 exports.getApplicationsForJob = async (req, res) => {
   try {
-    const applications = await Application.find({ job: req.params.jobId });
+    const applications = await Application.find({ job: req.params.jobId }).populate(
+      'applicant',
+      'firstName lastName email'
+    );
     res.json(applications);
   } catch (error) {
     res.status(500).json({ message: error.message });

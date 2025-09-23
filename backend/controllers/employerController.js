@@ -42,6 +42,9 @@ const registerEmployer = async (req, res) => {
   }
 };
 
+const Job = require('../models/jobModel');
+const Application = require('../models/applicationModel');
+
 const loginEmployer = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -54,7 +57,7 @@ const loginEmployer = async (req, res) => {
       const token = jwt.sign({ email: employer.email, id: employer._id, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
-        employer: { companyName: employer.companyName, email: employer.email }
+        employer: { _id: employer._id, companyName: employer.companyName, email: employer.email }
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });
@@ -65,4 +68,15 @@ const loginEmployer = async (req, res) => {
   }
 };
 
-module.exports = { registerEmployer, loginEmployer };
+const getEmployerApplications = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.user.id });
+    const jobIds = jobs.map(job => job._id);
+    const applications = await Application.find({ job: { $in: jobIds } });
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications };
