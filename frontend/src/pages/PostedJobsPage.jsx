@@ -1,19 +1,30 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
+import { getEmployerJobs, getEmployerApplications, deleteJob, shortlistCandidate } from '../services/api';
 import Chat from '../components/Chat';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
-  const [applications, setApplications] = useState({});
+  const [applications, setApplications] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const { token } = useContext(AuthContext);
 
+  const fetchApplications = React.useCallback(async () => {
+    if (token) {
+      try {
+        const employerApplications = await getEmployerApplications(token);
+        setApplications(employerApplications);
+      } catch (error) {
+        console.error('Failed to fetch employer applications:', error);
+      }
+    }
+  }, [token]);
+
   const handleShortlist = async (applicationId) => {
     try {
       await shortlistCandidate(applicationId, token);
-      handleViewApplications(selectedJob);
+      fetchApplications();
     } catch (error) {
       console.error('Failed to shortlist candidate:', error);
     }
@@ -31,18 +42,9 @@ const PostedJobsPage = () => {
   useEffect(() => {
     if (token) {
       fetchJobs();
+      fetchApplications();
     }
-  }, [token, fetchJobs]);
-
-  const handleViewApplications = async (jobId) => {
-    try {
-      const jobApplications = await getApplicationsForJob(jobId, token);
-      setApplications({ ...applications, [jobId]: jobApplications });
-      setSelectedJob(jobId);
-    } catch (error) {
-      console.error('Failed to fetch applications:', error);
-    }
-  };
+  }, [token, fetchJobs, fetchApplications]);
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -78,10 +80,10 @@ const PostedJobsPage = () => {
               <p>{job.company}</p>
               <div className="flex space-x-2 mt-2">
                 <button
-                  onClick={() => handleViewApplications(job._id)}
+                  onClick={() => setSelectedJob(selectedJob === job._id ? null : job._id)}
                   className="px-4 py-2 bg-blue-600 text-white rounded"
                 >
-                  View Applications
+                  {selectedJob === job._id ? 'Hide' : 'View'} Applications
                 </button>
                 <button
                   onClick={() => handleDeleteJob(job._id)}
@@ -91,8 +93,9 @@ const PostedJobsPage = () => {
                 </button>
               </div>
               {selectedJob === job._id && (() => {
+                const jobApplications = applications.filter(app => app.job === job._id);
                 const validApplications =
-                  applications[job._id]?.filter((app) => app.applicant) || [];
+                  jobApplications.filter((app) => app.applicant) || [];
 
                 return (
                   <div className="mt-4">
