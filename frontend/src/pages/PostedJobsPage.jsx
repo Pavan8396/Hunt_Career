@@ -91,45 +91,52 @@ const PostedJobsPage = () => {
                 </button>
               </div>
               {selectedJob === job._id && (() => {
-                const validApplications =
-                  applications[job._id]?.filter((app) => app.applicant) || [];
+                const jobApplications = applications[job._id] || [];
 
                 return (
                   <div className="mt-4">
                     <h4 className="text-md font-semibold">
-                      Applications ({validApplications.length})
+                      Applications ({jobApplications.length})
                     </h4>
-                    {validApplications.length > 0 ? (
-                      validApplications.map((app) => (
+                    {jobApplications.length > 0 ? (
+                      jobApplications.map((app) => (
                         <div
                           key={app._id}
                           className="p-2 border-t flex justify-between items-center"
                         >
-                          <div>
-                            <p>
-                              {app.applicant.firstName} {app.applicant.lastName}
+                          {app.applicant ? (
+                            <>
+                              <div>
+                                <p>
+                                  {app.applicant.firstName} {app.applicant.lastName}
+                                </p>
+                                <p>{app.applicant.email}</p>
+                              </div>
+                              <div>
+                                {app.status !== "shortlisted" ? (
+                                  <button
+                                    onClick={() => handleShortlist(app._id)}
+                                    className="px-2 py-1 bg-green-600 text-white rounded text-sm"
+                                  >
+                                    Shortlist
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      setSelectedApplicant(app.applicant)
+                                    }
+                                    className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
+                                  >
+                                    Chat
+                                  </button>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <p className="text-red-500">
+                              Applicant details not available.
                             </p>
-                            <p>{app.applicant.email}</p>
-                          </div>
-                          <div>
-                            {app.status !== "shortlisted" ? (
-                              <button
-                                onClick={() => handleShortlist(app._id)}
-                                className="px-2 py-1 bg-green-600 text-white rounded text-sm"
-                              >
-                                Shortlist
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() =>
-                                  setSelectedApplicant(app.applicant)
-                                }
-                                className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
-                              >
-                                Chat
-                              </button>
-                            )}
-                          </div>
+                          )}
                         </div>
                       ))
                     ) : (
