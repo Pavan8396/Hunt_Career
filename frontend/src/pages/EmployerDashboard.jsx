@@ -166,6 +166,7 @@ const EmployerDashboard = () => {
           ) : (
             <p>You haven't posted any jobs yet.</p>
           )}
+          </div>
         </div>
         {selectedApplicant && (
           <Chat applicant={selectedApplicant} employer={true} />
