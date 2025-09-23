@@ -1,5 +1,6 @@
 const Application = require('../models/applicationModel');
 const Job = require('../models/jobModel');
+const User = require('../models/userModel');
 const { getDb } = require('../config/db');
 
 exports.applyForJob = async (req, res) => {

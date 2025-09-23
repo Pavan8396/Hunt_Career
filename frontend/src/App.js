@@ -10,6 +10,9 @@ import UserTypeSelection from './pages/UserTypeSelection';
 import EmployerLogin from './pages/EmployerLogin';
 import EmployerSignup from './pages/EmployerSignup';
 import EmployerDashboard from './pages/EmployerDashboard';
+import EmployerLayout from './components/EmployerLayout';
+import PostJobPage from './pages/PostJobPage';
+import PostedJobsPage from './pages/PostedJobsPage';
 import ChatPage from './pages/ChatPage';
 import Layout from './components/Layout';
 import { ThemeProvider } from './context/ThemeContext';
@@ -33,7 +36,11 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/employer/login" element={<EmployerLogin />} />
               <Route path="/employer/signup" element={<EmployerSignup />} />
-              <Route path="/employer/dashboard" element={<ProtectedRoute><EmployerDashboard /></ProtectedRoute>} />
+              <Route path="/employer" element={<ProtectedRoute><EmployerLayout /></ProtectedRoute>}>
+                <Route path="dashboard" element={<EmployerDashboard />} />
+                <Route path="post-job" element={<PostJobPage />} />
+                <Route path="posted-jobs" element={<PostedJobsPage />} />
+              </Route>
               <Route
                 path="/saved"
                 element={
