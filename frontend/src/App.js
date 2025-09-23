@@ -89,7 +89,7 @@ function App() {
             </Routes>
           </Layout>
           <ToastContainer
-            position="top-right"
+            position="top-center"
             autoClose={3000}
             theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
           />
