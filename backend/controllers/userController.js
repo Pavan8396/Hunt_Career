@@ -1,4 +1,5 @@
 const userService = require('../services/userService');
+const Application = require('../models/applicationModel');
 
 const getUserDetails = async (req, res) => {
   try {
@@ -14,4 +15,13 @@ const getUserDetails = async (req, res) => {
   }
 };
 
-module.exports = { getUserDetails };
+const getUserApplications = async (req, res) => {
+  try {
+    const applications = await Application.find({ applicant: req.user.id });
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch user applications" });
+  }
+};
+
+module.exports = { getUserDetails, getUserApplications };
