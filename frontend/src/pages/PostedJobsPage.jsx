@@ -94,9 +94,11 @@ const PostedJobsPage = () => {
                 <div className="mt-4">
                   <h4 className="text-md font-semibold">Applications</h4>
                   {applications[job._id] && applications[job._id].length > 0 ? (
-                    applications[job._id].map((app) => (
-                      <div key={app._id} className="p-2 border-t flex justify-between items-center">
-                        <div>
+                    applications[job._id]
+                      .filter((app) => app.applicant)
+                      .map((app) => (
+                        <div key={app._id} className="p-2 border-t flex justify-between items-center">
+                          <div>
                           <p>{app.applicant.firstName} {app.applicant.lastName}</p>
                           <p>{app.applicant.email}</p>
                         </div>
