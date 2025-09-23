@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import { AuthContext } from '../context/AuthContext';
 
 const Chat = ({ applicant, employer }) => {
   const [messages, setMessages] = useState([]);
