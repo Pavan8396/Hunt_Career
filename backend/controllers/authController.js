@@ -74,10 +74,10 @@ const loginUser = async (req, res) => {
   try {
     const user = await userService.findUserForLogin(email);
     if (user && await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign({ _id: user._id, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({ _id: user._id, email: user.email, type: 'user' }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
-        user: { name: user.name || email.split('@')[0] }
+        user: { _id: user._id, name: user.name, email: user.email }
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });

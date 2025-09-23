@@ -49,8 +49,7 @@ const EmployerLogin = () => {
 
     try {
       const data = await employerLogin(email, password);
-      login(data.token, data.employer.companyName, 'employer');
-      sessionStorage.setItem('user', JSON.stringify(data.employer));
+      login(data.token, data.user, 'employer');
       toast.success('Logged in successfully!');
       navigate('/employer/dashboard');
     } catch (error) {

@@ -4,32 +4,32 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!sessionStorage.getItem('token'));
-  const [username, setUsername] = useState(sessionStorage.getItem('username') || '');
+  const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user')) || null);
   const [token, setToken] = useState(sessionStorage.getItem('token') || null);
   const [userType, setUserType] = useState(sessionStorage.getItem('userType') || '');
 
-  const login = (newToken, user, type = 'user') => {
+  const login = (newToken, userData, type = 'user') => {
     sessionStorage.setItem('token', newToken);
-    sessionStorage.setItem('username', user);
+    sessionStorage.setItem('user', JSON.stringify(userData));
     sessionStorage.setItem('userType', type);
     setToken(newToken);
     setIsAuthenticated(true);
-    setUsername(user);
+    setUser(userData);
     setUserType(type);
   };
 
   const logout = () => {
     sessionStorage.removeItem('token');
-    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('user');
     sessionStorage.removeItem('userType');
     setToken(null);
     setIsAuthenticated(false);
-    setUsername('');
+    setUser(null);
     setUserType('');
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, username, token, userType, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, userType, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

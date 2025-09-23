@@ -54,10 +54,10 @@ const loginEmployer = async (req, res) => {
   try {
     const employer = await Employer.findOne({ email });
     if (employer && await bcrypt.compare(password, employer.password)) {
-      const token = jwt.sign({ email: employer.email, id: employer._id, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({ _id: employer._id, email: employer.email, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
-        employer: { _id: employer._id, companyName: employer.companyName, email: employer.email }
+        user: { _id: employer._id, name: employer.companyName, email: employer.email }
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });
@@ -70,7 +70,7 @@ const loginEmployer = async (req, res) => {
 
 const getEmployerApplications = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.user.id });
+    const jobs = await Job.find({ employer: req.user._id });
     const jobIds = jobs.map(job => job._id);
     const applications = await Application.find({ job: { $in: jobIds } });
     res.json(applications);

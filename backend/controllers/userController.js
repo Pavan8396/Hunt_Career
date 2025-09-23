@@ -17,7 +17,7 @@ const getUserDetails = async (req, res) => {
 
 const getUserApplications = async (req, res) => {
   try {
-    const applications = await Application.find({ applicant: req.user.id });
+    const applications = await Application.find({ applicant: req.user._id });
     res.json(applications);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch user applications" });

@@ -66,7 +66,7 @@ const Login = () => {
       // and throws an error if response is not ok.
 
       // Call AuthContext login
-      login(data.token, data.user?.name || email.split('@')[0], 'user');
+      login(data.token, data.user, 'user');
       toast.success('Logged in successfully!');
       navigate('/home');
     } catch (error) {
