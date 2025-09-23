@@ -34,6 +34,7 @@ const ChatPage = () => {
         timestamp: new Date(),
       };
       socket.emit('sendMessage', messageData);
+      setMessages((prevMessages) => [...prevMessages, messageData]); // Optimistically update UI
       setMessage('');
     }
   };

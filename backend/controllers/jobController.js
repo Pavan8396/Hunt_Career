@@ -62,10 +62,10 @@ const createJob = async (req, res) => {
   try {
     const newJob = new Job({
       ...req.body,
-      employer: req.user.id,
+      employer: req.user._id,
     });
     const savedJob = await newJob.save();
-    const employer = await Employer.findById(req.user.id);
+    const employer = await Employer.findById(req.user._id);
     employer.postedJobs.push(savedJob._id);
     await employer.save();
     res.status(201).json(savedJob);
@@ -77,7 +77,7 @@ const createJob = async (req, res) => {
 
 const getEmployerJobs = async (req, res) => {
   try {
-    const employer = await Employer.findById(req.user.id).populate('postedJobs');
+    const employer = await Employer.findById(req.user._id).populate('postedJobs');
     res.json(employer.postedJobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -90,7 +90,7 @@ const deleteJob = async (req, res) => {
     if (!job) {
       return res.status(404).json({ message: 'Job not found' });
     }
-    if (job.employer.toString() !== req.user.id) {
+    if (job.employer.toString() !== req.user._id) {
       return res.status(401).json({ message: 'Not authorized' });
     }
     await job.deleteOne();
