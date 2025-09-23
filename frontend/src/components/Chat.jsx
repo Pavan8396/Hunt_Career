@@ -5,31 +5,36 @@ import { AuthContext } from '../context/AuthContext';
 const Chat = ({ applicant, employer }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
+  const [socket, setSocket] = useState(null);
   const { user } = useContext(AuthContext);
-  const socket = io('http://localhost:5000');
-
-  // Ensure user and applicant objects are available before creating roomId
-  if (!user || !applicant) {
-    return null; // Or a loading/error state
-  }
-
-  const roomId = [user._id, applicant._id].sort().join('_');
 
   useEffect(() => {
-    socket.emit('joinRoom', roomId);
+    const newSocket = io('http://localhost:5000');
+    setSocket(newSocket);
+    return () => newSocket.close();
+  }, []);
 
-    socket.on('receiveMessage', (data) => {
-      setMessages((prevMessages) => [...prevMessages, data]);
-    });
+  useEffect(() => {
+    if (socket && user && applicant) {
+      const roomId = [user._id, applicant._id].sort().join('_');
+      socket.emit('joinRoom', roomId);
 
-    return () => {
-      socket.off('receiveMessage');
-    };
-  }, [roomId, socket]);
+      const handleReceiveMessage = (data) => {
+        setMessages((prevMessages) => [...prevMessages, data]);
+      };
+
+      socket.on('receiveMessage', handleReceiveMessage);
+
+      return () => {
+        socket.off('receiveMessage', handleReceiveMessage);
+      };
+    }
+  }, [socket, user, applicant]);
 
   const sendMessage = (e) => {
     e.preventDefault();
-    if (message.trim()) {
+    if (message.trim() && socket && user && applicant) {
+      const roomId = [user._id, applicant._id].sort().join('_');
       const messageData = {
         roomId,
         sender: user._id,
@@ -40,6 +45,10 @@ const Chat = ({ applicant, employer }) => {
       setMessage('');
     }
   };
+
+  if (!user || !applicant) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-4 right-4 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex flex-col">
