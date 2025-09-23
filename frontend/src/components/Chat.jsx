@@ -5,8 +5,8 @@ import { AuthContext } from '../context/AuthContext';
 const Chat = ({ applicant, employer }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
-  const { user } = useContext(AuthContext);
   const socket = io('http://localhost:5000');
+  const user = JSON.parse(sessionStorage.getItem('user'));
 
   const roomId = [user._id, applicant._id].sort().join('_');
 

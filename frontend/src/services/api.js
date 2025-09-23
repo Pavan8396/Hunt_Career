@@ -72,6 +72,31 @@ export const login = async (email, password) => {
   }
 };
 
+export const getEmployerApplications = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/employer/applications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch employer applications';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    toast.error(error.message);
+    throw new Error(error.message);
+  }
+};
+
 export const deleteJob = async (jobId, token) => {
   try {
     const response = await fetch(`${API_URL}/jobs/${jobId}`, {
