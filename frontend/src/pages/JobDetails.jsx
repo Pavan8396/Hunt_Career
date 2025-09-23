@@ -5,7 +5,7 @@ import {
   removeJob,
   isJobSaved,
 } from '../utils/localStorageHelpers';
-import { fetchJobById, applyForJob } from '../services/api';
+import { fetchJobById, applyForJob, getUserApplications } from '../services/api';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'react-toastify';
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa';
@@ -50,6 +50,22 @@ const JobDetails = () => {
     };
     loadJob();
   }, [id]);
+
+  useEffect(() => {
+    const checkApplicationStatus = async () => {
+      if (job) {
+        try {
+          const token = sessionStorage.getItem('token');
+          const userApplications = await getUserApplications(token);
+          const hasApplied = userApplications.some(app => app.job === job._id);
+          setApplied(hasApplied);
+        } catch (error) {
+          // Error is already toasted in the service
+        }
+      }
+    };
+    checkApplicationStatus();
+  }, [job]);
 
   const toggleSave = () => {
     setConfirmAction(saved ? 'unsave' : 'save');

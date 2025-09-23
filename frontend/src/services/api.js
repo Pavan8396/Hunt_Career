@@ -307,6 +307,24 @@ export const applyForJob = async (jobId, token) => {
   }
 };
 
+export const getUserApplications = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/applications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch user applications');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user applications:', error);
+    toast.error('Could not load your application history.');
+    throw error;
+  }
+};
+
 export const signup = async (firstName, lastName, email, password, phoneNumber) => {
   try {
     console.log('Sending signup request with email:', email);

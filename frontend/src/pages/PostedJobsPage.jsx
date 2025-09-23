@@ -90,42 +90,54 @@ const PostedJobsPage = () => {
                   Delete
                 </button>
               </div>
-              {selectedJob === job._id && (
-                <div className="mt-4">
-                  <h4 className="text-md font-semibold">Applications</h4>
-                  {applications[job._id] && applications[job._id].length > 0 ? (
-                    applications[job._id]
-                      .filter((app) => app.applicant)
-                      .map((app) => (
-                        <div key={app._id} className="p-2 border-t flex justify-between items-center">
+              {selectedJob === job._id && (() => {
+                const validApplications =
+                  applications[job._id]?.filter((app) => app.applicant) || [];
+
+                return (
+                  <div className="mt-4">
+                    <h4 className="text-md font-semibold">
+                      Applications ({validApplications.length})
+                    </h4>
+                    {validApplications.length > 0 ? (
+                      validApplications.map((app) => (
+                        <div
+                          key={app._id}
+                          className="p-2 border-t flex justify-between items-center"
+                        >
                           <div>
-                          <p>{app.applicant.firstName} {app.applicant.lastName}</p>
-                          <p>{app.applicant.email}</p>
+                            <p>
+                              {app.applicant.firstName} {app.applicant.lastName}
+                            </p>
+                            <p>{app.applicant.email}</p>
+                          </div>
+                          <div>
+                            {app.status !== "shortlisted" ? (
+                              <button
+                                onClick={() => handleShortlist(app._id)}
+                                className="px-2 py-1 bg-green-600 text-white rounded text-sm"
+                              >
+                                Shortlist
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() =>
+                                  setSelectedApplicant(app.applicant)
+                                }
+                                className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
+                              >
+                                Chat
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          {app.status !== 'shortlisted' ? (
-                            <button
-                              onClick={() => handleShortlist(app._id)}
-                              className="px-2 py-1 bg-green-600 text-white rounded text-sm"
-                            >
-                              Shortlist
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => setSelectedApplicant(app.applicant)}
-                              className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
-                            >
-                              Chat
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p>No applications yet.</p>
-                  )}
-                </div>
-              )}
+                      ))
+                    ) : (
+                      <p>No applications to display.</p>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           ))
         ) : (
