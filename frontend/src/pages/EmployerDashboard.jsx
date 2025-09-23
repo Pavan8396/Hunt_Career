@@ -1,88 +1,30 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate, getEmployerApplications } from '../services/api';
-import PostJob from '../components/PostJob';
-import Chat from '../components/Chat';
+import { getEmployerJobs, getEmployerApplications } from '../services/api';
 
 const EmployerDashboard = () => {
   const [jobs, setJobs] = useState([]);
-  const [applications, setApplications] = useState({});
   const [totalApplications, setTotalApplications] = useState(0);
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [selectedApplicant, setSelectedApplicant] = useState(null);
   const { token } = useContext(AuthContext);
 
   useEffect(() => {
-    const fetchTotalApplications = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const allApplications = await getEmployerApplications(token);
+        const [employerJobs, allApplications] = await Promise.all([
+          getEmployerJobs(token),
+          getEmployerApplications(token)
+        ]);
+        setJobs(employerJobs);
         setTotalApplications(allApplications.length);
       } catch (error) {
-        console.error('Failed to fetch total applications:', error);
+        console.error('Failed to fetch dashboard data:', error);
       }
     };
 
     if (token) {
-      fetchTotalApplications();
+      fetchDashboardData();
     }
   }, [token]);
-
-  const handleShortlist = async (applicationId) => {
-    try {
-      await shortlistCandidate(applicationId, token);
-      handleViewApplications(selectedJob);
-    } catch (error) {
-      console.error('Failed to shortlist candidate:', error);
-    }
-  };
-
-  const fetchJobs = React.useCallback(async () => {
-    try {
-      const employerJobs = await getEmployerJobs(token);
-      setJobs(employerJobs);
-    } catch (error) {
-      console.error('Failed to fetch employer jobs:', error);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    if (token) {
-      fetchJobs();
-    }
-  }, [token, fetchJobs]);
-
-  const handleViewApplications = async (jobId) => {
-    try {
-      const jobApplications = await getApplicationsForJob(jobId, token);
-      setApplications({ ...applications, [jobId]: jobApplications });
-      setSelectedJob(jobId);
-    } catch (error) {
-      console.error('Failed to fetch applications:', error);
-    }
-  };
-
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [confirmAction, setConfirmAction] = useState(null);
-
-  const handleDeleteJob = async (jobId) => {
-    setConfirmAction(() => () => deleteJobAction(jobId));
-    setShowConfirm(true);
-  };
-
-  const deleteJobAction = async (jobId) => {
-    try {
-      await deleteJob(jobId, token);
-      fetchJobs();
-    } catch (error) {
-      console.error('Failed to delete job:', error);
-    }
-    setShowConfirm(false);
-  };
-
-  const handleCancel = () => {
-    setShowConfirm(false);
-    setConfirmAction(null);
-  };
 
   const { username } = useContext(AuthContext);
 

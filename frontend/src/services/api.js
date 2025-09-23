@@ -331,9 +331,6 @@ export const signup = async (firstName, lastName, email, password, phoneNumber) 
     console.log('Signup response:', data);
     return data;
   } catch (error) {
-    const errorMessage = error.message.includes('failed')
-      ? error.message
-      : `Signup failed: ${error.message}`;
     console.error('Signup error:', error.message);
     toast.error(error.message);
     throw new Error(error.message);
