@@ -25,6 +25,7 @@ const initSocket = (server) => {
           text: data.text,
         });
         await newMessage.save();
+        console.log('Message saved:', newMessage);
         io.to(data.roomId).emit("receiveMessage", data);
       } catch (error) {
         console.error('Error saving message:', error);

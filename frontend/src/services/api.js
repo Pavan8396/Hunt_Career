@@ -25,6 +25,24 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const getAppliedJobs = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/applied-jobs`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch applied jobs');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching applied jobs:', error);
+    toast.error('Could not load your applied jobs.');
+    throw error;
+  }
+};
+
 export const getChatHistory = async (roomId, token) => {
   try {
     const response = await fetch(`${API_URL}/chat/${roomId}`, {

@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Home from './pages/Home';
 import SavedJobs from './pages/SavedJobs';
+import AppliedJobs from './pages/AppliedJobs';
 import JobDetails from './pages/JobDetails';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -47,6 +48,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SavedJobs />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/applied"
+                element={
+                  <ProtectedRoute>
+                    <AppliedJobs />
                   </ProtectedRoute>
                 }
               />
