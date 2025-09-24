@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from '../context/AuthContext';
 
@@ -7,16 +7,11 @@ const Chat = ({ applicant, employer }) => {
   const [message, setMessage] = useState('');
   const [socket, setSocket] = useState(null);
   const { user } = useContext(AuthContext);
-  const isMounted = useRef(false);
 
   useEffect(() => {
-    isMounted.current = true;
     const newSocket = io('http://localhost:5000');
     setSocket(newSocket);
-    return () => {
-      newSocket.close();
-      isMounted.current = false;
-    };
+    return () => newSocket.close();
   }, []);
 
   useEffect(() => {
@@ -25,9 +20,7 @@ const Chat = ({ applicant, employer }) => {
       socket.emit('joinRoom', roomId);
 
       const handleReceiveMessage = (data) => {
-        if (isMounted.current) {
-          setMessages((prevMessages) => [...prevMessages, data]);
-        }
+        setMessages((prevMessages) => [...prevMessages, data]);
       };
 
       socket.on('receiveMessage', handleReceiveMessage);
