@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
 import {
   saveJob,
@@ -22,7 +21,6 @@ const JobDetails = () => {
   const [notification, setNotification] = useState({ message: '', type: '' });
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
-  const { joinRoom } = useContext(ChatContext);
   const { token } = useContext(AuthContext);
 
   const [applied, setApplied] = useState(false);
@@ -196,9 +194,8 @@ const JobDetails = () => {
 
           {applied ? (
             <button
-              onClick={() => joinRoom(job.employer, token)}
+              onClick={() => navigate('/chat', { state: { otherUserId: job.employer } })}
               className="inline-block text-sm text-center px-4 py-2 bg-green-600 text-white border border-green-600 rounded hover:bg-green-700 transition dark:bg-green-800 dark:border-gray-500 dark:hover:bg-green-700 dark:text-white"
-              data-chat-opener="true"
             >
               Message Employer
             </button>

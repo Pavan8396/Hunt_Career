@@ -25,6 +25,58 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const getConversations = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/chat/conversations`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch conversations');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching conversations:', error);
+    toast.error('Could not load conversations.');
+    throw error;
+  }
+};
+
+export const getApplicationsOverTime = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/employer/stats/applications-over-time`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch application stats');
+    }
+    return await response.json();
+  } catch (error) {
+    toast.error(error.message);
+    throw error;
+  }
+};
+
+export const getJobPostingsSummary = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/employer/stats/job-postings-summary`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch job posting summary');
+    }
+    return await response.json();
+  } catch (error) {
+    toast.error(error.message);
+    throw error;
+  }
+};
+
 export const deleteChatHistory = async (roomId, token) => {
   try {
     const response = await fetch(`${API_URL}/chat/${roomId}`, {

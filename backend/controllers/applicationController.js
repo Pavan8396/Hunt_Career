@@ -49,6 +49,7 @@ exports.getApplicationsForJob = async (req, res) => {
   try {
     const applications = await Application.find({ job: req.params.jobId }).populate({
       path: 'applicant',
+      model: 'User', // Explicitly specify the model
       select: 'firstName lastName email',
     });
     res.json(applications);

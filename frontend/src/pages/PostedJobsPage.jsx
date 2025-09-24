@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { ChatContext } from '../context/ChatContext';
 import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
 
 const PostedJobsPage = () => {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState({});
   const [selectedJob, setSelectedJob] = useState(null);
   const { token } = useContext(AuthContext);
-  const { joinRoom } = useContext(ChatContext);
 
   const handleShortlist = async (applicationId) => {
     try {
@@ -122,9 +122,8 @@ const PostedJobsPage = () => {
                                   </button>
                                 ) : (
                                   <button
-                                    onClick={() => joinRoom(app.applicant._id, token)}
+                                    onClick={() => navigate('/chat', { state: { otherUserId: app.applicant._id } })}
                                     className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
-                                    data-chat-opener="true"
                                   >
                                     Chat
                                   </button>

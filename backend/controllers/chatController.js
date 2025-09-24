@@ -1,4 +1,28 @@
 const Chat = require('../models/chatModel');
+const userService = require('../services/userService');
+const { ObjectId } = require('mongodb');
+
+const getConversations = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const rooms = await Chat.distinct('roomId', { sender: userId });
+
+    const conversations = await Promise.all(rooms.map(async (roomId) => {
+      const ids = roomId.split('_');
+      const otherUserId = ids[0].toString() === userId.toString() ? ids[1] : ids[0];
+      const otherUser = await userService.getUserById(otherUserId);
+      return {
+        roomId,
+        partner: otherUser
+      };
+    }));
+
+    res.json(conversations);
+  } catch (error) {
+    console.error('Error fetching conversations:', error);
+    res.status(500).json({ message: 'Failed to fetch conversations' });
+  }
+};
 
 const getChatHistory = async (req, res) => {
   try {
@@ -23,4 +47,4 @@ const deleteChatHistory = async (req, res) => {
   }
 };
 
-module.exports = { getChatHistory, deleteChatHistory };
+module.exports = { getChatHistory, deleteChatHistory, getConversations };
