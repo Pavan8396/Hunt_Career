@@ -22,6 +22,11 @@ const EmployerLayout = () => {
                 Posted Jobs
               </NavLink>
             </li>
+            <li className="mb-2">
+              <NavLink to="/employer/shortlisted-candidates" className={({ isActive }) => isActive ? "text-blue-400" : ""}>
+                Shortlisted Candidates
+              </NavLink>
+            </li>
           </ul>
         </nav>
       </aside>

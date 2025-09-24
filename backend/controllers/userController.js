@@ -24,4 +24,18 @@ const getUserApplications = async (req, res) => {
   }
 };
 
-module.exports = { getUserDetails, getUserApplications };
+const getAppliedJobs = async (req, res) => {
+  try {
+    const applications = await Application.find({ applicant: req.user._id })
+      .populate({
+        path: 'job',
+        select: 'title company',
+      })
+      .sort({ date: -1 });
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getUserDetails, getUserApplications, getAppliedJobs };
