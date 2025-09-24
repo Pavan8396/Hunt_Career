@@ -13,13 +13,16 @@ const ChatProvider = ({ children }) => {
   const socketRef = useRef(null);
 
   useEffect(() => {
+    console.log('ChatContext useEffect triggered. Auth status:', isAuthenticated);
     if (isAuthenticated && user && token) {
+      console.log('Connecting socket...');
       // Connect socket when user is authenticated
       socketRef.current = io('http://localhost:5000', {
         query: { token },
       });
 
       socketRef.current.on('receiveMessage', (data) => {
+        console.log('Received message:', data);
         setMessages((prevMessages) => ({
           ...prevMessages,
           [data.roomId]: [...(prevMessages[data.roomId] || []), data],
@@ -27,21 +30,26 @@ const ChatProvider = ({ children }) => {
       });
 
       return () => {
+        console.log('Disconnecting socket...');
         socketRef.current.disconnect();
         socketRef.current = null;
       };
     }
   }, [isAuthenticated, user, token]);
 
-  const joinRoom = async (otherUserId) => {
+  const joinRoom = async (otherUserId, userToken) => {
+    console.log(`joinRoom called with otherUserId: ${otherUserId}`);
     if (user && socketRef.current) {
       const roomId = [user._id, otherUserId].sort().join('_');
+      console.log(`Joining room: ${roomId}`);
       setActiveRoom(roomId);
 
       // Fetch chat history if it's not already loaded
       if (!messages[roomId]) {
+        console.log(`Fetching history for room: ${roomId}`);
         try {
-          const history = await getChatHistory(roomId, token);
+          const history = await getChatHistory(roomId, userToken);
+          console.log('Fetched history:', history);
           setMessages((prevMessages) => ({
             ...prevMessages,
             [roomId]: history,
@@ -53,6 +61,8 @@ const ChatProvider = ({ children }) => {
 
       socketRef.current.emit('joinRoom', roomId);
       setIsChatOpen(true);
+    } else {
+      console.error('joinRoom failed: user or socket not available.', { user, socket: socketRef.current });
     }
   };
 

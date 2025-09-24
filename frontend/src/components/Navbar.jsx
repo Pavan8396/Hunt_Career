@@ -144,6 +144,13 @@ const Navbar = () => {
                       >
                         Saved Jobs
                       </Link>
+                      <Link
+                        to="/applied"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Applied Jobs
+                      </Link>
                     </>
                   )}
                   <Link
@@ -226,6 +233,13 @@ const Navbar = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Saved Jobs
+                    </Link>
+                    <Link
+                      to="/applied"
+                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Applied Jobs
                     </Link>
                   </>
                 )}

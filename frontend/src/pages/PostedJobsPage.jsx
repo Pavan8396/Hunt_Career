@@ -122,7 +122,7 @@ const PostedJobsPage = () => {
                                   </button>
                                 ) : (
                                   <button
-                                    onClick={() => joinRoom(app.applicant._id)}
+                                    onClick={() => joinRoom(app.applicant._id, token)}
                                     className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
                                     data-chat-opener="true"
                                   >

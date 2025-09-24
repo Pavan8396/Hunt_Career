@@ -22,6 +22,7 @@ const JobDetails = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const { joinRoom } = useContext(ChatContext);
+  const { token } = useContext(AuthContext);
 
   const [applied, setApplied] = useState(false);
 
@@ -194,7 +195,7 @@ const JobDetails = () => {
 
           {applied ? (
             <button
-              onClick={() => joinRoom(job.employer)}
+              onClick={() => joinRoom(job.employer, token)}
               className="inline-block text-sm text-center px-4 py-2 bg-green-600 text-white border border-green-600 rounded hover:bg-green-700 transition dark:bg-green-800 dark:border-gray-500 dark:hover:bg-green-700 dark:text-white"
               data-chat-opener="true"
             >
