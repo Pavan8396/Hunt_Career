@@ -307,38 +307,20 @@ export const applyForJob = async (jobId, token) => {
   }
 };
 
-export const getUserApplications = async (token) => {
+export const getShortlistedCandidates = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/applications`, {
+    const response = await fetch(`${API_URL}/employer/shortlisted-candidates`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to fetch user applications');
+      throw new Error('Failed to fetch shortlisted candidates');
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching user applications:', error);
-    toast.error('Could not load your application history.');
-    throw error;
-  }
-};
-
-export const getUserAppliedJobs = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/user/applied-jobs`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch applied jobs');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching applied jobs:', error);
-    toast.error('Could not load your applied jobs.');
+    console.error('Error fetching shortlisted candidates:', error);
+    toast.error('Could not load shortlisted candidates.');
     throw error;
   }
 };
@@ -375,6 +357,24 @@ export const getJobPostingsSummaryStats = async (token) => {
   } catch (error) {
     console.error('Error fetching job postings summary stats:', error);
     toast.error('Could not load job postings summary stats.');
+    throw error;
+  }
+};
+
+export const getUserApplications = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/applications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch user applications');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user applications:', error);
+    toast.error('Could not load your application history.');
     throw error;
   }
 };
