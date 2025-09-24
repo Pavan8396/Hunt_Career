@@ -9,6 +9,7 @@ const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState({}); // Store messages by roomId
   const [activeRoom, setActiveRoom] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isSocketConnected, setIsSocketConnected] = useState(false);
   const { user, isAuthenticated, token } = useContext(AuthContext);
   const socketRef = useRef(null);
 
@@ -19,6 +20,16 @@ const ChatProvider = ({ children }) => {
       // Connect socket when user is authenticated
       socketRef.current = io('http://localhost:5000', {
         query: { token },
+      });
+
+      socketRef.current.on('connect', () => {
+        console.log('Socket connected successfully.');
+        setIsSocketConnected(true);
+      });
+
+      socketRef.current.on('disconnect', () => {
+        console.log('Socket disconnected.');
+        setIsSocketConnected(false);
       });
 
       socketRef.current.on('receiveMessage', (data) => {
@@ -39,7 +50,7 @@ const ChatProvider = ({ children }) => {
 
   const joinRoom = async (otherUserId, userToken) => {
     console.log(`joinRoom called with otherUserId: ${otherUserId}`);
-    if (user && socketRef.current) {
+    if (user && isSocketConnected) {
       const roomId = [user._id, otherUserId].sort().join('_');
       console.log(`Joining room: ${roomId}`);
       setActiveRoom(roomId);
