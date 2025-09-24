@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from './AuthContext';
+import { getChatHistory } from '../services/api';
 
 const ChatContext = createContext();
 
@@ -30,10 +31,25 @@ const ChatProvider = ({ children }) => {
     }
   }, [isAuthenticated, user]);
 
-  const joinRoom = (otherUserId) => {
+  const joinRoom = async (otherUserId) => {
     if (user && socketRef.current) {
       const roomId = [user._id, otherUserId].sort().join('_');
       setActiveRoom(roomId);
+
+      // Fetch chat history if it's not already loaded
+      if (!messages[roomId]) {
+        try {
+          const token = sessionStorage.getItem('token');
+          const history = await getChatHistory(roomId, token);
+          setMessages((prevMessages) => ({
+            ...prevMessages,
+            [roomId]: history,
+          }));
+        } catch (error) {
+          console.error("Failed to fetch chat history", error);
+        }
+      }
+
       socketRef.current.emit('joinRoom', roomId);
       setIsChatOpen(true);
     }

@@ -25,6 +25,24 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const getChatHistory = async (roomId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/chat/${roomId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch chat history');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching chat history:', error);
+    toast.error('Could not load chat history.');
+    throw error;
+  }
+};
+
 export const fetchJobById = async (id) => {
   try {
     console.log(`Sending request to fetch job by ID: ${id}`);

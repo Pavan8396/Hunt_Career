@@ -1,4 +1,5 @@
 const { Server } = require("socket.io");
+const Chat = require('./models/chatModel');
 
 const initSocket = (server) => {
   const io = new Server(server, {
@@ -16,8 +17,18 @@ const initSocket = (server) => {
       console.log(`User ${socket.id} joined room ${roomId}`);
     });
 
-    socket.on("sendMessage", (data) => {
-      io.to(data.roomId).emit("receiveMessage", data);
+    socket.on("sendMessage", async (data) => {
+      try {
+        const newMessage = new Chat({
+          roomId: data.roomId,
+          sender: data.sender,
+          text: data.text,
+        });
+        await newMessage.save();
+        io.to(data.roomId).emit("receiveMessage", data);
+      } catch (error) {
+        console.error('Error saving message:', error);
+      }
     });
 
     socket.on("disconnect", () => {

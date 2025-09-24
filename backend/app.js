@@ -37,7 +37,9 @@ app.use('/api/user', userRoutes);
 const employerRoutes = require('./routes/employerRoutes');
 app.use('/api/employer', employerRoutes);
 const applicationRoutes = require('./routes/applicationRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 app.use('/api/applications', applicationRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello from the Job Aggregator Backend!");
