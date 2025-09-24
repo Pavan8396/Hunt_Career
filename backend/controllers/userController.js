@@ -24,15 +24,4 @@ const getUserApplications = async (req, res) => {
   }
 };
 
-const getAppliedJobs = async (req, res) => {
-  try {
-    const applications = await Application.find({ applicant: req.user._id }).populate('job');
-    const appliedJobs = applications.map(app => app.job).filter(job => job != null);
-    res.json(appliedJobs);
-  } catch (error) {
-    console.error('Error fetching applied jobs:', error);
-    res.status(500).json({ message: 'Failed to fetch applied jobs' });
-  }
-};
-
-module.exports = { getUserDetails, getUserApplications, getAppliedJobs };
+module.exports = { getUserDetails, getUserApplications };
