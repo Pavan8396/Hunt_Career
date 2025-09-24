@@ -30,9 +30,9 @@ const ChatProvider = ({ children }) => {
     }
   }, [isAuthenticated, user]);
 
-  const joinRoom = (employerId) => {
+  const joinRoom = (otherUserId) => {
     if (user && socketRef.current) {
-      const roomId = [user._id, employerId].sort().join('_');
+      const roomId = [user._id, otherUserId].sort().join('_');
       setActiveRoom(roomId);
       socketRef.current.emit('joinRoom', roomId);
       setIsChatOpen(true);
@@ -47,17 +47,13 @@ const ChatProvider = ({ children }) => {
         text,
         timestamp: new Date(),
       };
+      // Rely on the server to broadcast the message back to us
       socketRef.current.emit('sendMessage', messageData);
-      setMessages((prevMessages) => ({
-        ...prevMessages,
-        [activeRoom]: [...(prevMessages[activeRoom] || []), messageData],
-      }));
     }
   };
 
   const closeChat = () => {
     setIsChatOpen(false);
-    // We don't nullify activeRoom so the context remembers the last chat
   };
 
   const value = {

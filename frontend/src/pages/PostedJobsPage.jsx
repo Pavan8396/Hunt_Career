@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { ChatContext } from '../context/ChatContext';
 import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
-import Chat from '../components/Chat';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState({});
   const [selectedJob, setSelectedJob] = useState(null);
-  const [selectedApplicant, setSelectedApplicant] = useState(null);
   const { token } = useContext(AuthContext);
+  const { joinRoom } = useContext(ChatContext);
 
   const handleShortlist = async (applicationId) => {
     try {
@@ -122,10 +122,9 @@ const PostedJobsPage = () => {
                                   </button>
                                 ) : (
                                   <button
-                                    onClick={() =>
-                                      setSelectedApplicant(app.applicant)
-                                    }
+                                    onClick={() => joinRoom(app.applicant._id)}
                                     className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
+                                    data-chat-opener="true"
                                   >
                                     Chat
                                   </button>
@@ -151,9 +150,6 @@ const PostedJobsPage = () => {
           <p>You haven't posted any jobs yet.</p>
         )}
       </div>
-      {selectedApplicant && (
-        <Chat applicant={selectedApplicant} employer={true} />
-      )}
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
