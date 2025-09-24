@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChatContext } from '../context/ChatContext';
+import { AuthContext } from '../context/AuthContext';
 import {
   saveJob,
   removeJob,
