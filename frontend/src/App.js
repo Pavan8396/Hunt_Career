@@ -14,10 +14,10 @@ import EmployerDashboard from './pages/EmployerDashboard';
 import EmployerLayout from './components/EmployerLayout';
 import PostJobPage from './pages/PostJobPage';
 import PostedJobsPage from './pages/PostedJobsPage';
-import ChatPage from './pages/ChatPage';
 import Layout from './components/Layout';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import { ChatProvider } from './context/ChatContext';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = !!sessionStorage.getItem('token'); // Changed to sessionStorage
@@ -28,10 +28,11 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<UserTypeSelection />} />
+        <ChatProvider>
+          <Router>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<UserTypeSelection />} />
               <Route path="/home" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
@@ -93,14 +94,6 @@ function App() {
                   </div>
                 }
               />
-              <Route
-                path="/chat/:employerId"
-                element={
-                  <ProtectedRoute>
-                    <ChatPage />
-                  </ProtectedRoute>
-                }
-              />
               <Route path="*" element={<div className="p-4 text-center dark:text-gray-200">404 - Page Not Found</div>} />
             </Routes>
           </Layout>
@@ -110,6 +103,7 @@ function App() {
             theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
           />
         </Router>
+        </ChatProvider>
       </AuthProvider>
     </ThemeProvider>
   );
