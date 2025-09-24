@@ -9,13 +9,15 @@ const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState({}); // Store messages by roomId
   const [activeRoom, setActiveRoom] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const { user, isAuthenticated } = useContext(AuthContext);
+  const { user, isAuthenticated, token } = useContext(AuthContext);
   const socketRef = useRef(null);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user && token) {
       // Connect socket when user is authenticated
-      socketRef.current = io('http://localhost:5000');
+      socketRef.current = io('http://localhost:5000', {
+        query: { token },
+      });
 
       socketRef.current.on('receiveMessage', (data) => {
         setMessages((prevMessages) => ({
@@ -29,7 +31,7 @@ const ChatProvider = ({ children }) => {
         socketRef.current = null;
       };
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, token]);
 
   const joinRoom = async (otherUserId) => {
     if (user && socketRef.current) {
@@ -39,7 +41,6 @@ const ChatProvider = ({ children }) => {
       // Fetch chat history if it's not already loaded
       if (!messages[roomId]) {
         try {
-          const token = sessionStorage.getItem('token');
           const history = await getChatHistory(roomId, token);
           setMessages((prevMessages) => ({
             ...prevMessages,
