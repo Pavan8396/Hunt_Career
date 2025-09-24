@@ -109,10 +109,24 @@ const Navbar = () => {
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                   {userType === 'employer' ? (
                     <>
-                      {/* Employer-specific links are in the sidebar, so we keep this menu minimal */}
-                      <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-                        Welcome, {user.name}
-                      </div>
+                      <Link
+                        to="/employer/dashboard"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        to="/employer/dashboard"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        onClick={() => {
+                          setIsDropdownOpen(false);
+                          // Ideally, this should trigger a modal or a specific section on the dashboard
+                          // For now, it just navigates to the dashboard
+                        }}
+                      >
+                        Post a Job
+                      </Link>
                     </>
                   ) : (
                     <>
@@ -197,9 +211,13 @@ const Navbar = () => {
             {isAuthenticated ? (
               <>
                 {userType === 'employer' ? (
-                  <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-                    Welcome, {user.name}
-                  </div>
+                  <Link
+                    to="/employer/dashboard"
+                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
                 ) : (
                   <>
                     <Link
