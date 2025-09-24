@@ -102,6 +102,14 @@ const deleteJob = async (req, res) => {
     if (job.employer.toString() !== req.user._id) {
       return res.status(401).json({ message: 'Not authorized' });
     }
+
+    // Remove the job from the employer's postedJobs array
+    const employer = await Employer.findById(req.user._id);
+    if (employer) {
+      employer.postedJobs.pull(job._id);
+      await employer.save();
+    }
+
     await job.deleteOne();
     res.json({ message: 'Job removed' });
   } catch (error) {
