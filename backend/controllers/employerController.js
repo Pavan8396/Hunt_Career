@@ -79,24 +79,4 @@ const getEmployerApplications = async (req, res) => {
   }
 };
 
-const getShortlistedCandidates = async (req, res) => {
-  try {
-    const jobs = await Job.find({ employer: req.user._id });
-    const jobIds = jobs.map(job => job._id);
-    const applications = await Application.find({
-      job: { $in: jobIds },
-      status: 'shortlisted',
-    }).populate({
-      path: 'applicant',
-      select: 'firstName lastName email',
-    }).populate({
-      path: 'job',
-      select: 'title',
-    });
-    res.json(applications);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getShortlistedCandidates };
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications };

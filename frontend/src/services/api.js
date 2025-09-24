@@ -307,31 +307,6 @@ export const applyForJob = async (jobId, token) => {
   }
 };
 
-export const getShortlistedCandidates = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/employer/shortlisted-candidates`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch shortlisted candidates';
-      try {
-        const errorBody = await response.json();
-        errorMessage = errorBody.message || errorMessage;
-      } catch (jsonError) {
-        console.warn('Could not parse error response:', jsonError);
-      }
-      throw new Error(errorMessage);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    toast.error(error.message);
-    throw new Error(error.message);
-  }
-};
-
 export const getUserApplications = async (token) => {
   try {
     const response = await fetch(`${API_URL}/user/applications`, {
