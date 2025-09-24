@@ -19,9 +19,15 @@ const getUserProfile = async (email) => {
   return getDb().collection("Users").findOne({ email: email }, { projection: { password: 0 } });
 };
 
+const getUserById = async (id) => {
+  const { ObjectId } = require('mongodb');
+  return getDb().collection("Users").findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } });
+};
+
 module.exports = {
   findUserByEmail,
   createUser,
   findUserForLogin,
   getUserProfile,
+  getUserById,
 };

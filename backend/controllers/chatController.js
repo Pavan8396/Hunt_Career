@@ -12,4 +12,15 @@ const getChatHistory = async (req, res) => {
   }
 };
 
-module.exports = { getChatHistory };
+const deleteChatHistory = async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    await Chat.deleteMany({ roomId });
+    res.json({ message: 'Chat history deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting chat history:', error);
+    res.status(500).json({ message: 'Failed to delete chat history' });
+  }
+};
+
+module.exports = { getChatHistory, deleteChatHistory };
