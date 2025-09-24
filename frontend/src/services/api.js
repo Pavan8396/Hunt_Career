@@ -25,6 +25,24 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const getAppliedJobs = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/applied-jobs`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch applied jobs');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching applied jobs:', error);
+    toast.error('Could not load your applied jobs.');
+    throw error;
+  }
+};
+
 export const fetchJobById = async (id) => {
   try {
     console.log(`Sending request to fetch job by ID: ${id}`);
@@ -69,40 +87,6 @@ export const login = async (email, password) => {
   } catch (error) {
     console.error('Login error:', error.message);
     throw new Error(error.message);
-  }
-};
-
-export const getApplicationsOverTime = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/employer/stats/applications-over-time`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch application stats');
-    }
-    return await response.json();
-  } catch (error) {
-    toast.error(error.message);
-    throw error;
-  }
-};
-
-export const getJobPostingsSummary = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/employer/stats/job-postings-summary`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch job posting summary');
-    }
-    return await response.json();
-  } catch (error) {
-    toast.error(error.message);
-    throw error;
   }
 };
 

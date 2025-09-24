@@ -2,14 +2,14 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
-import api from '../services/api';
+import { getAppliedJobs } from '../services/api';
 import SkeletonCard from '../components/SkeletonCard';
 
 const AppliedJobs = () => {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,14 +17,11 @@ const AppliedJobs = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = sessionStorage.getItem('token');
         if (!token) {
           throw new Error('No token found');
         }
-        const response = await api.get('/user/applied-jobs', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setAppliedJobs(response.data);
+        const data = await getAppliedJobs(token);
+        setAppliedJobs(data);
       } catch (err) {
         setError('Failed to load applied jobs. Please try again.');
         toast.error('Failed to load applied jobs. Please try again.');
@@ -36,7 +33,7 @@ const AppliedJobs = () => {
     if (user) {
       fetchAppliedJobs();
     }
-  }, [user]);
+  }, [user, token]);
 
   const handleCardClick = (id) => {
     navigate(`/jobs/${id}`);
