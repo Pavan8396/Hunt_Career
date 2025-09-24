@@ -307,60 +307,6 @@ export const applyForJob = async (jobId, token) => {
   }
 };
 
-export const getShortlistedCandidates = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/employer/shortlisted-candidates`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch shortlisted candidates');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching shortlisted candidates:', error);
-    toast.error('Could not load shortlisted candidates.');
-    throw error;
-  }
-};
-
-export const getApplicationsOverTimeStats = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/employer/stats/applications-over-time`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch applications over time stats');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching applications over time stats:', error);
-    toast.error('Could not load applications over time stats.');
-    throw error;
-  }
-};
-
-export const getJobPostingsSummaryStats = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/employer/stats/job-postings-summary`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch job postings summary stats');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching job postings summary stats:', error);
-    toast.error('Could not load job postings summary stats.');
-    throw error;
-  }
-};
-
 export const getUserApplications = async (token) => {
   try {
     const response = await fetch(`${API_URL}/user/applications`, {
