@@ -72,6 +72,40 @@ export const login = async (email, password) => {
   }
 };
 
+export const getApplicationsOverTime = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/employer/stats/applications-over-time`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch application stats');
+    }
+    return await response.json();
+  } catch (error) {
+    toast.error(error.message);
+    throw error;
+  }
+};
+
+export const getJobPostingsSummary = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/employer/stats/job-postings-summary`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch job posting summary');
+    }
+    return await response.json();
+  } catch (error) {
+    toast.error(error.message);
+    throw error;
+  }
+};
+
 export const getEmployerApplications = async (token) => {
   try {
     const response = await fetch(`${API_URL}/employer/applications`, {
