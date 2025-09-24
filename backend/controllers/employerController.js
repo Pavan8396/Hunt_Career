@@ -54,7 +54,7 @@ const loginEmployer = async (req, res) => {
   try {
     const employer = await Employer.findOne({ email });
     if (employer && await bcrypt.compare(password, employer.password)) {
-      const token = jwt.sign({ _id: employer._id, email: employer.email, userType: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({ _id: employer._id, email: employer.email, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
         user: { _id: employer._id, name: employer.companyName, email: employer.email }
