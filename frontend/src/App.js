@@ -13,6 +13,7 @@ import EmployerDashboard from './pages/EmployerDashboard';
 import EmployerLayout from './components/EmployerLayout';
 import PostJobPage from './pages/PostJobPage';
 import PostedJobsPage from './pages/PostedJobsPage';
+import ShortlistedCandidatesPage from './pages/ShortlistedCandidatesPage';
 import ChatPage from './pages/ChatPage';
 import Layout from './components/Layout';
 import { ThemeProvider } from './context/ThemeContext';
@@ -40,6 +41,7 @@ function App() {
                 <Route path="dashboard" element={<EmployerDashboard />} />
                 <Route path="post-job" element={<PostJobPage />} />
                 <Route path="posted-jobs" element={<PostedJobsPage />} />
+                <Route path="shortlisted-candidates" element={<ShortlistedCandidatesPage />} />
               </Route>
               <Route
                 path="/saved"

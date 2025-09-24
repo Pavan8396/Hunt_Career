@@ -112,24 +112,23 @@ const PostedJobsPage = () => {
                                 </p>
                                 <p>{app.applicant.email}</p>
                               </div>
-                              <div>
-                                {app.status !== "shortlisted" ? (
+                              <div className="flex space-x-2">
+                                {app.status !== "shortlisted" && (
                                   <button
                                     onClick={() => handleShortlist(app._id)}
                                     className="px-2 py-1 bg-green-600 text-white rounded text-sm"
                                   >
                                     Shortlist
                                   </button>
-                                ) : (
-                                  <button
-                                    onClick={() =>
-                                      setSelectedApplicant(app.applicant)
-                                    }
-                                    className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
-                                  >
-                                    Chat
-                                  </button>
                                 )}
+                                <button
+                                  onClick={() =>
+                                    setSelectedApplicant(app.applicant)
+                                  }
+                                  className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
+                                >
+                                  Chat
+                                </button>
                               </div>
                             </>
                           ) : (
