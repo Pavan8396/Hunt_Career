@@ -74,7 +74,7 @@ const loginUser = async (req, res) => {
   try {
     const user = await userService.findUserForLogin(email);
     if (user && await bcrypt.compare(password, user.password)) {
-      const token = jwt.sign({ _id: user._id, email: user.email, userType: 'user' }, JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({ _id: user._id, email: user.email, type: 'user' }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
         user: { _id: user._id, name: user.name, email: user.email }
