@@ -72,11 +72,44 @@ const getEmployerApplications = async (req, res) => {
   try {
     const jobs = await Job.find({ employer: req.user._id });
     const jobIds = jobs.map(job => job._id);
-    const applications = await Application.find({ job: { $in: jobIds } });
+    const applications = await Application.find({ job: { $in: jobIds } })
+      .populate({
+        path: 'applicant',
+        select: 'firstName lastName email',
+        model: 'User'
+      })
+      .populate('job', 'title');
     res.json(applications);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications };
+const getApplicationsOverTime = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.user._id });
+    const jobIds = jobs.map(job => job._id);
+    const applications = await Application.aggregate([
+      { $match: { job: { $in: jobIds } } },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 } }
+    ]);
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getJobPostingsSummary = async (req, res) => {
+  try {
+    const summary = await Job.aggregate([
+      { $match: { employer: req.user._id } },
+      { $group: { _id: "$job_type", count: { $sum: 1 } } }
+    ]);
+    res.json(summary);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary };

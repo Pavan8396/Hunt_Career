@@ -113,6 +113,13 @@ const Navbar = () => {
                       <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
                         Welcome, {user.name}
                       </div>
+                      <Link
+                        to="/chat"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Chat
+                      </Link>
                     </>
                   ) : (
                     <>
@@ -136,6 +143,13 @@ const Navbar = () => {
                         onClick={() => setIsDropdownOpen(false)}
                       >
                         Applied Jobs
+                      </Link>
+                      <Link
+                        to="/chat"
+                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Chat
                       </Link>
                     </>
                   )}
@@ -200,6 +214,13 @@ const Navbar = () => {
                   <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
                     Welcome, {user.name}
                   </div>
+                  <Link
+                    to="/chat"
+                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Chat
+                  </Link>
                 ) : (
                   <>
                     <Link
@@ -222,6 +243,13 @@ const Navbar = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Applied Jobs
+                    </Link>
+                    <Link
+                      to="/chat"
+                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Chat
                     </Link>
                   </>
                 )}
