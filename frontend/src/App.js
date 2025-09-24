@@ -3,6 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Home from './pages/Home';
 import SavedJobs from './pages/SavedJobs';
+import AppliedJobs from './pages/AppliedJobs';
 import JobDetails from './pages/JobDetails';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -13,10 +14,10 @@ import EmployerDashboard from './pages/EmployerDashboard';
 import EmployerLayout from './components/EmployerLayout';
 import PostJobPage from './pages/PostJobPage';
 import PostedJobsPage from './pages/PostedJobsPage';
-import ChatPage from './pages/ChatPage';
 import Layout from './components/Layout';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
+import { ChatProvider } from './context/ChatContext';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = !!sessionStorage.getItem('token'); // Changed to sessionStorage
@@ -27,10 +28,11 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<UserTypeSelection />} />
+        <ChatProvider>
+          <Router>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<UserTypeSelection />} />
               <Route path="/home" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
@@ -46,6 +48,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <SavedJobs />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/applied"
+                element={
+                  <ProtectedRoute>
+                    <AppliedJobs />
                   </ProtectedRoute>
                 }
               />
@@ -84,14 +94,6 @@ function App() {
                   </div>
                 }
               />
-              <Route
-                path="/chat/:employerId"
-                element={
-                  <ProtectedRoute>
-                    <ChatPage />
-                  </ProtectedRoute>
-                }
-              />
               <Route path="*" element={<div className="p-4 text-center dark:text-gray-200">404 - Page Not Found</div>} />
             </Routes>
           </Layout>
@@ -101,6 +103,7 @@ function App() {
             theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
           />
         </Router>
+        </ChatProvider>
       </AuthProvider>
     </ThemeProvider>
   );
