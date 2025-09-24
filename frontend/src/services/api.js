@@ -25,6 +25,43 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const deleteChatHistory = async (roomId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/chat/${roomId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete chat history');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting chat history:', error);
+    toast.error('Could not delete chat history.');
+    throw error;
+  }
+};
+
+export const getUserById = async (userId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch user details');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    toast.error('Could not fetch user details.');
+    throw error;
+  }
+};
+
 export const getAppliedJobs = async (token) => {
   try {
     const response = await fetch(`${API_URL}/user/applied-jobs`, {
