@@ -81,22 +81,101 @@ const getEmployerApplications = async (req, res) => {
 
 const getShortlistedCandidates = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.user._id });
-    const jobIds = jobs.map(job => job._id);
-    const applications = await Application.find({
-      job: { $in: jobIds },
-      status: 'shortlisted',
-    }).populate({
-      path: 'applicant',
-      select: 'firstName lastName email',
-    }).populate({
-      path: 'job',
-      select: 'title',
-    });
+    const applications = await Application.aggregate([
+      {
+        $lookup: {
+          from: 'Jobs',
+          localField: 'job',
+          foreignField: '_id',
+          as: 'job',
+        },
+      },
+      {
+        $unwind: '$job',
+      },
+      {
+        $match: {
+          'job.employer': req.user._id,
+          status: 'shortlisted',
+        },
+      },
+      {
+        $lookup: {
+          from: 'Users',
+          localField: 'applicant',
+          foreignField: '_id',
+          as: 'applicant',
+        },
+      },
+      {
+        $unwind: '$applicant',
+      },
+      {
+        $group: {
+          _id: '$job._id',
+          jobTitle: { $first: '$job.title' },
+          applicants: {
+            $push: {
+              _id: '$applicant._id',
+              firstName: '$applicant.firstName',
+              lastName: '$applicant.lastName',
+              email: '$applicant.email',
+            },
+          },
+        },
+      },
+    ]);
     res.json(applications);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getShortlistedCandidates };
+const getApplicationsOverTimeStats = async (req, res) => {
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const applications = await Application.aggregate([
+      {
+        $match: {
+          employer: req.user._id,
+          createdAt: { $gte: thirtyDaysAgo },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getJobPostingsSummaryStats = async (req, res) => {
+  try {
+    const jobs = await Job.aggregate([
+      {
+        $match: { employer: req.user._id },
+      },
+      {
+        $group: {
+          _id: '$job_type',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getShortlistedCandidates, getApplicationsOverTimeStats, getJobPostingsSummaryStats };

@@ -24,7 +24,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 const isEmployer = (req, res, next) => {
-  if (req.user.type !== 'employer') {
+  if (req.user.userType !== 'employer') {
     return res.status(403).json({ message: 'Forbidden: Access denied' });
   }
   next();

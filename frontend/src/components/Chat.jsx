@@ -1,39 +1,37 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from '../context/AuthContext';
 
 const Chat = ({ applicant, employer }) => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
-  const [socket, setSocket] = useState(null);
   const { user } = useContext(AuthContext);
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    const newSocket = io('http://localhost:5000');
-    setSocket(newSocket);
-    return () => newSocket.close();
-  }, []);
+    socketRef.current = io('http://localhost:5000');
 
-  useEffect(() => {
-    if (socket && user && applicant) {
+    if (user && applicant) {
       const roomId = [user._id, applicant._id].sort().join('_');
-      socket.emit('joinRoom', roomId);
+      socketRef.current.emit('joinRoom', roomId);
 
       const handleReceiveMessage = (data) => {
         setMessages((prevMessages) => [...prevMessages, data]);
       };
 
-      socket.on('receiveMessage', handleReceiveMessage);
-
-      return () => {
-        socket.off('receiveMessage', handleReceiveMessage);
-      };
+      socketRef.current.on('receiveMessage', handleReceiveMessage);
     }
-  }, [socket, user, applicant]);
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, [user, applicant]);
 
   const sendMessage = (e) => {
     e.preventDefault();
-    if (message.trim() && socket && user && applicant) {
+    if (message.trim() && socketRef.current && user && applicant) {
       const roomId = [user._id, applicant._id].sort().join('_');
       const messageData = {
         roomId,
@@ -41,7 +39,7 @@ const Chat = ({ applicant, employer }) => {
         text: message,
         timestamp: new Date(),
       };
-      socket.emit('sendMessage', messageData);
+      socketRef.current.emit('sendMessage', messageData);
       setMessages((prevMessages) => [...prevMessages, messageData]); // Optimistically update UI
       setMessage('');
     }

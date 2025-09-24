@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerEmployer, loginEmployer, getEmployerApplications, getShortlistedCandidates } = require('../controllers/employerController');
+const { registerEmployer, loginEmployer, getEmployerApplications, getShortlistedCandidates, getApplicationsOverTimeStats, getJobPostingsSummaryStats } = require('../controllers/employerController');
 const { ensureDb } = require('../middleware/dbMiddleware');
 const { authenticateToken, isEmployer } = require('../middleware/authMiddleware');
 
@@ -9,5 +9,7 @@ router.post('/register', ensureDb, registerEmployer);
 router.post('/login', ensureDb, loginEmployer);
 router.get('/applications', ensureDb, authenticateToken, isEmployer, getEmployerApplications);
 router.get('/shortlisted-candidates', ensureDb, authenticateToken, isEmployer, getShortlistedCandidates);
+router.get('/stats/applications-over-time', ensureDb, authenticateToken, isEmployer, getApplicationsOverTimeStats);
+router.get('/stats/job-postings-summary', ensureDb, authenticateToken, isEmployer, getJobPostingsSummaryStats);
 
 module.exports = router;

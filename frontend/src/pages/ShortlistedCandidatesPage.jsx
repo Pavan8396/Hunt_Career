@@ -4,15 +4,15 @@ import { getShortlistedCandidates } from '../services/api';
 import Chat from '../components/Chat';
 
 const ShortlistedCandidatesPage = () => {
-  const [candidates, setCandidates] = useState([]);
+  const [groupedCandidates, setGroupedCandidates] = useState([]);
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const { user, token } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        const shortlistedCandidates = await getShortlistedCandidates(token);
-        setCandidates(shortlistedCandidates);
+        const candidates = await getShortlistedCandidates(token);
+        setGroupedCandidates(candidates);
       } catch (error) {
         console.error('Failed to fetch shortlisted candidates:', error);
       }
@@ -25,21 +25,27 @@ const ShortlistedCandidatesPage = () => {
   return (
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Shortlisted Candidates</h1>
-      <div className="space-y-4">
-        {candidates.length > 0 ? (
-          candidates.map((app) => (
-            <div key={app._id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold">{app.applicant.firstName} {app.applicant.lastName}</h3>
-                <p>Applied for: {app.job.title}</p>
-                <p>Email: {app.applicant.email}</p>
+      <div className="space-y-8">
+        {groupedCandidates.length > 0 ? (
+          groupedCandidates.map((jobGroup) => (
+            <div key={jobGroup._id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+              <h2 className="text-xl font-semibold mb-4">{jobGroup.jobTitle}</h2>
+              <div className="space-y-4">
+                {jobGroup.applicants.map((applicant) => (
+                  <div key={applicant._id} className="flex justify-between items-center border-t pt-4">
+                    <div>
+                      <h3 className="text-lg font-semibold">{applicant.firstName} {applicant.lastName}</h3>
+                      <p>Email: {applicant.email}</p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedApplicant(applicant)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded"
+                    >
+                      Chat
+                    </button>
+                  </div>
+                ))}
               </div>
-              <button
-                onClick={() => setSelectedApplicant(app.applicant)}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
-              >
-                Chat
-              </button>
             </div>
           ))
         ) : (

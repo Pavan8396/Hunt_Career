@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from '../context/AuthContext';
 import { useParams } from 'react-router-dom';
@@ -8,32 +8,40 @@ const ChatPage = () => {
   const [message, setMessage] = useState('');
   const { user } = useContext(AuthContext);
   const { employerId } = useParams();
-  const socket = io('http://localhost:5000');
-
-  const roomId = [user._id, employerId].sort().join('_');
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    socket.emit('joinRoom', roomId);
+    socketRef.current = io('http://localhost:5000');
 
-    socket.on('receiveMessage', (data) => {
-      setMessages((prevMessages) => [...prevMessages, data]);
-    });
+    if (user && employerId) {
+      const roomId = [user._id, employerId].sort().join('_');
+      socketRef.current.emit('joinRoom', roomId);
+
+      const handleReceiveMessage = (data) => {
+        setMessages((prevMessages) => [...prevMessages, data]);
+      };
+
+      socketRef.current.on('receiveMessage', handleReceiveMessage);
+    }
 
     return () => {
-      socket.off('receiveMessage');
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
     };
-  }, [roomId, socket]);
+  }, [user, employerId]);
 
   const sendMessage = (e) => {
     e.preventDefault();
-    if (message.trim()) {
+    if (message.trim() && socketRef.current && user && employerId) {
+      const roomId = [user._id, employerId].sort().join('_');
       const messageData = {
         roomId,
         sender: user._id,
         text: message,
         timestamp: new Date(),
       };
-      socket.emit('sendMessage', messageData);
+      socketRef.current.emit('sendMessage', messageData);
       setMessages((prevMessages) => [...prevMessages, messageData]); // Optimistically update UI
       setMessage('');
     }
