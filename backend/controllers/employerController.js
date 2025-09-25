@@ -135,4 +135,17 @@ const getShortlistedToHiredRatio = async (req, res) => {
   }
 };
 
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getShortlistedToHiredRatio };
+const getEmployerById = async (req, res) => {
+  try {
+    const employer = await Employer.findById(req.params.id);
+    if (employer) {
+      res.json({ name: employer.companyName });
+    } else {
+      res.status(404).json({ message: "Employer not found" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch employer details" });
+  }
+};
+
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getShortlistedToHiredRatio, getEmployerById };
