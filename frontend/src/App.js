@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Home from './pages/Home';
@@ -11,7 +11,6 @@ import UserTypeSelection from './pages/UserTypeSelection';
 import EmployerLogin from './pages/EmployerLogin';
 import EmployerSignup from './pages/EmployerSignup';
 import EmployerDashboard from './pages/EmployerDashboard';
-import EmployerLayout from './components/EmployerLayout';
 import PostJobPage from './pages/PostJobPage';
 import PostedJobsPage from './pages/PostedJobsPage';
 import Layout from './components/Layout';
@@ -51,7 +50,7 @@ function App() {
               />
               <Route
                 path="/employer"
-                element={<ProtectedRoute><AuthenticatedLayout><div/></AuthenticatedLayout></ProtectedRoute>}
+                element={<ProtectedRoute><AuthenticatedLayout><Outlet /></AuthenticatedLayout></ProtectedRoute>}
               >
                 <Route path="dashboard" element={<EmployerDashboard />} />
                 <Route path="post-job" element={<PostJobPage />} />
