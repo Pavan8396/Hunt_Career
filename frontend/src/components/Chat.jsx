@@ -8,31 +8,28 @@ const Chat = ({ user, recipient }) => {
 
   useEffect(() => {
     socketRef.current = io("http://localhost:5000");
-    const roomId = [user, recipient].sort().join("_");
 
     socketRef.current.on("connect", () => {
       console.log("Connected to server");
-      socketRef.current.emit("joinRoom", roomId);
     });
 
-    socketRef.current.on("receiveMessage", (data) => {
+    socketRef.current.on("receive_message", (data) => {
       setChat((prevChat) => [...prevChat, data]);
     });
 
     return () => {
       socketRef.current.disconnect();
     };
-  }, [user, recipient]);
+  }, []);
 
   const sendMessage = (e) => {
     e.preventDefault();
-    const roomId = [user, recipient].sort().join("_");
     const messageData = {
-      roomId,
-      sender: user,
+      user,
+      recipient,
       text: message,
     };
-    socketRef.current.emit("sendMessage", messageData);
+    socketRef.current.emit("send_message", messageData);
     setChat((prevChat) => [...prevChat, { user, text: message }]);
     setMessage("");
   };

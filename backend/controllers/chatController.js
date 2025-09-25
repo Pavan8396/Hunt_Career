@@ -3,7 +3,7 @@ const Chat = require('../models/chatModel');
 const getChatHistory = async (req, res) => {
   try {
     const { roomId } = req.params;
-    const chat = await Chat.findOne({ roomId });
+    const chat = await Chat.findOne({ roomId }).populate('messages.sender', 'firstName lastName');
     res.json(chat ? chat.messages : []);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch chat history' });
