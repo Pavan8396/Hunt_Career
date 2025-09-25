@@ -100,7 +100,9 @@ const getJobPostingsSummary = async (req, res) => {
   try {
     const jobs = await Job.find({ employer: req.user._id });
     const data = jobs.reduce((acc, job) => {
-      acc[job.jobType] = (acc[job.jobType] || 0) + 1;
+      if (job.jobType) {
+        acc[job.jobType] = (acc[job.jobType] || 0) + 1;
+      }
       return acc;
     }, {});
     const formattedData = Object.keys(data).map(type => ({ name: type, count: data[type] }));
