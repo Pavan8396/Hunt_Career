@@ -20,7 +20,6 @@ const Login = () => {
 
   const setError = (message) => {
     setErrorMessage(message);
-    toast.error(message);
   };
 
   const validateForm = () => {

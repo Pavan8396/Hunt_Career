@@ -31,13 +31,13 @@ const Navbar = () => {
   // Handle outside clicks to close dropdown and mobile menu
   useEffect(() => {
     const handleClickOutside = (event) => {
-      console.log('Checking click outside:', event.target);
+
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        console.log('Closing dropdown');
+
         setIsDropdownOpen(false);
       }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
-        console.log('Closing mobile menu');
+
         setIsMobileMenuOpen(false);
       }
     };
@@ -80,7 +80,7 @@ const Navbar = () => {
         <button
           className="md:hidden text-white focus:outline-none"
           onClick={() => {
-            console.log('Toggling mobile menu');
+
             setIsMobileMenuOpen(!isMobileMenuOpen);
           }}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
@@ -94,7 +94,7 @@ const Navbar = () => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => {
-                  console.log('Toggling dropdown');
+
                   setIsDropdownOpen(!isDropdownOpen);
                 }}
                 className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 p-2 rounded-full focus:outline-none transition"
@@ -211,16 +211,18 @@ const Navbar = () => {
             {isAuthenticated ? (
               <>
                 {userType === 'employer' ? (
-                  <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-                    Welcome, {user.name}
-                  </div>
-                  <Link
-                    to="/chat"
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Chat
-                  </Link>
+                  <>
+                    <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                      Welcome, {user.name}
+                    </div>
+                    <Link
+                      to="/chat"
+                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Chat
+                    </Link>
+                  </>
                 ) : (
                   <>
                     <Link

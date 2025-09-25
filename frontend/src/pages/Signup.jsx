@@ -70,14 +70,13 @@ const Signup = () => {
   };
 
   const handleNext = () => {
-    console.log('[Handle] handleNext called');
+
     const validationResult = validateNavigation();
     if (validationResult === true) {
       setNavigationError('');
       setStep(step + 1);
     } else {
       setNavigationError(validationResult);
-      toast.error(validationResult);
     }
   };
 
@@ -89,14 +88,13 @@ const Signup = () => {
   };
 
   const handleSubmit = async (e) => {
-    console.log('[Handle] handleSubmit called');
+
     e.preventDefault();
     setHasSubmitted(true);
 
     const validationError = validateSubmission();
     if (validationError) {
       setSubmissionError(validationError);
-      toast.error(validationError);
       return;
     }
 

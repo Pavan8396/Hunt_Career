@@ -17,7 +17,7 @@ const SavedJobs = () => {
       setError(null);
       try {
         const jobs = getSavedJobs();
-        console.log('Fetched saved jobs:', jobs); // Debug logging
+
         if (!Array.isArray(jobs)) {
           throw new Error('Saved jobs data is not an array');
         }
