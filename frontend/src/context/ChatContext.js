@@ -1,7 +1,7 @@
-import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from './AuthContext';
-import { getChatHistory, deleteChatHistory } from '../services/api';
+import { getChatHistory, deleteChatHistory, getNotifications } from '../services/api';
 
 const ChatContext = createContext();
 
@@ -11,70 +11,101 @@ const ChatProvider = ({ children }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [recipient, setRecipient] = useState(null);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const { user, isAuthenticated, token } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const socketRef = useRef(null);
+  const [notifications, setNotifications] = useState([]);
+
+  const fetchNotifications = useCallback(async () => {
+    if (token) {
+      try {
+        const data = await getNotifications(token);
+        setNotifications(data);
+      } catch (error) {
+        console.error('Failed to fetch notifications', error);
+      }
+    }
+  }, [token]);
 
   useEffect(() => {
     if (user && !socketRef.current) {
-      console.log('Connecting socket...');
       socketRef.current = io('http://localhost:5000', {
         query: { token },
       });
 
       socketRef.current.on('connect', () => {
-        console.log('Socket connected successfully.');
         setIsSocketConnected(true);
+        fetchNotifications();
       });
 
       socketRef.current.on('disconnect', () => {
-        console.log('Socket disconnected.');
         setIsSocketConnected(false);
       });
 
       socketRef.current.on('receiveMessage', (data) => {
-        console.log('Received message:', data);
         const message = {
           sender: data.sender,
           text: data.text,
           timestamp: data.timestamp,
         };
-        setMessages((prevMessages) => ({
-          ...prevMessages,
-          [data.roomId]: [...(prevMessages[data.roomId] || []), message],
+        setMessages((prev) => ({
+          ...prev,
+          [data.roomId]: [...(prev[data.roomId] || []), message],
         }));
+
+        if (data.sender !== user._id) {
+          if (isChatOpen && activeRoom === data.roomId) {
+            socketRef.current.emit('markAsRead', { roomId: data.roomId, userId: user._id });
+          } else {
+            setNotifications((prev) => {
+              const existingNotif = prev.find((n) => n.senderId === data.sender);
+              if (existingNotif) {
+                return prev.map((n) =>
+                  n.senderId === data.sender
+                    ? { ...n, count: n.count + 1, lastMessage: data.text }
+                    : n
+                );
+              } else {
+                return [
+                  ...prev,
+                  {
+                    senderId: data.sender,
+                    senderName: data.senderName,
+                    count: 1,
+                    roomId: data.roomId,
+                    lastMessage: data.text,
+                  },
+                ];
+              }
+            });
+          }
+        }
       });
     }
 
     return () => {
       if (socketRef.current) {
-        console.log('Disconnecting socket...');
         socketRef.current.disconnect();
         socketRef.current = null;
       }
     };
-  }, [user, token]);
+  }, [user, token, fetchNotifications]);
 
-  const joinRoom = async (otherUserId, recipientName, userToken) => {
-    console.log(`joinRoom called with otherUserId: ${otherUserId}`);
+  const joinRoom = async (otherUserId, recipientName) => {
     if (user && isSocketConnected) {
       const roomId = [user._id, otherUserId].sort().join('_');
-      console.log(`Joining room: ${roomId}`);
       setActiveRoom(roomId);
       setRecipient(recipientName);
 
-      // Fetch chat history if it's not already loaded
       if (!messages[roomId]) {
-        console.log(`Fetching history for room: ${roomId}`);
         try {
-          const history = await getChatHistory(roomId, userToken);
-          const formattedHistory = history.map(msg => ({
-            sender: msg.user,
-            text: msg.text,
-            timestamp: msg.timestamp,
-          }));
-          setMessages((prevMessages) => ({
-            ...prevMessages,
-            [roomId]: formattedHistory,
+          const history = await getChatHistory(roomId, token);
+          setMessages((prev) => ({
+            ...prev,
+            [roomId]: history.map(msg => ({
+              sender: msg.user,
+              text: msg.text,
+              timestamp: msg.timestamp,
+            })),
           }));
         } catch (error) {
           console.error("Failed to fetch chat history", error);
@@ -82,9 +113,11 @@ const ChatProvider = ({ children }) => {
       }
 
       socketRef.current.emit('joinRoom', roomId);
+      socketRef.current.emit('markAsRead', { roomId, userId: user._id });
+
+      setNotifications((prev) => prev.filter((n) => n.roomId !== roomId));
+
       setIsChatOpen(true);
-    } else {
-      console.error('joinRoom failed: user or socket not available.', { user, socket: socketRef.current });
     }
   };
 
@@ -96,12 +129,10 @@ const ChatProvider = ({ children }) => {
         text,
         timestamp: new Date(),
       };
-      // Optimistic UI update
-      setMessages((prevMessages) => ({
-        ...prevMessages,
-        [activeRoom]: [...(prevMessages[activeRoom] || []), messageData],
+      setMessages((prev) => ({
+        ...prev,
+        [activeRoom]: [...(prev[activeRoom] || []), messageData],
       }));
-      // Rely on the server to broadcast the message back to us
       socketRef.current.emit('sendMessage', messageData);
     }
   };
@@ -114,8 +145,8 @@ const ChatProvider = ({ children }) => {
     if (activeRoom) {
       try {
         await deleteChatHistory(activeRoom, token);
-        setMessages((prevMessages) => {
-          const newMessages = { ...prevMessages };
+        setMessages((prev) => {
+          const newMessages = { ...prev };
           delete newMessages[activeRoom];
           return newMessages;
         });
@@ -130,6 +161,7 @@ const ChatProvider = ({ children }) => {
     activeRoom,
     isChatOpen,
     recipient,
+    notifications,
     joinRoom,
     sendMessage,
     closeChat,

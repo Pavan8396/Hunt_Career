@@ -1,22 +1,29 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MoonIcon, MenuIcon, XIcon } from '@heroicons/react/outline';
+import { MoonIcon, MenuIcon, XIcon, BellIcon } from '@heroicons/react/outline';
 import { ThemeContext } from '../context/ThemeContext';
 import { AuthContext } from '../context/AuthContext';
+import { ChatContext } from '../context/ChatContext';
 import { toast } from 'react-toastify';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const { isAuthenticated, user, userType, logout } = useContext(AuthContext);
+  const { notifications, joinRoom } = useContext(ChatContext);
+
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
+  const notificationRef = useRef(null);
   const [userInitials, setUserInitials] = useState('');
 
-  // Compute user initials
+  const totalUnread = notifications.reduce((sum, notif) => sum + notif.count, 0);
+
   useEffect(() => {
     if (isAuthenticated && user) {
       const nameParts = user.name ? user.name.split(' ') : [];
@@ -30,7 +37,6 @@ const Navbar = () => {
     }
   }, [isAuthenticated, user]);
 
-  // Close dropdown/mobile menu on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -38,6 +44,9 @@ const Navbar = () => {
       }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
         setIsMobileMenuOpen(false);
+      }
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setIsNotificationOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -62,10 +71,14 @@ const Navbar = () => {
 
   const handleCancelLogout = () => setShowConfirm(false);
 
+  const handleNotificationClick = (senderId, senderName) => {
+    joinRoom(senderId, senderName);
+    setIsNotificationOpen(false);
+  };
+
   return (
     <nav className="bg-blue-600 text-white p-4 shadow-md dark:bg-gray-800">
       <div className="container mx-auto flex justify-between items-center">
-        {/* Logo/Brand */}
         <Link
           to={isAuthenticated && userType === 'employer' ? '/employer/dashboard' : '/'}
           className="text-xl font-bold hover:text-gray-200 transition"
@@ -73,7 +86,6 @@ const Navbar = () => {
           Hunt-Career
         </Link>
 
-        {/* Mobile Menu Button */}
         <button
           className="md:hidden text-white focus:outline-none"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -82,73 +94,82 @@ const Navbar = () => {
           {isMobileMenuOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
         </button>
 
-        {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-4">
           {isAuthenticated ? (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 p-2 rounded-full focus:outline-none transition"
-              >
-                <span className="w-8 h-8 bg-blue-200 text-blue-800 flex items-center justify-center rounded-full">
-                  {userInitials || 'U'}
-                </span>
-              </button>
-
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-                  {/* Welcome message for all users */}
-                  <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-                    Welcome, {user.name}
+            <>
+              {/* Notification Bell */}
+              <div className="relative" ref={notificationRef}>
+                <button
+                  onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                  className="relative text-white hover:text-gray-200 focus:outline-none"
+                  aria-label="Notifications"
+                >
+                  <BellIcon className="h-6 w-6" />
+                  {totalUnread > 0 && (
+                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold">
+                      {totalUnread}
+                    </span>
+                  )}
+                </button>
+                {isNotificationOpen && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="p-4 font-bold border-b dark:border-gray-600">Notifications</div>
+                    {notifications.length > 0 ? (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif.senderId}
+                          onClick={() => handleNotificationClick(notif.senderId, notif.senderName)}
+                          className="p-4 border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                        >
+                          <div className="font-semibold">{notif.senderName}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                            {notif.lastMessage}
+                          </div>
+                          <div className="text-xs text-blue-500 mt-1">{notif.count} new messages</div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+                        No new notifications
+                      </div>
+                    )}
                   </div>
+                )}
+              </div>
 
-                  <Link
-                    to="/about"
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    About
-                  </Link>
-                  <Link
-                    to="/contact"
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    Contact
-                  </Link>
-                  <Link
-                    to="/privacy"
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    Privacy Policy
-                  </Link>
-
-                  <button
-                    onClick={toggleDarkMode}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
-                  >
-                    <MoonIcon className="h-5 w-5 mr-2" />
-                    {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                  </button>
-
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 hover:text-red-700"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
+              {/* User Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 p-2 rounded-full focus:outline-none transition"
+                >
+                  <span className="w-8 h-8 bg-blue-200 text-blue-800 flex items-center justify-center rounded-full">
+                    {userInitials || 'U'}
+                  </span>
+                </button>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                      Welcome, {user.name}
+                    </div>
+                    <Link to="/about" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600" onClick={() => setIsDropdownOpen(false)}>About</Link>
+                    <Link to="/contact" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600" onClick={() => setIsDropdownOpen(false)}>Contact</Link>
+                    <Link to="/privacy" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600" onClick={() => setIsDropdownOpen(false)}>Privacy Policy</Link>
+                    <button onClick={toggleDarkMode} className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center">
+                      <MoonIcon className="h-5 w-5 mr-2" />
+                      {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                    </button>
+                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 hover:text-red-700">
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
           ) : (
             <>
-              <Link to="/login" className="hover:text-gray-200 transition">
-                Login
-              </Link>
-              <Link to="/signup" className="hover:text-gray-200 transition">
-                Signup
-              </Link>
+              <Link to="/login" className="hover:text-gray-200 transition">Login</Link>
+              <Link to="/signup" className="hover:text-gray-200 transition">Signup</Link>
             </>
           )}
         </div>

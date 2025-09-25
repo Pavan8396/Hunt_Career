@@ -25,6 +25,24 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const getNotifications = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/chat/notifications`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch notifications');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    toast.error('Could not load notifications.');
+    throw error;
+  }
+};
+
 export const getChatHistory = async (roomId, token) => {
   try {
     const response = await fetch(`${API_URL}/chat/${roomId}`, {
