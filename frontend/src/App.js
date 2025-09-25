@@ -15,6 +15,7 @@ import EmployerLayout from './components/EmployerLayout';
 import PostJobPage from './pages/PostJobPage';
 import PostedJobsPage from './pages/PostedJobsPage';
 import Layout from './components/Layout';
+import AuthenticatedLayout from './components/AuthenticatedLayout';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { ChatProvider } from './context/ChatContext';
@@ -30,79 +31,50 @@ function App() {
       <AuthProvider>
         <ChatProvider>
           <Router>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<UserTypeSelection />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/employer/login" element={<EmployerLogin />} />
-              <Route path="/employer/signup" element={<EmployerSignup />} />
-              <Route path="/employer" element={<ProtectedRoute><EmployerLayout /></ProtectedRoute>}>
+            <Routes>
+              {/* Authenticated routes with the new sidebar layout */}
+              <Route
+                path="/home"
+                element={<ProtectedRoute><AuthenticatedLayout><Home /></AuthenticatedLayout></ProtectedRoute>}
+              />
+              <Route
+                path="/saved"
+                element={<ProtectedRoute><AuthenticatedLayout><SavedJobs /></AuthenticatedLayout></ProtectedRoute>}
+              />
+              <Route
+                path="/applied"
+                element={<ProtectedRoute><AuthenticatedLayout><AppliedJobs /></AuthenticatedLayout></ProtectedRoute>}
+              />
+              <Route
+                path="/jobs/:id"
+                element={<ProtectedRoute><AuthenticatedLayout><JobDetails /></AuthenticatedLayout></ProtectedRoute>}
+              />
+              <Route
+                path="/employer"
+                element={<ProtectedRoute><AuthenticatedLayout><div/></AuthenticatedLayout></ProtectedRoute>}
+              >
                 <Route path="dashboard" element={<EmployerDashboard />} />
                 <Route path="post-job" element={<PostJobPage />} />
                 <Route path="posted-jobs" element={<PostedJobsPage />} />
               </Route>
-              <Route
-                path="/saved"
-                element={
-                  <ProtectedRoute>
-                    <SavedJobs />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/applied"
-                element={
-                  <ProtectedRoute>
-                    <AppliedJobs />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/jobs/:id"
-                element={
-                  <ProtectedRoute>
-                    <JobDetails />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/about"
-                element={
-                  <div className="p-4 max-w-4xl mx-auto">
-                    <h1 className="text-2xl font-bold dark:text-gray-200">About</h1>
-                    <p className="dark:text-gray-300">Learn more about Hunt-Career.</p>
-                  </div>
-                }
-              />
-              <Route
-                path="/contact"
-                element={
-                  <div className="p-4 max-w-4xl mx-auto">
-                    <h1 className="text-2xl font-bold dark:text-gray-200">Contact</h1>
-                    <p className="dark:text-gray-300">Contact us at support@hunt-career.com.</p>
-                  </div>
-                }
-              />
-              <Route
-                path="/privacy"
-                element={
-                  <div className="p-4 max-w-4xl mx-auto">
-                    <h1 className="text-2xl font-bold dark:text-gray-200">Privacy Policy</h1>
-                    <p className="dark:text-gray-300">Your privacy matters to us.</p>
-                  </div>
-                }
-              />
-              <Route path="*" element={<div className="p-4 text-center dark:text-gray-200">404 - Page Not Found</div>} />
+
+              {/* Public routes with the simple layout */}
+              <Route path="/" element={<Layout><UserTypeSelection /></Layout>} />
+              <Route path="/login" element={<Layout><Login /></Layout>} />
+              <Route path="/signup" element={<Layout><Signup /></Layout>} />
+              <Route path="/employer/login" element={<Layout><EmployerLogin /></Layout>} />
+              <Route path="/employer/signup" element={<Layout><EmployerSignup /></Layout>} />
+              <Route path="/about" element={<Layout><div className="p-4 max-w-4xl mx-auto"><h1 className="text-2xl font-bold dark:text-gray-200">About</h1><p className="dark:text-gray-300">Learn more about Hunt-Career.</p></div></Layout>} />
+              <Route path="/contact" element={<Layout><div className="p-4 max-w-4xl mx-auto"><h1 className="text-2xl font-bold dark:text-gray-200">Contact</h1><p className="dark:text-gray-300">Contact us at support@hunt-career.com.</p></div></Layout>} />
+              <Route path="/privacy" element={<Layout><div className="p-4 max-w-4xl mx-auto"><h1 className="text-2xl font-bold dark:text-gray-200">Privacy Policy</h1><p className="dark:text-gray-300">Your privacy matters to us.</p></div></Layout>} />
+              <Route path="*" element={<Layout><div className="p-4 text-center dark:text-gray-200">404 - Page Not Found</div></Layout>} />
             </Routes>
-          </Layout>
-          <ToastContainer
-            position="top-center"
-            autoClose={3000}
-            theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
-          />
-        </Router>
+            <ToastContainer
+              position="top-center"
+              autoClose={3000}
+              theme={localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'}
+            />
+          </Router>
         </ChatProvider>
       </AuthProvider>
     </ThemeProvider>
