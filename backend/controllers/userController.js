@@ -37,14 +37,13 @@ const getAppliedJobs = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    const user = await userService.getUserById(req.params.userId);
+    const user = await userService.getUserById(req.params.id);
     if (user) {
-      res.json({ name: user.name || `${user.firstName} ${user.lastName}` });
+      res.json(user);
     } else {
       res.status(404).json({ message: "User not found" });
     }
   } catch (err) {
-    console.error("Fetch user by ID error:", err.message);
     res.status(500).json({ message: "Failed to fetch user details" });
   }
 };

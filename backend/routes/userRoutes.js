@@ -8,6 +8,6 @@ const router = express.Router();
 router.get('/', authenticateToken, ensureDb, getUserDetails);
 router.get('/applications', authenticateToken, ensureDb, getUserApplications);
 router.get('/applied-jobs', authenticateToken, ensureDb, getAppliedJobs);
-router.get('/:userId', authenticateToken, ensureDb, getUserById);
+router.get('/:id', authenticateToken, ensureDb, getUserById);
 
 module.exports = router;
