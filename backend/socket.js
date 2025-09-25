@@ -23,7 +23,7 @@ const initSocket = (server) => {
         if (!chat) {
           chat = new Chat({ roomId, messages: [] });
         }
-        const newMessage = { sender: sender, text: text, timestamp: new Date() };
+        const newMessage = { user: sender, text: text, timestamp: new Date() };
         chat.messages.push(newMessage);
         await chat.save();
 
