@@ -17,9 +17,8 @@ const initSocket = (server) => {
       console.log(`User ${socket.id} joined room ${roomId}`);
     });
 
-    socket.on("sendMessage", async (data) => {
+    socket.on("sendMessage", async ({ roomId, sender, text }) => {
       try {
-        const { roomId, sender, text } = data;
         let chat = await Chat.findOne({ roomId });
         if (!chat) {
           chat = new Chat({ roomId, messages: [] });
@@ -28,7 +27,7 @@ const initSocket = (server) => {
         chat.messages.push(newMessage);
         await chat.save();
 
-        io.to(data.roomId).emit("receiveMessage", newMessage);
+        io.to(roomId).emit("receiveMessage", newMessage);
       } catch (error) {
         console.error('Error saving message:', error);
       }

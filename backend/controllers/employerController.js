@@ -103,7 +103,7 @@ const getJobPostingsSummary = async (req, res) => {
       acc[job.jobType] = (acc[job.jobType] || 0) + 1;
       return acc;
     }, {});
-    const formattedData = Object.keys(data).map(type => ({ type, count: data[type] }));
+    const formattedData = Object.keys(data).map(type => ({ name: type, count: data[type] }));
     res.json(formattedData);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -114,7 +114,11 @@ const getRecentActivity = async (req, res) => {
   try {
     const jobs = await Job.find({ employer: req.user._id });
     const jobIds = jobs.map(job => job._id);
-    const applications = await Application.find({ job: { $in: jobIds } }).sort({ date: -1 }).limit(5).populate('applicant');
+    const applications = await Application.find({ job: { $in: jobIds } })
+      .sort({ date: -1 })
+      .limit(5)
+      .populate('applicant', 'firstName lastName')
+      .populate('job', 'title');
     res.json(applications);
   } catch (error) {
     res.status(500).json({ message: error.message });
