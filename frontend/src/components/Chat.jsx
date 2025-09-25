@@ -7,6 +7,24 @@ const Chat = ({ user, recipient }) => {
   const socketRef = useRef();
 
   useEffect(() => {
+    const fetchChatHistory = async () => {
+      const roomId = [user, recipient].sort().join("_");
+      try {
+        const response = await fetch(`http://localhost:5000/api/chat/${roomId}`, {
+          headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          }
+        });
+        const data = await response.json();
+        const formattedData = data.map(msg => ({ sender: msg.user, text: msg.text }));
+        setChat(formattedData);
+      } catch (error) {
+        console.error("Failed to fetch chat history", error);
+      }
+    };
+
+    fetchChatHistory();
+
     socketRef.current = io("http://localhost:5000");
     const roomId = [user, recipient].sort().join("_");
 
@@ -16,7 +34,7 @@ const Chat = ({ user, recipient }) => {
     });
 
     socketRef.current.on("receiveMessage", (data) => {
-      setChat((prevChat) => [...prevChat, data]);
+      setChat((prevChat) => [...prevChat, { sender: data.sender, text: data.text }]);
     });
 
     return () => {
