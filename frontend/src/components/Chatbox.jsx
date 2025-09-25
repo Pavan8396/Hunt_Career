@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
-import { XIcon } from '@heroicons/react/outline';
+import { XIcon, TrashIcon } from '@heroicons/react/outline';
 
 const Chatbox = () => {
-  const { messages, isChatOpen, sendMessage, closeChat } = useContext(ChatContext);
+  const { messages, isChatOpen, sendMessage, closeChat, chatPartner, deleteHistory } = useContext(ChatContext);
   const { user } = useContext(AuthContext);
   const [newMessage, setNewMessage] = useState('');
   const chatboxRef = useRef(null);
@@ -47,10 +47,17 @@ const Chatbox = () => {
       className="fixed bottom-4 right-4 w-96 h-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl flex flex-col z-50"
     >
       <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">Chat</h3>
-        <button onClick={closeChat} className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
-          <XIcon className="h-6 w-6" />
-        </button>
+        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">
+          Chat with {chatPartner?.name || '...'}
+        </h3>
+        <div className="flex items-center space-x-2">
+          <button onClick={deleteHistory} className="text-gray-500 hover:text-red-500 dark:hover:text-red-400">
+            <TrashIcon className="h-5 w-5" />
+          </button>
+          <button onClick={closeChat} className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
+            <XIcon className="h-6 w-6" />
+          </button>
+        </div>
       </div>
       <div className="flex-grow p-4 overflow-y-auto h-80">
         {messages.map((msg, index) => (

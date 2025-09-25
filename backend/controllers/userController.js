@@ -35,4 +35,18 @@ const getAppliedJobs = async (req, res) => {
   }
 };
 
-module.exports = { getUserDetails, getUserApplications, getAppliedJobs };
+const getUserById = async (req, res) => {
+  try {
+    const user = await userService.getUserById(req.params.userId);
+    if (user) {
+      res.json({ name: user.name || `${user.firstName} ${user.lastName}` });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (err) {
+    console.error("Fetch user by ID error:", err.message);
+    res.status(500).json({ message: "Failed to fetch user details" });
+  }
+};
+
+module.exports = { getUserDetails, getUserApplications, getAppliedJobs, getUserById };
