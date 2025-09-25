@@ -27,7 +27,7 @@ const initSocket = (server) => {
         chat.messages.push(newMessage);
         await chat.save();
 
-        io.to(roomId).emit("receiveMessage", newMessage);
+        socket.to(roomId).emit("receiveMessage", { sender, text });
       } catch (error) {
         console.error('Error saving message:', error);
       }
