@@ -33,7 +33,7 @@ const Chat = ({ user, recipient }) => {
       text: message,
     };
     socketRef.current.emit("sendMessage", messageData);
-    setChat((prevChat) => [...prevChat, { user, text: message }]);
+    setChat((prevChat) => [...prevChat, { sender: user, text: message }]);
     setMessage("");
   };
 
@@ -60,11 +60,11 @@ const Chat = ({ user, recipient }) => {
           Delete Chat
         </button>
       </div>
-      <div className="flex-grow p-4 overflow-auto">
+      <div className="flex flex-col flex-grow p-4 overflow-auto">
         {chat.map((msg, index) => (
-          <div key={index} className={`message ${msg.user === user ? "sent" : "received"}`}>
+          <div key={index} className={`message ${msg.sender === user ? "sent" : "received"}`}>
             <p>
-              <strong>{msg.user}:</strong> {msg.text}
+              <strong>{msg.sender}:</strong> {msg.text}
             </p>
           </div>
         ))}
