@@ -16,39 +16,35 @@ const Navbar = () => {
   const mobileMenuRef = useRef(null);
   const [userInitials, setUserInitials] = useState('');
 
-  // Compute user initials based on user
+  // Compute user initials
   useEffect(() => {
     if (isAuthenticated && user) {
       const nameParts = user.name ? user.name.split(' ') : [];
       const initials =
         nameParts.length > 1
           ? `${nameParts[0][0]}${nameParts[1][0]}`
-          : user.name ? user.name.slice(0, 2).toUpperCase() : 'U';
+          : user.name
+          ? user.name.slice(0, 2).toUpperCase()
+          : 'U';
       setUserInitials(initials);
     }
   }, [isAuthenticated, user]);
 
-  // Handle outside clicks to close dropdown and mobile menu
+  // Close dropdown/mobile menu on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
-      console.log('Checking click outside:', event.target);
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        console.log('Closing dropdown');
         setIsDropdownOpen(false);
       }
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
-        console.log('Closing mobile menu');
         setIsMobileMenuOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    setShowConfirm(true);
-  };
+  const handleLogout = () => setShowConfirm(true);
 
   const handleConfirmLogout = () => {
     const type = userType;
@@ -64,41 +60,35 @@ const Navbar = () => {
     }
   };
 
-  const handleCancelLogout = () => {
-    setShowConfirm(false);
-  };
+  const handleCancelLogout = () => setShowConfirm(false);
 
   return (
     <nav className="bg-blue-600 text-white p-4 shadow-md dark:bg-gray-800">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo/Brand */}
-        <Link to={isAuthenticated && userType === 'employer' ? '/employer/dashboard' : '/'} className="text-xl font-bold hover:text-gray-200 transition">
+        <Link
+          to={isAuthenticated && userType === 'employer' ? '/employer/dashboard' : '/'}
+          className="text-xl font-bold hover:text-gray-200 transition"
+        >
           Hunt-Career
         </Link>
 
         {/* Mobile Menu Button */}
         <button
           className="md:hidden text-white focus:outline-none"
-          onClick={() => {
-            console.log('Toggling mobile menu');
-            setIsMobileMenuOpen(!isMobileMenuOpen);
-          }}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
         >
           {isMobileMenuOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
         </button>
 
-        {/* Desktop Menu and User Icon */}
+        {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-4">
           {isAuthenticated ? (
             <div className="relative" ref={dropdownRef}>
               <button
-                onClick={() => {
-                  console.log('Toggling dropdown');
-                  setIsDropdownOpen(!isDropdownOpen);
-                }}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 p-2 rounded-full focus:outline-none transition"
-                aria-label="Open user menu"
               >
                 <span className="w-8 h-8 bg-blue-200 text-blue-800 flex items-center justify-center rounded-full">
                   {userInitials || 'U'}
@@ -107,38 +97,11 @@ const Navbar = () => {
 
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-                  {userType === 'employer' ? (
-                    <>
-                      {/* Employer-specific links are in the sidebar, so we keep this menu minimal */}
-                      <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-                        Welcome, {user.name}
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        to="/home"
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        Home
-                      </Link>
-                      <Link
-                        to="/saved"
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        Saved Jobs
-                      </Link>
-                      <Link
-                        to="/applied"
-                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        Applied Jobs
-                      </Link>
-                    </>
-                  )}
+                  {/* Welcome message for all users */}
+                  <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                    Welcome, {user.name}
+                  </div>
+
                   <Link
                     to="/about"
                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -160,6 +123,7 @@ const Navbar = () => {
                   >
                     Privacy Policy
                   </Link>
+
                   <button
                     onClick={toggleDarkMode}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
@@ -167,6 +131,7 @@ const Navbar = () => {
                     <MoonIcon className="h-5 w-5 mr-2" />
                     {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                   </button>
+
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 hover:text-red-700"
@@ -196,35 +161,11 @@ const Navbar = () => {
           >
             {isAuthenticated ? (
               <>
-                {userType === 'employer' ? (
-                  <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-                    Welcome, {user.name}
-                  </div>
-                ) : (
-                  <>
-                    <Link
-                      to="/home"
-                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Home
-                    </Link>
-                    <Link
-                      to="/saved"
-                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Saved Jobs
-                    </Link>
-                    <Link
-                      to="/applied"
-                      className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Applied Jobs
-                    </Link>
-                  </>
-                )}
+                {/* Welcome message */}
+                <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+                  Welcome, {user.name}
+                </div>
+
                 <Link
                   to="/about"
                   className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -246,6 +187,7 @@ const Navbar = () => {
                 >
                   Privacy Policy
                 </Link>
+
                 <button
                   onClick={toggleDarkMode}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
@@ -253,6 +195,7 @@ const Navbar = () => {
                   <MoonIcon className="h-5 w-5 mr-2" />
                   {isDarkMode ? 'Light Mode' : 'Dark Mode'}
                 </button>
+
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 hover:text-red-700"
@@ -281,7 +224,7 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* Custom Confirmation Dialog */}
+        {/* Logout Confirmation */}
         {showConfirm && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
