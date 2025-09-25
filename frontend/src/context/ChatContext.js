@@ -13,7 +13,23 @@ const ChatProvider = ({ children }) => {
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const { user, token } = useContext(AuthContext);
   const socketRef = useRef(null);
-  const [notifications, setNotifications] = useState([]);
+
+  // Initialize notifications from session storage
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const savedNotifications = sessionStorage.getItem('notifications');
+      return savedNotifications ? JSON.parse(savedNotifications) : [];
+    } catch (error) {
+      console.error("Failed to parse notifications from session storage", error);
+      return [];
+    }
+  });
+
+  // Save notifications to session storage whenever they change
+  useEffect(() => {
+    sessionStorage.setItem('notifications', JSON.stringify(notifications));
+  }, [notifications]);
+
 
   // Refs to hold current state for the socket listener to avoid stale closures
   const isChatOpenRef = useRef(isChatOpen);
@@ -36,7 +52,7 @@ const ChatProvider = ({ children }) => {
   }, [token]);
 
   useEffect(() => {
-    if (user && !socketRef.current) {
+    if (user && token && !socketRef.current) { // Ensure token exists
       socketRef.current = io('http://localhost:5000', {
         query: { token },
       });
@@ -105,6 +121,7 @@ const ChatProvider = ({ children }) => {
       setActiveRoom(roomId);
       setRecipient(recipientName);
 
+      // Fetch chat history if it's not already loaded
       if (!messages[roomId]) {
         try {
           const history = await getChatHistory(roomId, token);
