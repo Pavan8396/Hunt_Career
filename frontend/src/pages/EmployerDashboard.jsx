@@ -100,7 +100,7 @@ const EmployerDashboard = () => {
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
+              <Legend layout="vertical" verticalAlign="middle" align="right" />
             </PieChart>
           </ResponsiveContainer>
         </div>
