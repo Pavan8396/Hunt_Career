@@ -127,20 +127,6 @@ const getRecentActivity = async (req, res) => {
   }
 };
 
-const getShortlistedToHiredRatio = async (req, res) => {
-  try {
-    const jobs = await Job.find({ employer: req.user._id });
-    const jobIds = jobs.map(job => job._id);
-    const applications = await Application.find({ job: { $in: jobIds } });
-    const shortlisted = applications.filter(app => app.status === 'shortlisted').length;
-    const hired = applications.filter(app => app.status === 'hired').length;
-    const ratio = hired > 0 ? shortlisted / hired : 0;
-    res.json({ ratio });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
 const getEmployerById = async (req, res) => {
   try {
     const employer = await Employer.findById(req.params.id);
@@ -154,18 +140,4 @@ const getEmployerById = async (req, res) => {
   }
 };
 
-const getTotalHired = async (req, res) => {
-  try {
-    const jobs = await Job.find({ employer: req.user._id });
-    const jobIds = jobs.map(job => job._id);
-    const hiredCount = await Application.countDocuments({
-      job: { $in: jobIds },
-      status: 'hired'
-    });
-    res.json({ totalHired: hiredCount });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getShortlistedToHiredRatio, getEmployerById, getTotalHired };
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getEmployerById };
