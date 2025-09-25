@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from './AuthContext';
-import { getChatHistory, deleteChatHistory } from '../services/api';
+import { getChatHistory } from '../services/api';
 
 const ChatContext = createContext();
 
@@ -15,8 +15,10 @@ const ChatProvider = ({ children }) => {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    if (user && !socketRef.current) {
+    console.log('ChatContext useEffect triggered. Auth status:', isAuthenticated);
+    if (isAuthenticated && user && token) {
       console.log('Connecting socket...');
+      // Connect socket when user is authenticated
       socketRef.current = io('http://localhost:5000', {
         query: { token },
       });
@@ -33,26 +35,19 @@ const ChatProvider = ({ children }) => {
 
       socketRef.current.on('receiveMessage', (data) => {
         console.log('Received message:', data);
-        const message = {
-          sender: data.sender,
-          text: data.text,
-          timestamp: data.timestamp,
-        };
         setMessages((prevMessages) => ({
           ...prevMessages,
-          [data.roomId]: [...(prevMessages[data.roomId] || []), message],
+          [data.roomId]: [...(prevMessages[data.roomId] || []), data],
         }));
       });
-    }
 
-    return () => {
-      if (socketRef.current) {
+      return () => {
         console.log('Disconnecting socket...');
         socketRef.current.disconnect();
         socketRef.current = null;
-      }
-    };
-  }, [user, token]);
+      };
+    }
+  }, [isAuthenticated, user, token]);
 
   const joinRoom = async (otherUserId, recipientName, userToken) => {
     console.log(`joinRoom called with otherUserId: ${otherUserId}`);
@@ -67,14 +62,10 @@ const ChatProvider = ({ children }) => {
         console.log(`Fetching history for room: ${roomId}`);
         try {
           const history = await getChatHistory(roomId, userToken);
-          const formattedHistory = history.map(msg => ({
-            sender: msg.user,
-            text: msg.text,
-            timestamp: msg.timestamp,
-          }));
+          console.log('Fetched history:', history);
           setMessages((prevMessages) => ({
             ...prevMessages,
-            [roomId]: formattedHistory,
+            [roomId]: history,
           }));
         } catch (error) {
           console.error("Failed to fetch chat history", error);
@@ -96,11 +87,6 @@ const ChatProvider = ({ children }) => {
         text,
         timestamp: new Date(),
       };
-      // Optimistic UI update
-      setMessages((prevMessages) => ({
-        ...prevMessages,
-        [activeRoom]: [...(prevMessages[activeRoom] || []), messageData],
-      }));
       // Rely on the server to broadcast the message back to us
       socketRef.current.emit('sendMessage', messageData);
     }
@@ -108,21 +94,6 @@ const ChatProvider = ({ children }) => {
 
   const closeChat = () => {
     setIsChatOpen(false);
-  };
-
-  const deleteChat = async () => {
-    if (activeRoom) {
-      try {
-        await deleteChatHistory(activeRoom, token);
-        setMessages((prevMessages) => {
-          const newMessages = { ...prevMessages };
-          delete newMessages[activeRoom];
-          return newMessages;
-        });
-      } catch (error) {
-        console.error("Failed to delete chat history", error);
-      }
-    }
   };
 
   const value = {
@@ -133,7 +104,6 @@ const ChatProvider = ({ children }) => {
     joinRoom,
     sendMessage,
     closeChat,
-    deleteChat,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

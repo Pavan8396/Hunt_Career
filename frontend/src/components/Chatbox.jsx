@@ -97,7 +97,7 @@ const Chatbox = () => {
                 onClick={() => toggleTimestamp(index)}
                 className={`px-4 py-2 rounded-2xl max-w-[75%] break-words cursor-pointer ${
                   isSender
-                    ? 'bg-lime-100 text-black rounded-br-none'
+                    ? 'bg-lime-200 text-black rounded-br-none'
                     : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100 rounded-bl-none'
                 }`}
               >
@@ -135,7 +135,7 @@ const Chatbox = () => {
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-400 hover:bg-lime-400 text-black rounded-r-lg"
+            className="px-4 py-2 bg-lime-300 hover:bg-lime-400 text-black rounded-r-lg"
           >
             Send
           </button>
