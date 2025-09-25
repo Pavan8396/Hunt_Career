@@ -79,4 +79,35 @@ const getEmployerApplications = async (req, res) => {
   }
 };
 
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications };
+const getApplicationsOverTime = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.user._id });
+    const jobIds = jobs.map(job => job._id);
+    const applications = await Application.find({ job: { $in: jobIds } });
+    const data = applications.reduce((acc, app) => {
+      const date = new Date(app.date).toISOString().split('T')[0];
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    }, {});
+    const formattedData = Object.keys(data).map(date => ({ date, count: data[date] }));
+    res.json(formattedData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getJobPostingsSummary = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.user._id });
+    const data = jobs.reduce((acc, job) => {
+      acc[job.jobType] = (acc[job.jobType] || 0) + 1;
+      return acc;
+    }, {});
+    const formattedData = Object.keys(data).map(type => ({ type, count: data[type] }));
+    res.json(formattedData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary };

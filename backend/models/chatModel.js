@@ -1,30 +1,26 @@
 const mongoose = require('mongoose');
 
 const chatSchema = new mongoose.Schema({
-  job: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Job',
+  roomId: {
+    type: String,
+    required: true,
   },
-  jobSeeker: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  employer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Employer',
-  },
-  messages: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Message',
-  }],
-  isShortlisted: {
-    type: Boolean,
-    default: false,
-  },
-}, {
-  timestamps: true,
+  messages: [
+    {
+      user: {
+        type: String,
+        required: true,
+      },
+      message: {
+        type: String,
+        required: true,
+      },
+      timestamp: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 });
 
-const Chat = mongoose.model('Chat', chatSchema);
-
-module.exports = Chat;
+module.exports = mongoose.model('Chat', chatSchema);
