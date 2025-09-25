@@ -25,6 +25,7 @@ exports.deleteChatHistory = async (req, res) => {
 exports.getNotifications = async (req, res) => {
   try {
     const userId = req.user._id;
+    console.log(`[getNotifications] Fetching notifications for userId: ${userId}`);
 
     const notifications = await Chat.aggregate([
       // Find chats where the user is a participant
@@ -77,6 +78,7 @@ exports.getNotifications = async (req, res) => {
       },
     ]);
 
+    console.log(`[getNotifications] Found ${notifications.length} notifications for userId: ${userId}`, notifications);
     res.json(notifications);
   } catch (error) {
     console.error('Error fetching notifications:', error);
