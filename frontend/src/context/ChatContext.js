@@ -15,6 +15,15 @@ const ChatProvider = ({ children }) => {
   const socketRef = useRef(null);
   const [notifications, setNotifications] = useState([]);
 
+  // Refs to hold current state for the socket listener to avoid stale closures
+  const isChatOpenRef = useRef(isChatOpen);
+  const activeRoomRef = useRef(activeRoom);
+
+  useEffect(() => {
+    isChatOpenRef.current = isChatOpen;
+    activeRoomRef.current = activeRoom;
+  }, [isChatOpen, activeRoom]);
+
   const fetchNotifications = useCallback(async () => {
     if (token) {
       try {
@@ -53,7 +62,7 @@ const ChatProvider = ({ children }) => {
         }));
 
         if (data.sender !== user._id) {
-          if (isChatOpen && activeRoom === data.roomId) {
+          if (isChatOpenRef.current && activeRoomRef.current === data.roomId) {
             socketRef.current.emit('markAsRead', { roomId: data.roomId, userId: user._id });
           } else {
             setNotifications((prev) => {
