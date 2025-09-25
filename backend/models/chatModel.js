@@ -7,7 +7,7 @@ const chatSchema = new mongoose.Schema({
   },
   messages: [
     {
-      user: {
+      sender: {
         type: String,
         required: true,
       },

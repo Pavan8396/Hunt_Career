@@ -17,25 +17,17 @@ const initSocket = (server) => {
       console.log(`User ${socket.id} joined room ${roomId}`);
     });
 
-    socket.on("sendMessage", async ({ roomId, sender, text }) => {
+    socket.on("sendMessage", async (data) => {
       try {
+        const { roomId, sender, text } = data;
         let chat = await Chat.findOne({ roomId });
         if (!chat) {
           chat = new Chat({ roomId, messages: [] });
         }
-        const newMessage = { user: sender, text, timestamp: new Date() };
+        const newMessage = { sender, text, timestamp: new Date() };
         chat.messages.push(newMessage);
         await chat.save();
-
-        // Create a consistent payload to send back
-        const messageToSend = {
-          roomId,
-          sender,
-          text,
-          timestamp: newMessage.timestamp,
-        };
-
-        io.to(roomId).emit("receiveMessage", messageToSend);
+        io.to(roomId).emit("receiveMessage", { ...newMessage, roomId });
       } catch (error) {
         console.error('Error saving message:', error);
       }
