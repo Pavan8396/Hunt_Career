@@ -36,21 +36,30 @@ const ChatProvider = ({ children }) => {
   }, [token]);
 
   useEffect(() => {
-    if (user && token && !socketRef.current) {
-      socketRef.current = io('http://localhost:5000', {
-        query: { token },
-      });
+    if (user && token) {
+      // Cleanup previous socket instance if it exists
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
 
-      socketRef.current.on('connect', () => {
+      const socket = io('http://localhost:5000', {
+        query: { token },
+        // Important for preventing multiple connections on hot reloads
+        transports: ['websocket'],
+        upgrade: false,
+      });
+      socketRef.current = socket;
+
+      const onConnect = () => {
         setIsSocketConnected(true);
         fetchNotifications();
-      });
+      };
 
-      socketRef.current.on('disconnect', () => {
+      const onDisconnect = () => {
         setIsSocketConnected(false);
-      });
+      };
 
-      socketRef.current.on('receiveMessage', (data) => {
+      const onReceiveMessage = (data) => {
         const message = {
           sender: data.sender,
           text: data.text,
@@ -63,21 +72,26 @@ const ChatProvider = ({ children }) => {
 
         if (data.sender !== user._id) {
           if (isChatOpenRef.current && activeRoomRef.current === data.roomId) {
-            socketRef.current.emit('markAsRead', { roomId: data.roomId, userId: user._id });
+            socket.emit('markAsRead', { roomId: data.roomId, userId: user._id });
           } else {
-            // Refetch notifications from the server as the single source of truth
             fetchNotifications();
           }
         }
-      });
-    }
+      };
 
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
+      socket.on('connect', onConnect);
+      socket.on('disconnect', onDisconnect);
+      socket.on('receiveMessage', onReceiveMessage);
+
+      // Cleanup function to remove listeners and disconnect socket
+      return () => {
+        socket.off('connect', onConnect);
+        socket.off('disconnect', onDisconnect);
+        socket.off('receiveMessage', onReceiveMessage);
+        socket.disconnect();
         socketRef.current = null;
-      }
-    };
+      };
+    }
   }, [user, token, fetchNotifications]);
 
   const joinRoom = async (otherUserId, recipientName) => {
