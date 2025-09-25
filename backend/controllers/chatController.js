@@ -51,10 +51,10 @@ exports.getNotifications = async (req, res) => {
           lastMessage: { $last: '$messages.text' },
         },
       },
-      // Get sender's information from the users collection
+      // Get sender's information from the Users collection
       {
         $lookup: {
-          from: 'users',
+          from: 'Users',
           localField: '_id',
           foreignField: '_id',
           as: 'senderInfo',
