@@ -154,4 +154,18 @@ const getEmployerById = async (req, res) => {
   }
 };
 
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getShortlistedToHiredRatio, getEmployerById };
+const getTotalHired = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.user._id });
+    const jobIds = jobs.map(job => job._id);
+    const hiredCount = await Application.countDocuments({
+      job: { $in: jobIds },
+      status: 'hired'
+    });
+    res.json({ totalHired: hiredCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getShortlistedToHiredRatio, getEmployerById, getTotalHired };

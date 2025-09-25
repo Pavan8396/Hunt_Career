@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
-import { XIcon, TrashIcon } from '@heroicons/react/outline';
+import { XIcon } from '@heroicons/react/outline';
 
 const Chatbox = () => {
-  const { messages, isChatOpen, sendMessage, closeChat, recipient, deleteChat } = useContext(ChatContext);
+  const { messages, isChatOpen, sendMessage, closeChat, recipient } = useContext(ChatContext);
   const { user } = useContext(AuthContext);
   const [newMessage, setNewMessage] = useState('');
   const chatboxRef = useRef(null);
@@ -48,22 +48,21 @@ const Chatbox = () => {
     >
       <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
         <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">Chat with {recipient}</h3>
-        <div>
-          <button onClick={deleteChat} className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 mr-2">
-            <TrashIcon className="h-6 w-6" />
-          </button>
-          <button onClick={closeChat} className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
-            <XIcon className="h-6 w-6" />
-          </button>
-        </div>
+        <button onClick={closeChat} className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
+          <XIcon className="h-6 w-6" />
+        </button>
       </div>
-      <div className="flex-grow p-4 overflow-y-auto h-80 flex flex-col">
+      <div className="flex-grow p-4 overflow-y-auto h-80">
         {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`message ${msg.sender === user._id ? 'sent' : 'received'}`}
-          >
-            <p>{msg.text}</p>
+          <div key={index} className={`mb-2 ${msg.sender === user?._id ? 'text-right' : ''}`}>
+            <div
+              className={`inline-block p-2 rounded-lg ${
+                msg.sender === user?._id ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
+              }`}
+            >
+              {msg.text}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">{new Date(msg.timestamp).toLocaleTimeString()}</div>
           </div>
         ))}
         <div ref={messagesEndRef} />
