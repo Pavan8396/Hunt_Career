@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from './AuthContext';
-import { getChatHistory } from '../services/api';
+import { getChatHistory, deleteChatHistory } from '../services/api';
 
 const ChatContext = createContext();
 
@@ -110,6 +110,21 @@ const ChatProvider = ({ children }) => {
     setIsChatOpen(false);
   };
 
+  const deleteChat = async () => {
+    if (activeRoom) {
+      try {
+        await deleteChatHistory(activeRoom, token);
+        setMessages((prevMessages) => {
+          const newMessages = { ...prevMessages };
+          delete newMessages[activeRoom];
+          return newMessages;
+        });
+      } catch (error) {
+        console.error("Failed to delete chat history", error);
+      }
+    }
+  };
+
   const value = {
     messages: messages[activeRoom] || [],
     activeRoom,
@@ -118,6 +133,7 @@ const ChatProvider = ({ children }) => {
     joinRoom,
     sendMessage,
     closeChat,
+    deleteChat,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

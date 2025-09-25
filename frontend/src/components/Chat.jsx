@@ -3,7 +3,7 @@ import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
 
 const Chat = () => {
-  const { messages, recipient, sendMessage, closeChat } = useContext(ChatContext);
+  const { messages, recipient, sendMessage, closeChat, deleteChat } = useContext(ChatContext);
   const { user } = useContext(AuthContext);
   const [message, setMessage] = useState('');
 
@@ -17,9 +17,14 @@ const Chat = () => {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between p-4 border-b">
         <h2 className="text-xl font-semibold">Chat with {recipient}</h2>
-        <button onClick={closeChat} className="px-4 py-2 text-white bg-red-500 rounded">
-          Close
-        </button>
+        <div>
+          <button onClick={deleteChat} className="px-4 py-2 mr-2 text-white bg-gray-500 rounded">
+            Delete
+          </button>
+          <button onClick={closeChat} className="px-4 py-2 text-white bg-red-500 rounded">
+            Close
+          </button>
+        </div>
       </div>
       <div className="flex flex-col flex-grow p-4 overflow-auto">
         {messages.map((msg, index) => (
