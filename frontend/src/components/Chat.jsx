@@ -27,10 +27,10 @@ const Chat = ({ user, recipient }) => {
     const messageData = {
       user,
       recipient,
-      message,
+      text: message,
     };
     socketRef.current.emit("send_message", messageData);
-    setChat((prevChat) => [...prevChat, messageData]);
+    setChat((prevChat) => [...prevChat, { user, text: message }]);
     setMessage("");
   };
 
@@ -61,7 +61,7 @@ const Chat = ({ user, recipient }) => {
         {chat.map((msg, index) => (
           <div key={index} className={`message ${msg.user === user ? "sent" : "received"}`}>
             <p>
-              <strong>{msg.user}:</strong> {msg.message}
+              <strong>{msg.user}:</strong> {msg.text}
             </p>
           </div>
         ))}

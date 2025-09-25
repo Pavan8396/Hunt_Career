@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
-import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate, getUserDetails } from '../services/api';
+import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
