@@ -8,32 +8,6 @@ const SkeletonCard = () => {
       <div className="h-4 bg-gray-200 rounded mb-2 w-1/2 animate-shimmer dark:bg-gray-600"></div>
       <div className="h-4 bg-gray-200 rounded mb-2 w-1/3 animate-shimmer dark:bg-gray-600"></div>
       <div className="h-4 bg-gray-200 rounded w-2/3 animate-shimmer dark:bg-gray-600"></div>
-      {/* Custom shimmering overlay */}
-      <style jsx>{`
-        @keyframes shimmer {
-          0% {
-            background-position: -200%;
-          }
-          100% {
-            background-position: 200%;
-          }
-        }
-        .animate-shimmer {
-          background: linear-gradient(
-            90deg,
-            #e5e7eb 25%,
-            #f3f4f6 50%,
-            #e5e7eb 75%
-          ) dark:linear-gradient(
-            90deg,
-            #4b5563 25%,
-            #6b7280 50%,
-            #4b5563 75%
-          );
-          background-size: 200%;
-          animation: shimmer 1.5s infinite;
-        }
-      `}</style>
     </div>
   );
 };

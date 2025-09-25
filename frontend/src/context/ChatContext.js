@@ -44,9 +44,6 @@ const ChatProvider = ({ children }) => {
 
       const socket = io('http://localhost:5000', {
         query: { token },
-        // Important for preventing multiple connections on hot reloads
-        transports: ['websocket'],
-        upgrade: false,
       });
       socketRef.current = socket;
 
