@@ -23,11 +23,19 @@ const initSocket = (server) => {
         if (!chat) {
           chat = new Chat({ roomId, messages: [] });
         }
-        const newMessage = { user: sender, text: text, timestamp: new Date() };
+        const newMessage = { user: sender, text, timestamp: new Date() };
         chat.messages.push(newMessage);
         await chat.save();
 
-        io.to(roomId).emit("receiveMessage", newMessage);
+        // Create a consistent payload to send back
+        const messageToSend = {
+          roomId,
+          sender,
+          text,
+          timestamp: newMessage.timestamp,
+        };
+
+        io.to(roomId).emit("receiveMessage", messageToSend);
       } catch (error) {
         console.error('Error saving message:', error);
       }
