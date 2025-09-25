@@ -15,6 +15,9 @@ const Chat = ({ user, recipient }) => {
             'Authorization': `Bearer ${sessionStorage.getItem('token')}`
           }
         });
+        if (!response.ok) {
+          throw new Error('Failed to fetch chat history');
+        }
         const data = await response.json();
         const formattedData = data.map(msg => ({ sender: msg.user, text: msg.text }));
         setChat(formattedData);
