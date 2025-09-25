@@ -25,39 +25,38 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
-export const deleteChatHistory = async (roomId, token) => {
+export const getRecentActivity = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/chat/${roomId}`, {
-      method: 'DELETE',
+    const response = await fetch(`${API_URL}/employer/stats/recent-activity`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to delete chat history');
+      throw new Error('Failed to fetch recent activity');
     }
     return await response.json();
   } catch (error) {
-    console.error('Error deleting chat history:', error);
-    toast.error('Could not delete chat history.');
+    console.error('Error fetching recent activity:', error);
+    toast.error('Could not load recent activity.');
     throw error;
   }
 };
 
-export const getUserById = async (userId, token) => {
+export const getShortlistedToHiredRatio = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/${userId}`, {
+    const response = await fetch(`${API_URL}/employer/stats/shortlisted-to-hired-ratio`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to fetch user details');
+      throw new Error('Failed to fetch shortlisted to hired ratio');
     }
     return await response.json();
   } catch (error) {
-    console.error('Error fetching user details:', error);
-    toast.error('Could not fetch user details.');
+    console.error('Error fetching shortlisted to hired ratio:', error);
+    toast.error('Could not load shortlisted to hired ratio.');
     throw error;
   }
 };
@@ -142,6 +141,24 @@ export const login = async (email, password) => {
   } catch (error) {
     console.error('Login error:', error.message);
     throw new Error(error.message);
+  }
+};
+
+export const getUserDetails = async (userId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Could not fetch user details.');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    toast.error('Could not fetch user details.');
+    throw error;
   }
 };
 

@@ -21,19 +21,7 @@ const getUserProfile = async (email) => {
 
 const getUserById = async (id) => {
   const { ObjectId } = require('mongodb');
-  const db = getDb();
-  let user = await db.collection("Users").findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } });
-  if (user) {
-    // It's a job seeker, return the user object which has firstName and lastName
-    return user;
-  }
-  // If not found in Users, check Employers collection
-  const employer = await db.collection("employers").findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } });
-  if (employer) {
-    // It's an employer, return an object with a 'name' field to match the user object structure
-    return { ...employer, name: employer.companyName };
-  }
-  return null; // Return null if not found in either collection
+  return getDb().collection("Users").findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } });
 };
 
 module.exports = {

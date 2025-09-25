@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
-import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
+import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate, getUserDetails } from '../services/api';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -122,7 +122,14 @@ const PostedJobsPage = () => {
                                   </button>
                                 ) : (
                                   <button
-                                    onClick={() => joinRoom(app.applicant._id, token)}
+                                    onClick={async () => {
+                                      try {
+                                        const recipientDetails = await getUserDetails(app.applicant._id, token);
+                                        joinRoom(app.applicant._id, recipientDetails.firstName, token);
+                                      } catch (error) {
+                                        console.error("Could not fetch user details for chat.", error);
+                                      }
+                                    }}
                                     className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
                                     data-chat-opener="true"
                                   >

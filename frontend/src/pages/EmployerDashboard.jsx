@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getEmployerJobs, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary } from '../services/api';
+import { getEmployerJobs, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getShortlistedToHiredRatio } from '../services/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const EmployerDashboard = () => {
@@ -8,21 +8,27 @@ const EmployerDashboard = () => {
   const [totalApplications, setTotalApplications] = useState(0);
   const [applicationsOverTime, setApplicationsOverTime] = useState([]);
   const [jobPostingsSummary, setJobPostingsSummary] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [shortlistedToHiredRatio, setShortlistedToHiredRatio] = useState(0);
   const { user, token } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [employerJobs, allApplications, applicationsTime, jobSummary] = await Promise.all([
+        const [employerJobs, allApplications, applicationsTime, jobSummary, activity, ratio] = await Promise.all([
           getEmployerJobs(token),
           getEmployerApplications(token),
           getApplicationsOverTime(token),
-          getJobPostingsSummary(token)
+          getJobPostingsSummary(token),
+          getRecentActivity(token),
+          getShortlistedToHiredRatio(token)
         ]);
         setJobs(employerJobs);
         setTotalApplications(allApplications.length);
         setApplicationsOverTime(applicationsTime);
         setJobPostingsSummary(jobSummary);
+        setRecentActivity(activity);
+        setShortlistedToHiredRatio(ratio);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       }
@@ -76,6 +82,38 @@ const EmployerDashboard = () => {
               <Bar dataKey="count" fill="#82ca9d" />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Recent Activity and KPI Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Recent Activity</h3>
+          <div className="space-y-4">
+            {recentActivity.map((activity) => (
+              <div key={activity._id} className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                      {activity.applicant.firstName.charAt(0)}
+                    </span>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                    {activity.applicant.firstName} {activity.applicant.lastName}
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Applied for {activity.job.title}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300">Shortlisted to Hired Ratio</h3>
+          <p className="text-4xl font-bold text-green-600 dark:text-green-400">{shortlistedToHiredRatio.ratio}</p>
         </div>
       </div>
     </div>

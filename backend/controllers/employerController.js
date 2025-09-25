@@ -110,4 +110,29 @@ const getJobPostingsSummary = async (req, res) => {
   }
 };
 
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary };
+const getRecentActivity = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.user._id });
+    const jobIds = jobs.map(job => job._id);
+    const applications = await Application.find({ job: { $in: jobIds } }).sort({ date: -1 }).limit(5).populate('applicant');
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getShortlistedToHiredRatio = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.user._id });
+    const jobIds = jobs.map(job => job._id);
+    const applications = await Application.find({ job: { $in: jobIds } });
+    const shortlisted = applications.filter(app => app.status === 'shortlisted').length;
+    const hired = applications.filter(app => app.status === 'hired').length;
+    const ratio = hired > 0 ? shortlisted / hired : 0;
+    res.json({ ratio });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getShortlistedToHiredRatio };
