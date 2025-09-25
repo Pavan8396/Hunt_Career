@@ -122,14 +122,7 @@ const PostedJobsPage = () => {
                                   </button>
                                 ) : (
                                   <button
-                                    onClick={async () => {
-                                      try {
-                                        const recipientDetails = await getUserDetails(app.applicant._id, token);
-                                        joinRoom(app.applicant._id, recipientDetails.firstName, token);
-                                      } catch (error) {
-                                        console.error("Could not fetch user details for chat.", error);
-                                      }
-                                    }}
+                                    onClick={() => joinRoom(app.applicant._id, `${app.applicant.firstName} ${app.applicant.lastName}`, token)}
                                     className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
                                     data-chat-opener="true"
                                   >

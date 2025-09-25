@@ -34,8 +34,19 @@ const Chat = ({ user, recipient }) => {
     setMessage("");
   };
 
-  const deleteChat = () => {
-    setChat([]);
+  const deleteChat = async () => {
+    const roomId = [user, recipient].sort().join("_");
+    try {
+      await fetch(`http://localhost:5000/api/chat/${roomId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+        }
+      });
+      setChat([]);
+    } catch (error) {
+      console.error("Failed to delete chat history", error);
+    }
   };
 
   return (

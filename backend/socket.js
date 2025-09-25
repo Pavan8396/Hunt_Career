@@ -18,7 +18,7 @@ const initSocket = (server) => {
 
     socket.on("send_message", async (data) => {
       const { user, recipient, message } = data;
-      const roomId = [user, recipient].sort().join("-");
+      const roomId = [user, recipient].sort().join("_");
       let chat = await Chat.findOne({ roomId });
       if (!chat) {
         chat = new Chat({ roomId, messages: [] });

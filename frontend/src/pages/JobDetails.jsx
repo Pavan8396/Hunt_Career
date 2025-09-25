@@ -7,7 +7,7 @@ import {
   removeJob,
   isJobSaved,
 } from '../utils/localStorageHelpers';
-import { fetchJobById, applyForJob, getUserApplications } from '../services/api';
+import { fetchJobById, applyForJob, getUserApplications, getEmployerDetails } from '../services/api';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'react-toastify';
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa';
@@ -196,7 +196,14 @@ const JobDetails = () => {
 
           {applied ? (
             <button
-              onClick={() => joinRoom(job.employer, token)}
+              onClick={async () => {
+                try {
+                  const employerDetails = await getEmployerDetails(job.employer, token);
+                  joinRoom(job.employer, employerDetails.name, token);
+                } catch (error) {
+                  console.error("Could not fetch employer details for chat.", error);
+                }
+              }}
               className="inline-block text-sm text-center px-4 py-2 bg-green-600 text-white border border-green-600 rounded hover:bg-green-700 transition dark:bg-green-800 dark:border-gray-500 dark:hover:bg-green-700 dark:text-white"
               data-chat-opener="true"
             >

@@ -25,6 +25,24 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const getEmployerDetails = async (employerId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/employer/${employerId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Could not fetch employer details.');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching employer details:', error);
+    toast.error('Could not fetch employer details.');
+    throw error;
+  }
+}
+
 export const getRecentActivity = async (token) => {
   try {
     const response = await fetch(`${API_URL}/employer/stats/recent-activity`, {
