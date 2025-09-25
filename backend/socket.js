@@ -1,5 +1,7 @@
 const { Server } = require("socket.io");
 const Chat = require('./models/chatModel');
+const User = require('./models/userModel');
+const Employer = require('./models/employerModel');
 
 const initSocket = (server) => {
   const io = new Server(server, {
@@ -27,7 +29,18 @@ const initSocket = (server) => {
         chat.messages.push(newMessage);
         await chat.save();
 
-        socket.to(roomId).emit("receiveMessage", { sender, text });
+        let senderName = 'Unknown';
+        const user = await User.findById(sender).lean();
+        if (user) {
+          senderName = `${user.firstName} ${user.lastName}`;
+        } else {
+          const employer = await Employer.findById(sender).lean();
+          if (employer) {
+            senderName = employer.companyName;
+          }
+        }
+
+        io.to(roomId).emit("receiveMessage", { roomId, sender, senderName, text });
       } catch (error) {
         console.error('Error saving message:', error);
       }

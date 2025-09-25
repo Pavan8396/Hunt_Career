@@ -100,8 +100,8 @@ const getJobPostingsSummary = async (req, res) => {
   try {
     const jobs = await Job.find({ employer: req.user._id });
     const data = jobs.reduce((acc, job) => {
-      if (job.job_type) {
-        acc[job.job_type] = (acc[job.job_type] || 0) + 1;
+      if (job.jobType) {
+        acc[job.jobType] = (acc[job.jobType] || 0) + 1;
       }
       return acc;
     }, {});
@@ -127,6 +127,20 @@ const getRecentActivity = async (req, res) => {
   }
 };
 
+const getShortlistedToHiredRatio = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.user._id });
+    const jobIds = jobs.map(job => job._id);
+    const applications = await Application.find({ job: { $in: jobIds } });
+    const shortlisted = applications.filter(app => app.status === 'shortlisted').length;
+    const hired = applications.filter(app => app.status === 'hired').length;
+    const ratio = hired > 0 ? shortlisted / hired : 0;
+    res.json({ ratio });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getEmployerById = async (req, res) => {
   try {
     const employer = await Employer.findById(req.params.id);
@@ -140,4 +154,4 @@ const getEmployerById = async (req, res) => {
   }
 };
 
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getEmployerById };
+module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getShortlistedToHiredRatio, getEmployerById };

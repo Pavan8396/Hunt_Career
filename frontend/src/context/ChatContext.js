@@ -7,6 +7,8 @@ const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState({}); // Store messages by roomId
+  const [unreadMessages, setUnreadMessages] = useState({}); // Store unread counts by roomId
+  const [conversations, setConversations] = useState({}); // Store conversation metadata
   const [activeRoom, setActiveRoom] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [recipient, setRecipient] = useState(null);
@@ -38,10 +40,23 @@ const ChatProvider = ({ children }) => {
           text: data.text,
           timestamp: data.timestamp,
         };
+        // Add the message to the state, as we now rely on the server as the source of truth.
         setMessages((prevMessages) => ({
           ...prevMessages,
           [data.roomId]: [...(prevMessages[data.roomId] || []), message],
         }));
+
+        // Only increment unread count if the message is from another user and the chat is not active.
+        if (data.sender !== user._id && data.roomId !== activeRoom) {
+          setUnreadMessages((prevUnread) => {
+            const newUnread = { ...prevUnread };
+            if (!newUnread[data.roomId]) {
+              newUnread[data.roomId] = { count: 0, senderName: data.senderName };
+            }
+            newUnread[data.roomId].count += 1;
+            return newUnread;
+          });
+        }
       });
     }
 
@@ -61,6 +76,20 @@ const ChatProvider = ({ children }) => {
       console.log(`Joining room: ${roomId}`);
       setActiveRoom(roomId);
       setRecipient(recipientName);
+
+      if (!conversations[roomId]) {
+        setConversations((prev) => ({
+          ...prev,
+          [roomId]: { recipientName, otherUserId },
+        }));
+      }
+
+      // Reset unread messages for the room
+      setUnreadMessages((prevUnread) => {
+        const newUnread = { ...prevUnread };
+        delete newUnread[roomId];
+        return newUnread;
+      });
 
       // Fetch chat history if it's not already loaded
       if (!messages[roomId]) {
@@ -96,18 +125,14 @@ const ChatProvider = ({ children }) => {
         text,
         timestamp: new Date(),
       };
-      // Optimistic UI update
-      setMessages((prevMessages) => ({
-        ...prevMessages,
-        [activeRoom]: [...(prevMessages[activeRoom] || []), messageData],
-      }));
-      // Rely on the server to broadcast the message back to us
+      // No optimistic update. We will wait for the server to broadcast the message.
       socketRef.current.emit('sendMessage', messageData);
     }
   };
 
   const closeChat = () => {
     setIsChatOpen(false);
+    setActiveRoom(null);
   };
 
   const deleteChat = async () => {
@@ -127,6 +152,8 @@ const ChatProvider = ({ children }) => {
 
   const value = {
     messages: messages[activeRoom] || [],
+    unreadMessages,
+    conversations,
     activeRoom,
     isChatOpen,
     recipient,
