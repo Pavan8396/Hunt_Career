@@ -81,7 +81,7 @@ const EmployerDashboard = () => {
           </ResponsiveContainer>
         </div>
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Job Postings by Status</h3>
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Job Postings by Type</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
