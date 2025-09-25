@@ -13,23 +13,7 @@ const ChatProvider = ({ children }) => {
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const { user, token } = useContext(AuthContext);
   const socketRef = useRef(null);
-
-  // Initialize notifications from session storage
-  const [notifications, setNotifications] = useState(() => {
-    try {
-      const savedNotifications = sessionStorage.getItem('notifications');
-      return savedNotifications ? JSON.parse(savedNotifications) : [];
-    } catch (error) {
-      console.error("Failed to parse notifications from session storage", error);
-      return [];
-    }
-  });
-
-  // Save notifications to session storage whenever they change
-  useEffect(() => {
-    sessionStorage.setItem('notifications', JSON.stringify(notifications));
-  }, [notifications]);
-
+  const [notifications, setNotifications] = useState([]);
 
   // Refs to hold current state for the socket listener to avoid stale closures
   const isChatOpenRef = useRef(isChatOpen);
@@ -52,7 +36,7 @@ const ChatProvider = ({ children }) => {
   }, [token]);
 
   useEffect(() => {
-    if (user && token && !socketRef.current) { // Ensure token exists
+    if (user && token && !socketRef.current) {
       socketRef.current = io('http://localhost:5000', {
         query: { token },
       });
@@ -81,27 +65,8 @@ const ChatProvider = ({ children }) => {
           if (isChatOpenRef.current && activeRoomRef.current === data.roomId) {
             socketRef.current.emit('markAsRead', { roomId: data.roomId, userId: user._id });
           } else {
-            setNotifications((prev) => {
-              const existingNotif = prev.find((n) => n.senderId === data.sender);
-              if (existingNotif) {
-                return prev.map((n) =>
-                  n.senderId === data.sender
-                    ? { ...n, count: n.count + 1, lastMessage: data.text }
-                    : n
-                );
-              } else {
-                return [
-                  ...prev,
-                  {
-                    senderId: data.sender,
-                    senderName: data.senderName,
-                    count: 1,
-                    roomId: data.roomId,
-                    lastMessage: data.text,
-                  },
-                ];
-              }
-            });
+            // Refetch notifications from the server as the single source of truth
+            fetchNotifications();
           }
         }
       });
@@ -141,8 +106,8 @@ const ChatProvider = ({ children }) => {
       socketRef.current.emit('joinRoom', roomId);
       socketRef.current.emit('markAsRead', { roomId, userId: user._id });
 
-      setNotifications((prev) => prev.filter((n) => n.roomId !== roomId));
-
+      // After marking as read, refetch notifications to update the count
+      fetchNotifications();
       setIsChatOpen(true);
     }
   };
