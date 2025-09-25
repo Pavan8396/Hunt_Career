@@ -27,7 +27,7 @@ const getJobs = async (req, res) => {
       };
     }
     if (jobTypes) {
-      const typeArray = jobTypes.split(',').map(type => type.trim());
+      const typeArray = jobTypes.split(',').map(type => new RegExp(`^${escapeRegex(type.trim())}$`, 'i'));
       query.job_type = { $in: typeArray };
     }
 
