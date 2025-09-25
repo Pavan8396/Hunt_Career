@@ -3,6 +3,7 @@ const jobService = require('../services/jobService');
 const { getDb } = require('../config/db');
 const Job = require('../models/jobModel');
 const Employer = require('../models/employerModel');
+const mongoose = require('mongoose');
 
 const getJobs = async (req, res) => {
   const { search, locations, jobTypes } = req.query;
@@ -38,8 +39,6 @@ const getJobs = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch jobs" });
   }
 };
-
-const mongoose = require('mongoose');
 
 const getJobById = async (req, res) => {
   try {

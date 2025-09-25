@@ -2,7 +2,7 @@
   "name": "hunt-career-monorepo",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently \"npm start --prefix frontend\" \"npm start --prefix backend\""
+    "start": "concurrently \"cd frontend && npm start\" \"cd backend && npm start\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
