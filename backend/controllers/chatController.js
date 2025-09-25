@@ -3,11 +3,9 @@ const Chat = require('../models/chatModel');
 const getChatHistory = async (req, res) => {
   try {
     const { roomId } = req.params;
-    console.log(`Fetching chat history for room: ${roomId}`);
-    const messages = await Chat.find({ roomId }).sort({ timestamp: 1 });
-    res.json(messages);
+    const chat = await Chat.findOne({ roomId });
+    res.json(chat ? chat.messages : []);
   } catch (error) {
-    console.error('Error fetching chat history:', error);
     res.status(500).json({ message: 'Failed to fetch chat history' });
   }
 };
@@ -15,6 +13,7 @@ const getChatHistory = async (req, res) => {
 const deleteChatHistory = async (req, res) => {
   try {
     const { roomId } = req.params;
+    // Delete all chat messages for the room
     await Chat.deleteMany({ roomId });
     res.json({ message: 'Chat history deleted successfully' });
   } catch (error) {
@@ -22,5 +21,11 @@ const deleteChatHistory = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete chat history' });
   }
 };
+
+module.exports = {
+  getChatHistory,
+  deleteChatHistory,
+};
+
 
 module.exports = { getChatHistory, deleteChatHistory };

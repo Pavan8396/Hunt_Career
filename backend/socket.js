@@ -12,24 +12,25 @@ const initSocket = (server) => {
   io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
 
-    socket.on("joinRoom", (roomId) => {
+    socket.on("join_room", (roomId) => {
       socket.join(roomId);
-      console.log(`User ${socket.id} joined room ${roomId}`);
     });
 
-    socket.on("sendMessage", async (data) => {
-      try {
-        const newMessage = new Chat({
-          roomId: data.roomId,
-          sender: data.sender,
-          text: data.text,
-        });
-        await newMessage.save();
-        console.log('Message saved:', newMessage);
-        io.to(data.roomId).emit("receiveMessage", data);
-      } catch (error) {
-        console.error('Error saving message:', error);
+    socket.on("send_message", async (data) => {
+      const { user, recipient, message } = data;
+      const roomId = [user, recipient].sort().join("-");
+      let chat = await Chat.findOne({ roomId });
+      if (!chat) {
+        chat = new Chat({ roomId, messages: [] });
       }
+      chat.messages.push({ user, message });
+      await chat.save();
+      socket.to(roomId).emit("receive_message", data);
+    });
+
+    socket.on("delete_chat", async (roomId) => {
+      await Chat.deleteOne({ roomId });
+      socket.to(roomId).emit("chat_deleted");
     });
 
     socket.on("disconnect", () => {

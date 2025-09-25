@@ -145,6 +145,42 @@ export const login = async (email, password) => {
   }
 };
 
+export const getApplicationsOverTime = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/employer/stats/applications-over-time`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch applications over time');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching applications over time:', error);
+    toast.error('Could not load applications over time data.');
+    throw error;
+  }
+}
+
+export const getJobPostingsSummary = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/employer/stats/job-postings-summary`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch job postings summary');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching job postings summary:', error);
+    toast.error('Could not load job postings summary data.');
+    throw error;
+  }
+}
+
 export const getEmployerApplications = async (token) => {
   try {
     const response = await fetch(`${API_URL}/employer/applications`, {
