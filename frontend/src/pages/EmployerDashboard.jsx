@@ -62,7 +62,7 @@ const EmployerDashboard = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
           <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Applications Over Time</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={applicationsOverTime}>
@@ -80,7 +80,7 @@ const EmployerDashboard = () => {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
           <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Job Postings by Type</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
