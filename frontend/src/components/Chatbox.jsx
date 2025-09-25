@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
-import { XIcon } from '@heroicons/react/outline';
+import { XIcon, TrashIcon } from '@heroicons/react/outline';
 
 const Chatbox = () => {
   const { messages, isChatOpen, sendMessage, closeChat, recipient, deleteChat } = useContext(ChatContext);
@@ -49,8 +49,8 @@ const Chatbox = () => {
       <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
         <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">Chat with {recipient}</h3>
         <div>
-          <button onClick={deleteChat} className="px-4 py-2 mr-2 text-white bg-gray-500 rounded">
-            Delete
+          <button onClick={deleteChat} className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 mr-2">
+            <TrashIcon className="h-6 w-6" />
           </button>
           <button onClick={closeChat} className="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">
             <XIcon className="h-6 w-6" />
@@ -63,9 +63,7 @@ const Chatbox = () => {
             key={index}
             className={`message ${msg.sender === user._id ? 'sent' : 'received'}`}
           >
-            <p>
-              <strong>{msg.sender === user._id ? 'You' : recipient}:</strong> {msg.text}
-            </p>
+            <p>{msg.text}</p>
           </div>
         ))}
         <div ref={messagesEndRef} />
