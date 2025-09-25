@@ -25,24 +25,6 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
-export const getTotalHired = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/employer/stats/total-hired`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch total hired');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching total hired:', error);
-    toast.error('Could not load total hired.');
-    throw error;
-  }
-};
-
 export const getChatHistory = async (roomId, token) => {
   try {
     const response = await fetch(`${API_URL}/chat/${roomId}`, {
@@ -112,24 +94,6 @@ export const getRecentActivity = async (token) => {
   } catch (error) {
     console.error('Error fetching recent activity:', error);
     toast.error('Could not load recent activity.');
-    throw error;
-  }
-};
-
-export const getShortlistedToHiredRatio = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/employer/stats/shortlisted-to-hired-ratio`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch shortlisted to hired ratio');
-    }
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching shortlisted to hired ratio:', error);
-    toast.error('Could not load shortlisted to hired ratio.');
     throw error;
   }
 };

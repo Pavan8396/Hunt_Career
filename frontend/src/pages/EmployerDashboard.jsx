@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getEmployerJobs, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getShortlistedToHiredRatio, getTotalHired } from '../services/api';
+import { getEmployerJobs, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity } from '../services/api';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { BriefcaseIcon, DocumentTextIcon, UserGroupIcon, CheckCircleIcon } from '@heroicons/react/outline';
+import { BriefcaseIcon, DocumentTextIcon, HashtagIcon } from '@heroicons/react/outline';
 
 const EmployerDashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -10,29 +10,23 @@ const EmployerDashboard = () => {
   const [applicationsOverTime, setApplicationsOverTime] = useState([]);
   const [jobPostingsSummary, setJobPostingsSummary] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
-  const [shortlistedToHiredRatio, setShortlistedToHiredRatio] = useState(0);
-  const [totalHired, setTotalHired] = useState(0);
   const { user, token } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [employerJobs, allApplications, applicationsTime, jobSummary, activity, ratio, hired] = await Promise.all([
+        const [employerJobs, allApplications, applicationsTime, jobSummary, activity] = await Promise.all([
           getEmployerJobs(token),
           getEmployerApplications(token),
           getApplicationsOverTime(token),
           getJobPostingsSummary(token),
           getRecentActivity(token),
-          getShortlistedToHiredRatio(token),
-          getTotalHired(token)
         ]);
         setJobs(employerJobs);
         setTotalApplications(allApplications.length);
         setApplicationsOverTime(applicationsTime);
         setJobPostingsSummary(jobSummary);
         setRecentActivity(activity);
-        setShortlistedToHiredRatio(ratio);
-        setTotalHired(hired.totalHired);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       }
@@ -42,6 +36,8 @@ const EmployerDashboard = () => {
       fetchDashboardData();
     }
   }, [token]);
+
+  const avgApplicationsPerJob = totalApplications > 0 && jobs.length > 0 ? (totalApplications / jobs.length).toFixed(1) : 0;
 
   const StatCard = ({ icon, title, value, color }) => (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex items-center">
@@ -58,11 +54,10 @@ const EmployerDashboard = () => {
       <h1 className="text-3xl font-bold mb-6">Welcome, {user?.name || 'Employer'}!</h1>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <StatCard icon={<BriefcaseIcon className="h-8 w-8" />} title="Total Jobs Posted" value={jobs.length} color="bg-blue-500" />
         <StatCard icon={<DocumentTextIcon className="h-8 w-8" />} title="Total Applications" value={totalApplications} color="bg-indigo-500" />
-        <StatCard icon={<UserGroupIcon className="h-8 w-8" />} title="Total Hired" value={totalHired} color="bg-green-500" />
-        <StatCard icon={<CheckCircleIcon className="h-8 w-8" />} title="Shortlisted/Hired Ratio" value={shortlistedToHiredRatio.ratio?.toFixed(2) || 0} color="bg-pink-500" />
+        <StatCard icon={<HashtagIcon className="h-8 w-8" />} title="Avg. Apps per Job" value={avgApplicationsPerJob} color="bg-pink-500" />
       </div>
 
       {/* Charts Section */}
