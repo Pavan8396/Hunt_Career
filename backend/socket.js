@@ -70,7 +70,7 @@ const initSocket = (server) => {
           chat.messages.push(newMessage);
           await chat.save();
 
-          io.to(applicationId).emit('receiveMessage', {
+          socket.to(applicationId).emit('receiveMessage', {
             ...newMessage,
             applicationId,
             sender: { _id: senderId, name: socket.user.name },
