@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
+import { ChatContext } from '../context/ChatContext';
 import { getAppliedJobs } from '../services/api';
 import SkeletonCard from '../components/SkeletonCard';
 
@@ -10,6 +11,7 @@ const AppliedJobs = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user, token } = useContext(AuthContext);
+  const { pendingChat, joinRoom, clearPendingChat } = useContext(ChatContext);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +36,20 @@ const AppliedJobs = () => {
       fetchAppliedJobs();
     }
   }, [user, token]);
+
+  // Effect to handle opening a chat from a notification
+  useEffect(() => {
+    if (pendingChat && appliedJobs.some(job => job._id === pendingChat.jobId)) {
+      joinRoom(
+        pendingChat.senderId,
+        pendingChat.senderName,
+        pendingChat.jobId,
+        pendingChat.jobTitle
+      );
+      // Clear the pending chat so it doesn't re-trigger on component re-renders
+      clearPendingChat();
+    }
+  }, [pendingChat, appliedJobs, joinRoom, clearPendingChat]);
 
   const handleCardClick = (id) => {
     navigate(`/jobs/${id}`);

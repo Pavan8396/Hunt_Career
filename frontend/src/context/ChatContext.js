@@ -11,11 +11,12 @@ const ChatProvider = ({ children }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [recipient, setRecipient] = useState(null);
   const [currentJobId, setCurrentJobId] = useState(null);
-  const [currentJobTitle, setCurrentJobTitle] = useState(null); // For the surprise feature
+  const [currentJobTitle, setCurrentJobTitle] = useState(null);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const { user, token } = useContext(AuthContext);
   const socketRef = useRef(null);
   const [notifications, setNotifications] = useState([]);
+  const [pendingChat, setPendingChat] = useState(null); // For post-navigation chat opening
 
   useEffect(() => {
     if (user && token) {
@@ -69,7 +70,7 @@ const ChatProvider = ({ children }) => {
       setActiveRoom(roomId);
       setRecipient(recipientName);
       setCurrentJobId(jobId);
-      setCurrentJobTitle(jobTitle); // Set the job title for context
+      setCurrentJobTitle(jobTitle);
 
       if (!messages[roomId]) {
         try {
@@ -113,7 +114,7 @@ const ChatProvider = ({ children }) => {
 
   const closeChat = () => {
     setIsChatOpen(false);
-    setCurrentJobTitle(null); // Clear job title when chat closes
+    setCurrentJobTitle(null);
   };
 
   const deleteChat = async () => {
@@ -131,13 +132,20 @@ const ChatProvider = ({ children }) => {
     }
   };
 
+  const clearPendingChat = () => {
+    setPendingChat(null);
+  };
+
   const value = {
     messages: messages[activeRoom] || [],
     activeRoom,
     isChatOpen,
     recipient,
     notifications,
-    currentJobTitle, // Pass job title to consumers
+    currentJobTitle,
+    pendingChat,
+    setPendingChat,
+    clearPendingChat,
     joinRoom,
     sendMessage,
     closeChat,

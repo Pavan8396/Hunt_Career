@@ -14,7 +14,7 @@ const Navbar = () => {
 
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const { isAuthenticated, user, userType, logout } = useContext(AuthContext);
-  const { notifications, joinRoom } = useContext(ChatContext);
+  const { notifications, setPendingChat } = useContext(ChatContext);
 
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
@@ -72,10 +72,16 @@ const Navbar = () => {
   const handleCancelLogout = () => setShowConfirm(false);
 
   const handleNotificationClick = (notification) => {
-    // Navigate to the job details page first
-    navigate(`/jobs/${notification.jobId}`);
-    // Then open the chat
-    joinRoom(notification.senderId, notification.senderName, notification.jobId, notification.jobTitle);
+    // Set the chat that should be opened after the page navigates.
+    setPendingChat(notification);
+
+    // Navigate to the correct page based on the user's role.
+    if (userType === 'employer') {
+      navigate('/posted-jobs');
+    } else {
+      navigate('/applied-jobs');
+    }
+
     setIsNotificationOpen(false);
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
@@ -8,41 +8,59 @@ const PostedJobsPage = () => {
   const [applications, setApplications] = useState({});
   const [selectedJob, setSelectedJob] = useState(null);
   const { token } = useContext(AuthContext);
-  const { joinRoom } = useContext(ChatContext);
+  const { joinRoom, pendingChat, clearPendingChat } = useContext(ChatContext);
 
   const handleShortlist = async (applicationId) => {
     try {
       await shortlistCandidate(applicationId, token);
-      handleViewApplications(selectedJob);
+      if (selectedJob) {
+        handleViewApplications(selectedJob);
+      }
     } catch (error) {
       console.error('Failed to shortlist candidate:', error);
     }
   };
 
-  const fetchJobs = React.useCallback(async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       const employerJobs = await getEmployerJobs(token);
       setJobs(employerJobs);
+      return employerJobs; // Return jobs to be used by pending chat logic
     } catch (error) {
       console.error('Failed to fetch employer jobs:', error);
+      return [];
     }
   }, [token]);
 
-  useEffect(() => {
-    if (token) {
-      fetchJobs();
-    }
-  }, [token, fetchJobs]);
-
-  const handleViewApplications = async (jobId) => {
+  const handleViewApplications = useCallback(async (jobId) => {
     try {
       const jobApplications = await getApplicationsForJob(jobId, token);
-      setApplications({ ...applications, [jobId]: jobApplications });
+      setApplications(prev => ({ ...prev, [jobId]: jobApplications }));
       setSelectedJob(jobId);
     } catch (error) {
       console.error('Failed to fetch applications:', error);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    const initialize = async () => {
+      if (token) {
+        const fetchedJobs = await fetchJobs();
+        // Now check for a pending chat after jobs are loaded
+        if (pendingChat && fetchedJobs.some(job => job._id === pendingChat.jobId)) {
+          await handleViewApplications(pendingChat.jobId);
+          joinRoom(
+            pendingChat.senderId,
+            pendingChat.senderName,
+            pendingChat.jobId,
+            pendingChat.jobTitle
+          );
+          clearPendingChat();
+        }
+      }
+    };
+    initialize();
+  }, [token, fetchJobs, pendingChat, clearPendingChat, joinRoom, handleViewApplications]);
 
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
