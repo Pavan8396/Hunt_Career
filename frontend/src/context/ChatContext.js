@@ -112,7 +112,6 @@ const ChatProvider = ({ children }) => {
           delete newMessages[activeApplicationId];
           return newMessages;
         });
-        closeChat();
       } catch (error) {
         console.error('Failed to delete chat history', error);
       }
