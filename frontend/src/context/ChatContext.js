@@ -1,7 +1,7 @@
-import React, { createContext, useState, useEffect, useContext, useRef, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from './AuthContext';
-import { getChatHistory, deleteChatHistory, getNotifications } from '../services/api';
+import { getChatHistory, deleteChatHistory } from '../services/api'; // Removed getNotifications
 
 const ChatContext = createContext();
 
@@ -15,26 +15,6 @@ const ChatProvider = ({ children }) => {
   const socketRef = useRef(null);
   const [notifications, setNotifications] = useState([]);
 
-  // Refs to hold current state for the socket listener to avoid stale closures
-  const isChatOpenRef = useRef(isChatOpen);
-  const activeRoomRef = useRef(activeRoom);
-
-  useEffect(() => {
-    isChatOpenRef.current = isChatOpen;
-    activeRoomRef.current = activeRoom;
-  }, [isChatOpen, activeRoom]);
-
-  const fetchNotifications = useCallback(async () => {
-    if (token) {
-      try {
-        const data = await getNotifications(token);
-        setNotifications(data);
-      } catch (error) {
-        console.error('Failed to fetch notifications', error);
-      }
-    }
-  }, [token]);
-
   useEffect(() => {
     if (user && token) {
       // Cleanup previous socket instance if it exists
@@ -44,17 +24,13 @@ const ChatProvider = ({ children }) => {
 
       const socket = io('http://localhost:5000', {
         query: { token },
+        transports: ['websocket'],
+        upgrade: false,
       });
       socketRef.current = socket;
 
-      const onConnect = () => {
-        setIsSocketConnected(true);
-        fetchNotifications();
-      };
-
-      const onDisconnect = () => {
-        setIsSocketConnected(false);
-      };
+      const onConnect = () => setIsSocketConnected(true);
+      const onDisconnect = () => setIsSocketConnected(false);
 
       const onReceiveMessage = (data) => {
         const message = {
@@ -66,30 +42,29 @@ const ChatProvider = ({ children }) => {
           ...prev,
           [data.roomId]: [...(prev[data.roomId] || []), message],
         }));
+      };
 
-        if (data.sender !== user._id) {
-          if (isChatOpenRef.current && activeRoomRef.current === data.roomId) {
-            socket.emit('markAsRead', { roomId: data.roomId, userId: user._id });
-          } else {
-            fetchNotifications();
-          }
-        }
+      // Listen for the complete notification list from the server
+      const onNotifications = (serverNotifications) => {
+        setNotifications(serverNotifications);
       };
 
       socket.on('connect', onConnect);
       socket.on('disconnect', onDisconnect);
       socket.on('receiveMessage', onReceiveMessage);
+      socket.on('notifications', onNotifications);
 
       // Cleanup function to remove listeners and disconnect socket
       return () => {
         socket.off('connect', onConnect);
         socket.off('disconnect', onDisconnect);
         socket.off('receiveMessage', onReceiveMessage);
+        socket.off('notifications', onNotifications);
         socket.disconnect();
         socketRef.current = null;
       };
     }
-  }, [user, token, fetchNotifications]);
+  }, [user, token]);
 
   const joinRoom = async (otherUserId, recipientName) => {
     if (user && isSocketConnected) {
@@ -115,10 +90,9 @@ const ChatProvider = ({ children }) => {
       }
 
       socketRef.current.emit('joinRoom', roomId);
+      // Tell the server we've read this room's messages
       socketRef.current.emit('markAsRead', { roomId, userId: user._id });
 
-      // After marking as read, refetch notifications to update the count
-      fetchNotifications();
       setIsChatOpen(true);
     }
   };
