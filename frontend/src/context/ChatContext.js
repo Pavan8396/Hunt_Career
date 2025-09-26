@@ -49,53 +49,59 @@ const ChatProvider = ({ children }) => {
     }
   }, [user, token, handleNewMessage, handleNotifications]);
 
-  const openChatForApplication = async (applicationId, recipientName) => {
-    if (!user || !socketRef.current) return;
+  const openChatForApplication = useCallback(
+    async (applicationId, recipientName) => {
+      if (!user || !socketRef.current) return;
 
-    setActiveApplicationId(applicationId);
-    setRecipient(recipientName);
+      setActiveApplicationId(applicationId);
+      setRecipient(recipientName);
 
-    try {
-      const history = await getChatHistory(applicationId, token);
-      setMessages((prev) => ({ ...prev, [applicationId]: history }));
-    } catch (error) {
-      console.error('Failed to fetch chat history', error);
-    }
+      try {
+        const history = await getChatHistory(applicationId, token);
+        setMessages((prev) => ({ ...prev, [applicationId]: history }));
+      } catch (error) {
+        console.error('Failed to fetch chat history', error);
+      }
 
-    socketRef.current.emit('joinRoom', { applicationId });
-    socketRef.current.emit('markAsRead', { applicationId });
-    setIsChatOpen(true);
-  };
+      socketRef.current.emit('joinRoom', { applicationId });
+      socketRef.current.emit('markAsRead', { applicationId });
+      setIsChatOpen(true);
+    },
+    [user, token]
+  );
 
-  const sendMessage = (text) => {
-    if (text.trim() && activeApplicationId && user && socketRef.current) {
-      const messageDataForSocket = {
-        applicationId: activeApplicationId,
-        senderId: user._id,
-        text,
-      };
+  const sendMessage = useCallback(
+    (text) => {
+      if (text.trim() && activeApplicationId && user && socketRef.current) {
+        const messageDataForSocket = {
+          applicationId: activeApplicationId,
+          senderId: user._id,
+          text,
+        };
 
-      const optimisticMessage = {
-        sender: { _id: user._id, name: user.name },
-        text,
-        timestamp: new Date(),
-      };
+        const optimisticMessage = {
+          sender: { _id: user._id, name: user.name },
+          text,
+          timestamp: new Date(),
+        };
 
-      setMessages((prev) => ({
-        ...prev,
-        [activeApplicationId]: [
-          ...(prev[activeApplicationId] || []),
-          optimisticMessage,
-        ],
-      }));
+        setMessages((prev) => ({
+          ...prev,
+          [activeApplicationId]: [
+            ...(prev[activeApplicationId] || []),
+            optimisticMessage,
+          ],
+        }));
 
-      socketRef.current.emit('sendMessage', messageDataForSocket);
-    }
-  };
+        socketRef.current.emit('sendMessage', messageDataForSocket);
+      }
+    },
+    [activeApplicationId, user]
+  );
 
-  const closeChat = () => setIsChatOpen(false);
+  const closeChat = useCallback(() => setIsChatOpen(false), []);
 
-  const deleteChat = async () => {
+  const deleteChat = useCallback(async () => {
     if (activeApplicationId) {
       try {
         await deleteChatHistory(activeApplicationId, token);
@@ -109,7 +115,7 @@ const ChatProvider = ({ children }) => {
         console.error('Failed to delete chat history', error);
       }
     }
-  };
+  }, [activeApplicationId, token, closeChat]);
 
   const value = {
     messages: messages[activeApplicationId] || [],
