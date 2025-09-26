@@ -1,8 +1,8 @@
-const { escapeRegex } = require('../utils/regexUtils');
-const jobService = require('../services/jobService');
-const { getDb } = require('../config/db');
+const mongoose = require('mongoose');
 const Job = require('../models/jobModel');
 const Employer = require('../models/employerModel');
+const Application = require('../models/applicationModel');
+const { escapeRegex } = require('../utils/regexUtils');
 
 const getJobs = async (req, res) => {
   const { search, locations, jobTypes } = req.query;
@@ -11,7 +11,7 @@ const getJobs = async (req, res) => {
     let query = {};
     if (search) {
       const searchLower = search.toLowerCase().trim();
-      const escapedSearch = escapeRegex(searchLower); // Escape special characters
+      const escapedSearch = escapeRegex(searchLower);
       query.$or = [
         { title: { $regex: escapedSearch, $options: 'i' } },
         { company: { $regex: escapedSearch, $options: 'i' } },
@@ -23,7 +23,7 @@ const getJobs = async (req, res) => {
     if (locations) {
       const locArray = locations.split(';').map(loc => loc.trim());
       query.candidate_required_location = {
-        $in: locArray.map(loc => new RegExp(`^${escapeRegex(loc)}$`, 'i')) // Escape location values as well
+        $in: locArray.map(loc => new RegExp(`^${escapeRegex(loc)}$`, 'i'))
       };
     }
     if (jobTypes) {
@@ -38,8 +38,6 @@ const getJobs = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch jobs" });
   }
 };
-
-const mongoose = require('mongoose');
 
 const getJobById = async (req, res) => {
   try {
@@ -67,8 +65,6 @@ const createJob = async (req, res) => {
     const savedJob = await newJob.save();
     const employer = await Employer.findById(req.user._id);
     if (!employer) {
-      // This case is unlikely if the JWT is valid, but it's good practice.
-      // We might also want to delete the job we just created to not have orphaned data.
       await Job.findByIdAndDelete(savedJob._id);
       return res.status(404).json({ message: "Employer not found." });
     }
@@ -93,8 +89,6 @@ const getEmployerJobs = async (req, res) => {
   }
 };
 
-const Application = require('../models/applicationModel');
-
 const deleteJob = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
@@ -112,14 +106,16 @@ const deleteJob = async (req, res) => {
 };
 
 const getApplicationForJob = async (req, res) => {
+  console.log(`[getApplicationForJob] Checking for job: ${req.params.id}, applicant: ${req.user._id}`);
   try {
     const application = await Application.findOne({
       job: req.params.id,
       applicant: req.user._id,
     });
+    console.log(`[getApplicationForJob] Found application:`, application);
     res.json(application);
   } catch (error) {
-    console.error('Error fetching application for job:', error);
+    console.error('[getApplicationForJob] Error fetching application for job:', error);
     res.status(500).json({ message: 'Failed to fetch application status' });
   }
 };
