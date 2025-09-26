@@ -129,15 +129,13 @@ const AppliedJobs = () => {
                   >
                     {app.status}
                   </span>
-                  {app.status === 'shortlisted' && (
-                    <button
-                      onClick={() => openChat(app)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded"
-                      data-chat-opener="true"
-                    >
-                      Chat
-                    </button>
-                  )}
+                  <button
+                    onClick={() => openChat(app)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded text-sm"
+                    data-chat-opener="true"
+                  >
+                    Chat with Recruiter
+                  </button>
                 </div>
               </div>
             ))}

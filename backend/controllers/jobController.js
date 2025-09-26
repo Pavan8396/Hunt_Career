@@ -93,6 +93,8 @@ const getEmployerJobs = async (req, res) => {
   }
 };
 
+const Application = require('../models/applicationModel');
+
 const deleteJob = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
@@ -109,4 +111,17 @@ const deleteJob = async (req, res) => {
   }
 };
 
-module.exports = { getJobs, getJobById, createJob, getEmployerJobs, deleteJob };
+const getApplicationForJob = async (req, res) => {
+  try {
+    const application = await Application.findOne({
+      job: req.params.id,
+      applicant: req.user._id,
+    });
+    res.json(application);
+  } catch (error) {
+    console.error('Error fetching application for job:', error);
+    res.status(500).json({ message: 'Failed to fetch application status' });
+  }
+};
+
+module.exports = { getJobs, getJobById, createJob, getEmployerJobs, deleteJob, getApplicationForJob };

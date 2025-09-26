@@ -23,6 +23,9 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+const User = require('../models/userModel');
+const Employer = require('../models/employerModel');
+
 const isEmployer = (req, res, next) => {
   if (req.user.type !== 'employer') {
     return res.status(403).json({ message: 'Forbidden: Access denied' });
@@ -30,4 +33,11 @@ const isEmployer = (req, res, next) => {
   next();
 };
 
-module.exports = { authenticateToken, isEmployer };
+const isJobSeeker = (req, res, next) => {
+  if (req.user.type !== 'user') {
+    return res.status(403).json({ message: 'Forbidden: Access denied' });
+  }
+  next();
+};
+
+module.exports = { authenticateToken, isEmployer, isJobSeeker };

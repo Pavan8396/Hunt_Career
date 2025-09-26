@@ -25,6 +25,27 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const getApplicationForJob = async (jobId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/jobs/${jobId}/application`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      throw new Error('Failed to fetch application status');
+    }
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
+  } catch (error) {
+    console.error('Error fetching application for job:', error);
+    return null;
+  }
+};
+
 export const getChatHistory = async (applicationId, token) => {
   try {
     const response = await fetch(`${API_URL}/chat/${applicationId}`, {
