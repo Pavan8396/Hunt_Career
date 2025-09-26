@@ -16,7 +16,7 @@ const getNotificationsForUser = async (userId) => {
       {
         $match: {
           'messages.read': false,
-          'messages.user': { $ne: userId },
+          'messages.user': { $ne: userId.toString() },
         },
       },
       // Group by sender and count unread messages
