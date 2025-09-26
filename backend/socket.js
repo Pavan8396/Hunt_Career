@@ -33,7 +33,10 @@ const initSocket = (server) => {
     const userSocket = userSockets.get(userId.toString());
     if (userSocket) {
       const notifications = await notificationService.getNotificationsForUser(userId);
+      console.log(`[Socket] Emitting 'notifications' to userId: ${userId} with data:`, JSON.stringify(notifications, null, 2));
       userSocket.emit('notifications', notifications);
+    } else {
+      console.log(`[Socket] Could not find socket for userId: ${userId} to send notifications.`);
     }
   };
 

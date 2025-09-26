@@ -46,6 +46,7 @@ const ChatProvider = ({ children }) => {
 
       // Listen for the complete notification list from the server
       const onNotifications = (serverNotifications) => {
+        console.log('[ChatContext] Received \'notifications\' event with data:', serverNotifications);
         setNotifications(serverNotifications);
       };
 
