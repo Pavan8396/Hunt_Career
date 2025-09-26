@@ -17,6 +17,7 @@ const ChatProvider = ({ children }) => {
   const [activeApplicationId, setActiveApplicationId] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [recipient, setRecipient] = useState(null);
+  const [activeJobTitle, setActiveJobTitle] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const { user, token } = useContext(AuthContext);
   const socketRef = useRef(null);
@@ -50,11 +51,12 @@ const ChatProvider = ({ children }) => {
   }, [user, token, handleNewMessage, handleNotifications]);
 
   const openChatForApplication = useCallback(
-    async (applicationId, recipientName) => {
+    async (applicationId, recipientName, jobTitle) => {
       if (!user || !socketRef.current) return;
 
       setActiveApplicationId(applicationId);
       setRecipient(recipientName);
+      setActiveJobTitle(jobTitle);
 
       try {
         const history = await getChatHistory(applicationId, token);
@@ -127,6 +129,7 @@ const ChatProvider = ({ children }) => {
     closeChat,
     deleteChat,
     activeApplicationId,
+    activeJobTitle,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

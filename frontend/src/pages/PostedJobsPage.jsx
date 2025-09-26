@@ -81,9 +81,9 @@ const PostedJobsPage = () => {
     setConfirmAction(null);
   };
 
-  const openChat = (application) => {
+  const openChat = (application, jobTitle) => {
     const recipientName = `${application.applicant.firstName} ${application.applicant.lastName}`;
-    openChatForApplication(application._id, recipientName);
+    openChatForApplication(application._id, recipientName, jobTitle);
   };
 
   return (
@@ -141,7 +141,7 @@ const PostedJobsPage = () => {
                                 </button>
                               ) : (
                                 <button
-                                  onClick={() => openChat(app)}
+                                  onClick={() => openChat(app, job.title)}
                                   className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
                                   data-chat-opener="true"
                                 >
