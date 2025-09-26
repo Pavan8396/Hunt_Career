@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
@@ -25,39 +25,65 @@ const JobDetails = () => {
   const { openChatForApplication } = useContext(ChatContext);
   const { token, user } = useContext(AuthContext);
 
-  const [application, setApplication] = useState(null);
+  const [hasApplied, setHasApplied] = useState(false);
 
   const handleApply = async () => {
     try {
-      const newApplication = await applyForJob(job._id, token);
-      setApplication(newApplication);
+      await applyForJob(job._id, token);
+      setHasApplied(true);
       toast.success('Application submitted successfully!');
     } catch (error) {
       toast.error(error.message);
     }
   };
 
+  const checkApplicationStatus = useCallback(async () => {
+    if (user && user.type === 'user' && token) {
+      try {
+        const app = await getApplicationForJob(id, token);
+        setHasApplied(!!app);
+      } catch (error) {
+        console.error('Failed to check application status:', error);
+      }
+    }
+  }, [id, user, token]);
+
   useEffect(() => {
-    const loadJobAndApplication = async () => {
+    const loadJobDetails = async () => {
       setLoading(true);
       setError(null);
       try {
         const foundJob = await fetchJobById(id);
         setJob(foundJob);
         setSaved(isJobSaved(foundJob._id));
-
-        if (user && user.type === 'user' && token) {
-          const app = await getApplicationForJob(id, token);
-          setApplication(app);
-        }
       } catch (err) {
         setError('Failed to load job details. Please ensure the backend server is running and try again.');
       } finally {
         setLoading(false);
       }
     };
-    loadJobAndApplication();
-  }, [id, user, token]);
+    loadJobDetails();
+  }, [id]);
+
+  useEffect(() => {
+    if (job) {
+      checkApplicationStatus();
+    }
+  }, [job, checkApplicationStatus]);
+
+  const handleMessageRecruiter = async () => {
+    try {
+      const app = await getApplicationForJob(job._id, token);
+      if (app) {
+        openChatForApplication(app._id, job.company, job.title);
+      } else {
+        toast.error('Could not find application details to start chat.');
+        setHasApplied(false);
+      }
+    } catch (error) {
+      toast.error('An error occurred while trying to start the chat.');
+    }
+  };
 
   const toggleSave = () => {
     setConfirmAction(saved ? 'unsave' : 'save');
@@ -78,7 +104,6 @@ const JobDetails = () => {
     }
     setShowConfirm(false);
     setConfirmAction(null);
-    // Auto-hide notification after 3 seconds
     setTimeout(() => setNotification({ message: '', type: '' }), 3000);
   };
 
@@ -88,7 +113,7 @@ const JobDetails = () => {
   };
 
   const handleHomeClick = (e) => {
-    const isAuthenticated = !!sessionStorage.getItem('token'); // Changed to sessionStorage
+    const isAuthenticated = !!sessionStorage.getItem('token');
     if (!isAuthenticated) {
       e.preventDefault();
       toast.error('Please log in to continue.');
@@ -182,15 +207,9 @@ const JobDetails = () => {
             {saved ? 'Unsave' : 'Save'}
           </button>
 
-          {application ? (
+          {hasApplied ? (
             <button
-              onClick={() =>
-                openChatForApplication(
-                  application._id,
-                  job.company,
-                  job.title
-                )
-              }
+              onClick={handleMessageRecruiter}
               className="inline-block text-sm text-center px-4 py-2 bg-green-600 text-white border border-green-600 rounded hover:bg-green-700 transition dark:bg-green-800 dark:border-gray-500 dark:hover:bg-green-700 dark:text-white"
               data-chat-opener="true"
             >
@@ -215,7 +234,6 @@ const JobDetails = () => {
         </div>
       </div>
 
-      {/* Notification below the job details */}
       {notification.message && (
         <div className="mt-4 text-center">
           <p
@@ -230,7 +248,6 @@ const JobDetails = () => {
         </div>
       )}
 
-      {/* Custom Confirmation Dialog */}
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
