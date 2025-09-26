@@ -55,13 +55,11 @@ const ChatProvider = ({ children }) => {
     setActiveApplicationId(applicationId);
     setRecipient(recipientName);
 
-    if (!messages[applicationId]) {
-      try {
-        const history = await getChatHistory(applicationId, token);
-        setMessages((prev) => ({ ...prev, [applicationId]: history }));
-      } catch (error) {
-        console.error('Failed to fetch chat history', error);
-      }
+    try {
+      const history = await getChatHistory(applicationId, token);
+      setMessages((prev) => ({ ...prev, [applicationId]: history }));
+    } catch (error) {
+      console.error('Failed to fetch chat history', error);
     }
 
     socketRef.current.emit('joinRoom', { applicationId });

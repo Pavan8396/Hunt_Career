@@ -29,7 +29,7 @@ const getNotificationsForUser = async (userId) => {
       },
       {
         $lookup: {
-          from: 'users',
+          from: 'Users',
           localField: '_id.sender',
           foreignField: '_id',
           as: 'senderInfo',
@@ -60,7 +60,16 @@ const getNotificationsForUser = async (userId) => {
           _id: 0,
           senderId: '$_id.sender',
           senderName: {
-            $ifNull: ['$senderDetails.name', '$senderDetails.companyName'],
+            $ifNull: [
+              '$senderDetails.companyName',
+              {
+                $concat: [
+                  '$senderDetails.firstName',
+                  ' ',
+                  '$senderDetails.lastName',
+                ],
+              },
+            ],
           },
           jobId: '$_id.job',
           applicationId: '$_id.application',

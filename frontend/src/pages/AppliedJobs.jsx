@@ -40,7 +40,7 @@ const AppliedJobs = () => {
     const { state } = location;
     if (state?.openChatForJobId && applications.length > 0) {
       const app = applications.find(
-        (app) => app.job._id === state.openChatForJobId
+        (app) => app.job && app.job._id === state.openChatForJobId
       );
       if (app) {
         openChat(app);
@@ -106,39 +106,41 @@ const AppliedJobs = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {applications.map((app) => (
-            <div
-              key={app._id}
-              className="border rounded p-4 shadow hover:shadow-md transition bg-white dark:bg-gray-800 dark:border-gray-700"
-            >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
-                {app.job.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400">
-                {app.job.company}
-              </p>
-              <div className="mt-4 flex justify-between items-center">
-                <span
-                  className={`text-sm px-3 py-1 rounded capitalize ${
-                    app.status === 'shortlisted'
-                      ? 'bg-green-100 text-green-600 border border-green-300'
-                      : 'bg-gray-100 text-gray-600 border border-gray-300'
-                  }`}
-                >
-                  {app.status}
-                </span>
-                {app.status === 'shortlisted' && (
-                  <button
-                    onClick={() => openChat(app)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded"
-                    data-chat-opener="true"
+          {applications
+            .filter((app) => app.job) // Filter out applications with no job
+            .map((app) => (
+              <div
+                key={app._id}
+                className="border rounded p-4 shadow hover:shadow-md transition bg-white dark:bg-gray-800 dark:border-gray-700"
+              >
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
+                  {app.job.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {app.job.company}
+                </p>
+                <div className="mt-4 flex justify-between items-center">
+                  <span
+                    className={`text-sm px-3 py-1 rounded capitalize ${
+                      app.status === 'shortlisted'
+                        ? 'bg-green-100 text-green-600 border border-green-300'
+                        : 'bg-gray-100 text-gray-600 border border-gray-300'
+                    }`}
                   >
-                    Chat
-                  </button>
-                )}
+                    {app.status}
+                  </span>
+                  {app.status === 'shortlisted' && (
+                    <button
+                      onClick={() => openChat(app)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded"
+                      data-chat-opener="true"
+                    >
+                      Chat
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       )}
     </div>
