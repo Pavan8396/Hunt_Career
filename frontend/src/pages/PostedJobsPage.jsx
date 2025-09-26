@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 import {
@@ -18,6 +18,7 @@ const PostedJobsPage = () => {
   const { token } = useContext(AuthContext);
   const { openChatForApplication } = useContext(ChatContext);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const fetchJobs = useCallback(async () => {
     try {
