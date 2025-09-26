@@ -27,30 +27,39 @@ const JobDetails = () => {
 
   const [hasApplied, setHasApplied] = useState(false);
 
+  // Effect for fetching the main job details
   useEffect(() => {
-    const loadJobAndApplicationStatus = async () => {
+    const loadJobDetails = async () => {
       setLoading(true);
       setError(null);
       try {
-        // First, fetch the job details
         const foundJob = await fetchJobById(id);
         setJob(foundJob);
         setSaved(isJobSaved(foundJob._id));
-
-        // Then, if the user is a logged-in job seeker, check their application status
-        if (user && user.type === 'user' && token) {
-          const app = await getApplicationForJob(id, token);
-          setHasApplied(!!app);
-        }
       } catch (err) {
         setError('Failed to load job details. Please ensure the backend server is running and try again.');
       } finally {
         setLoading(false);
       }
     };
+    loadJobDetails();
+  }, [id]);
 
-    loadJobAndApplicationStatus();
-  }, [id, user, token]);
+  // Effect for checking the application status, dependent on user and job
+  useEffect(() => {
+    const checkApplicationStatus = async () => {
+      if (user && user.type === 'user' && job && token) {
+        try {
+          const app = await getApplicationForJob(id, token);
+          setHasApplied(!!app);
+        } catch (error) {
+          console.error('Failed to check application status:', error);
+        }
+      }
+    };
+    checkApplicationStatus();
+  }, [id, user, job, token]);
+
 
   const handleApply = async () => {
     try {
