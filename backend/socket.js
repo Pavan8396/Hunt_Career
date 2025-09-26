@@ -52,9 +52,9 @@ const initSocket = (server) => {
           if (!application) return;
 
           const recipientId =
-            userId.toString() === application.user.toString()
+            userId.toString() === application.applicant.toString()
               ? application.job.employer
-              : application.user;
+              : application.applicant;
 
           let chat = await Chat.findOne({ application: applicationId });
           if (!chat) {

@@ -17,10 +17,19 @@ const getUserDetails = async (req, res) => {
 
 const getUserApplications = async (req, res) => {
   try {
-    const applications = await Application.find({ applicant: req.user._id });
+    let applications = await Application.find({
+      applicant: req.user._id,
+    }).populate({
+      path: 'job',
+      populate: {
+        path: 'employer',
+        model: 'Employer',
+      },
+    });
     res.json(applications);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch user applications" });
+    console.error('Failed to fetch user applications:', error);
+    res.status(500).json({ message: 'Failed to fetch user applications' });
   }
 };
 

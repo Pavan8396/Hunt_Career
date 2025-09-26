@@ -25,9 +25,9 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
-export const getChatHistory = async (roomId, token) => {
+export const getChatHistory = async (applicationId, token) => {
   try {
-    const response = await fetch(`${API_URL}/chat/${roomId}`, {
+    const response = await fetch(`${API_URL}/chat/${applicationId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -43,9 +43,9 @@ export const getChatHistory = async (roomId, token) => {
   }
 };
 
-export const deleteChatHistory = async (roomId, token) => {
+export const deleteChatHistory = async (applicationId, token) => {
   try {
-    const response = await fetch(`${API_URL}/chat/${roomId}`, {
+    const response = await fetch(`${API_URL}/chat/${applicationId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,

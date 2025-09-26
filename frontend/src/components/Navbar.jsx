@@ -140,6 +140,20 @@ const Navbar = () => {
             >
               About
             </Link>
+            <Link
+              to="/contact"
+              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              onClick={() => setIsDropdownOpen(false)}
+            >
+              Contact
+            </Link>
+            <Link
+              to="/privacy"
+              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              onClick={() => setIsDropdownOpen(false)}
+            >
+              Privacy Policy
+            </Link>
             <button
               onClick={toggleDarkMode}
               className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
@@ -157,6 +171,72 @@ const Navbar = () => {
         )}
       </div>
     </>
+  );
+
+  const MobileMenu = () => (
+    <div
+      className="md:hidden absolute top-16 right-4 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50"
+      ref={mobileMenuRef}
+    >
+      {isAuthenticated ? (
+        <>
+          <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+            Welcome, {user.name || user.companyName}
+          </div>
+          <Link
+            to="/about"
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            About
+          </Link>
+          <Link
+            to="/contact"
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Contact
+          </Link>
+          <Link
+            to="/privacy"
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Privacy Policy
+          </Link>
+          <button
+            onClick={toggleDarkMode}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
+          >
+            <MoonIcon className="h-5 w-5 mr-2" />
+            {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+          </button>
+          <button
+            onClick={handleLogout}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 hover:text-red-700"
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <>
+          <Link
+            to="/login"
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Login
+          </Link>
+          <Link
+            to="/signup"
+            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Signup
+          </Link>
+        </>
+      )}
+    </div>
   );
 
   return (
@@ -197,33 +277,7 @@ const Navbar = () => {
             </>
           )}
         </div>
-        {isMobileMenuOpen && (
-          <div
-            className="md:hidden absolute top-16 right-4 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50"
-            ref={mobileMenuRef}
-          >
-            {isAuthenticated ? (
-              <UserMenu />
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/signup"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Signup
-                </Link>
-              </>
-            )}
-          </div>
-        )}
+        {isMobileMenuOpen && <MobileMenu />}
         {showConfirm && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
