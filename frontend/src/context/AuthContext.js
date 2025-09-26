@@ -13,12 +13,13 @@ export const AuthProvider = ({ children }) => {
       console.error("Login function called with undefined userData.");
       return;
     }
+    const userWithType = { ...userData, type };
     sessionStorage.setItem('token', newToken);
-    sessionStorage.setItem('user', JSON.stringify(userData));
+    sessionStorage.setItem('user', JSON.stringify(userWithType));
     sessionStorage.setItem('userType', type);
     setToken(newToken);
     setIsAuthenticated(true);
-    setUser(userData);
+    setUser(userWithType);
     setUserType(type);
   };
 
