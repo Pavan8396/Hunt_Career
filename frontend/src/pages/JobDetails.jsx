@@ -147,8 +147,6 @@ const JobDetails = () => {
         <p className="text-red-500 dark:text-red-400">{error}</p>
         <Link
           to="/home"
-          to="/home"
-          to="/home"
           className="text-blue-600 hover:underline text-sm mt-4 inline-block dark:text-blue-200 dark:hover:text-blue-100"
           aria-label="Back to home"
         >
@@ -163,8 +161,7 @@ const JobDetails = () => {
       <div className="p-4 max-w-3xl mx-auto text-center">
         <p className="text-gray-500 dark:text-gray-200">Job not found.</p>
         <Link
-          to="/"
-          onClick={handleHomeClick}
+          to="/home"
           className="text-blue-600 hover:underline text-sm mt-4 inline-block dark:text-blue-200 dark:hover:text-blue-100"
           aria-label="Back to home"
         >
@@ -178,8 +175,7 @@ const JobDetails = () => {
     <div className="p-4 max-w-3xl mx-auto relative">
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg dark:shadow-gray-800/50">
         <Link
-          to="/"
-          onClick={handleHomeClick}
+          to="/home"
           className="text-blue-600 hover:underline text-sm dark:text-blue-200 dark:hover:text-blue-100 mb-4 inline-block"
           aria-label="Back to home"
         >
