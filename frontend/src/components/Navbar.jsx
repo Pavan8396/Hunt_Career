@@ -72,14 +72,14 @@ const Navbar = () => {
   const handleCancelLogout = () => setShowConfirm(false);
 
   const handleNotificationClick = (notification) => {
-    // Set the chat that should be opened after the page navigates.
     setPendingChat(notification);
 
     // Navigate to the correct page based on the user's role.
     if (userType === 'employer') {
       navigate('/posted-jobs');
     } else {
-      navigate('/applied-jobs');
+      // For job seekers, navigate directly to the job details page.
+      navigate(`/jobs/${notification.jobId}`);
     }
 
     setIsNotificationOpen(false);

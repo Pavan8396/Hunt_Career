@@ -22,10 +22,23 @@ const JobDetails = () => {
   const [notification, setNotification] = useState({ message: '', type: '' });
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
-  const { joinRoom } = useContext(ChatContext);
+  const { joinRoom, pendingChat, clearPendingChat } = useContext(ChatContext);
   const { token } = useContext(AuthContext);
 
   const [applied, setApplied] = useState(false);
+
+  // Effect to handle opening a chat from a notification
+  useEffect(() => {
+    if (job && pendingChat && pendingChat.jobId === job._id) {
+      joinRoom(
+        pendingChat.senderId,
+        pendingChat.senderName,
+        pendingChat.jobId,
+        pendingChat.jobTitle
+      );
+      clearPendingChat();
+    }
+  }, [job, pendingChat, joinRoom, clearPendingChat]);
 
   const handleApply = async () => {
     try {
