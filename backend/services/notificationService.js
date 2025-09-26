@@ -29,6 +29,20 @@ const getNotificationsForUser = async (userId) => {
       },
       {
         $lookup: {
+          from: 'Jobs',
+          localField: '_id.job',
+          foreignField: '_id',
+          as: 'jobInfo',
+        },
+      },
+      {
+        $unwind: {
+          path: '$jobInfo',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
           from: 'Users',
           localField: '_id.sender',
           foreignField: '_id',
@@ -72,6 +86,7 @@ const getNotificationsForUser = async (userId) => {
             ],
           },
           jobId: '$_id.job',
+          jobTitle: '$jobInfo.title',
           applicationId: '$_id.application',
           count: '$count',
           lastMessage: '$lastMessage',

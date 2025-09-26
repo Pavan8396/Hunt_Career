@@ -67,7 +67,7 @@ const Navbar = () => {
   const handleCancelLogout = () => setShowConfirm(false);
 
   const handleNotificationClick = (notification) => {
-    const { applicationId, senderName, jobId } = notification;
+    const { applicationId, senderName, jobId, jobTitle } = notification;
     if (userType === 'employer') {
       navigate('/employer/posted-jobs', {
         state: { openChatForJobId: jobId },
@@ -75,7 +75,7 @@ const Navbar = () => {
     } else {
       navigate('/applied-jobs', { state: { openChatForJobId: jobId } });
     }
-    openChatForApplication(applicationId, senderName);
+    openChatForApplication(applicationId, senderName, jobTitle);
     setIsNotificationOpen(false);
   };
 
