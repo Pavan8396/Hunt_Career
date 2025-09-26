@@ -143,14 +143,14 @@ const PostedJobsPage = () => {
                               {app.status !== 'shortlisted' && (
                                 <button
                                   onClick={() => handleShortlist(app._id, job._id)}
-                                  className="px-2 py-1 bg-green-600 text-white rounded text-sm"
+                                  className="px-4 py-2 bg-green-600 text-white rounded text-sm"
                                 >
                                   Shortlist
                                 </button>
                               )}
                               <button
                                 onClick={() => openChat(app, job.title)}
-                                className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
+                                className="px-4 py-2 bg-blue-600 text-white rounded text-sm"
                                 data-chat-opener="true"
                               >
                                 Chat

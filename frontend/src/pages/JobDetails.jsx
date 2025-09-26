@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
@@ -24,44 +24,71 @@ const JobDetails = () => {
   const [confirmAction, setConfirmAction] = useState(null);
   const { openChatForApplication } = useContext(ChatContext);
   const { token, user, isAuthenticated } = useContext(AuthContext);
-
   const [hasApplied, setHasApplied] = useState(false);
 
-  // Effect for fetching the main job details
+  // ✅ Effect for fetching job details (with cleanup)
   useEffect(() => {
+    let isMounted = true;
+
     const loadJobDetails = async () => {
       setLoading(true);
       setError(null);
       try {
         const foundJob = await fetchJobById(id);
+        if (!isMounted) return;
         setJob(foundJob);
         if (isAuthenticated) {
           setSaved(isJobSaved(foundJob._id));
         }
       } catch (err) {
-        setError('Failed to load job details. Please ensure the backend server is running and try again.');
+        if (isMounted) {
+          setError(
+            'Failed to load job details. Please ensure the backend server is running and try again.'
+          );
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
+
     loadJobDetails();
+    return () => {
+      isMounted = false;
+    };
   }, [id, isAuthenticated]);
 
-  // Effect for checking the application status, dependent on user and job
+  // ✅ Effect for checking application status (with cleanup)
   useEffect(() => {
+    let isMounted = true;
+
     const checkApplicationStatus = async () => {
       if (user && user.type === 'user' && job && token) {
         try {
           const app = await getApplicationForJob(id, token);
-          setHasApplied(!!app);
+          if (isMounted) setHasApplied(!!app);
         } catch (error) {
           console.error('Failed to check application status:', error);
         }
       }
     };
+
     checkApplicationStatus();
+    return () => {
+      isMounted = false;
+    };
   }, [id, user, job, token]);
 
+  // ✅ Effect to auto-clear notifications safely
+  useEffect(() => {
+    let timer;
+    if (notification.message) {
+      timer = setTimeout(
+        () => setNotification({ message: '', type: '' }),
+        3000
+      );
+    }
+    return () => clearTimeout(timer);
+  }, [notification]);
 
   const handleApply = async () => {
     if (!isAuthenticated) {
@@ -106,17 +133,22 @@ const JobDetails = () => {
     if (confirmAction === 'save') {
       saveJob(job);
       setSaved(true);
-      setNotification({ message: `Job "${job.title}" saved!`, type: 'success' });
+      setNotification({
+        message: `Job "${job.title}" saved!`,
+        type: 'success',
+      });
       toast.success(`Job "${job.title}" saved!`);
     } else if (confirmAction === 'unsave') {
       removeJob(job._id);
       setSaved(false);
-      setNotification({ message: `Job "${job.title}" unsaved!`, type: 'info' });
+      setNotification({
+        message: `Job "${job.title}" unsaved!`,
+        type: 'info',
+      });
       toast.info(`Job "${job.title}" unsaved!`);
     }
     setShowConfirm(false);
     setConfirmAction(null);
-    setTimeout(() => setNotification({ message: '', type: '' }), 3000);
   };
 
   const handleCancel = () => {
@@ -124,6 +156,7 @@ const JobDetails = () => {
     setConfirmAction(null);
   };
 
+  // ----------------- Render Section -----------------
 
   if (loading) {
     return (
@@ -190,13 +223,15 @@ const JobDetails = () => {
               <FaBriefcase className="text-gray-200" /> {job.job_type}
             </span>
             <span className="flex items-center gap-1">
-              <FaMapMarkerAlt className="text-gray-200" /> {job.candidate_required_location}
+              <FaMapMarkerAlt className="text-gray-200" />{' '}
+              {job.candidate_required_location}
             </span>
           </div>
         </div>
 
         <div className="flex justify-between items-center my-6">
           <button
+            type="button"
             onClick={toggleSave}
             className={`text-sm px-3 py-1 border rounded transition ${
               saved
@@ -210,6 +245,7 @@ const JobDetails = () => {
 
           {hasApplied ? (
             <button
+              type="button"
               onClick={handleMessageRecruiter}
               className="inline-block text-sm text-center px-4 py-2 bg-green-600 text-white border border-green-600 rounded hover:bg-green-700 transition dark:bg-green-800 dark:border-gray-500 dark:hover:bg-green-700 dark:text-white"
               data-chat-opener="true"
@@ -218,8 +254,9 @@ const JobDetails = () => {
             </button>
           ) : (
             <button
+              type="button"
               onClick={handleApply}
-              className={`inline-block text-sm text-center px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded hover:bg-blue-700 transition dark:bg-blue-800 dark:border-gray-500 dark:hover:bg-blue-700 dark:text-white`}
+              className="inline-block text-sm text-center px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded hover:bg-blue-700 transition dark:bg-blue-800 dark:border-gray-500 dark:hover:bg-blue-700 dark:text-white"
               aria-label="Apply for this job"
             >
               Apply
@@ -230,7 +267,9 @@ const JobDetails = () => {
         <div className="border-t dark:border-gray-700 my-6"></div>
 
         <div className="prose max-w-none dark:prose-invert prose-p:text-gray-700 dark:text-white prose-h3:text-gray-900 dark:prose-h3:text-gray-100 prose-h4:text-gray-900 dark:prose-h4:text-gray-100 prose-ul:text-gray-700 dark:text-white prose-ol:text-gray-700 dark:text-white">
-          <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">Job Description</h2>
+          <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">
+            Job Description
+          </h2>
           <ReactMarkdown>{job.description}</ReactMarkdown>
         </div>
       </div>
@@ -260,6 +299,7 @@ const JobDetails = () => {
             </p>
             <div className="flex justify-end gap-4">
               <button
+                type="button"
                 onClick={handleCancel}
                 className="px-4 py-2 text-sm text-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition"
                 aria-label="Cancel"
@@ -267,13 +307,16 @@ const JobDetails = () => {
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleConfirm}
                 className={`px-4 py-2 text-sm text-white rounded transition ${
                   confirmAction === 'save'
                     ? 'bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700'
                     : 'bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700'
                 }`}
-                aria-label={confirmAction === 'save' ? 'Confirm Save' : 'Confirm Unsave'}
+                aria-label={
+                  confirmAction === 'save' ? 'Confirm Save' : 'Confirm Unsave'
+                }
               >
                 Confirm
               </button>

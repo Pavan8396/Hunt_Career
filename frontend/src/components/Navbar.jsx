@@ -72,7 +72,7 @@ const Navbar = () => {
   const handleNotificationClick = (notification) => {
     const { applicationId, senderName, jobId, jobTitle } = notification;
     const path =
-      userType === 'employer' ? '/employer/posted-jobs' : '/applied-jobs';
+      userType === 'employer' ? '/employer/posted-jobs' : '/applied';
     navigate(path, {
       state: {
         chatToOpen: { applicationId, recipientName: senderName, jobTitle, jobId },
