@@ -7,7 +7,7 @@ import {
   removeJob,
   isJobSaved,
 } from '../utils/localStorageHelpers';
-import { fetchJobById, applyForJob, getUserApplications, getEmployerDetails } from '../services/api';
+import { fetchJobById, applyForJob, getApplicationForJob } from '../services/api';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'react-toastify';
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa';
@@ -22,16 +22,15 @@ const JobDetails = () => {
   const [notification, setNotification] = useState({ message: '', type: '' });
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
-  const { joinRoom } = useContext(ChatContext);
-  const { token } = useContext(AuthContext);
+  const { openChatForApplication } = useContext(ChatContext);
+  const { token, user } = useContext(AuthContext);
 
-  const [applied, setApplied] = useState(false);
+  const [application, setApplication] = useState(null);
 
   const handleApply = async () => {
     try {
-      const token = sessionStorage.getItem('token');
-      await applyForJob(job._id, token);
-      setApplied(true);
+      const newApplication = await applyForJob(job._id, token);
+      setApplication(newApplication);
       toast.success('Application submitted successfully!');
     } catch (error) {
       toast.error(error.message);
@@ -39,37 +38,26 @@ const JobDetails = () => {
   };
 
   useEffect(() => {
-    const loadJob = async () => {
+    const loadJobAndApplication = async () => {
       setLoading(true);
       setError(null);
       try {
         const foundJob = await fetchJobById(id);
         setJob(foundJob);
         setSaved(isJobSaved(foundJob._id));
+
+        if (user && user.type === 'user' && token) {
+          const app = await getApplicationForJob(id, token);
+          setApplication(app);
+        }
       } catch (err) {
         setError('Failed to load job details. Please ensure the backend server is running and try again.');
       } finally {
         setLoading(false);
       }
     };
-    loadJob();
-  }, [id]);
-
-  useEffect(() => {
-    const checkApplicationStatus = async () => {
-      if (job) {
-        try {
-          const token = sessionStorage.getItem('token');
-          const userApplications = await getUserApplications(token);
-          const hasApplied = userApplications.some(app => app.job === job._id);
-          setApplied(hasApplied);
-        } catch (error) {
-          // Error is already toasted in the service
-        }
-      }
-    };
-    checkApplicationStatus();
-  }, [job]);
+    loadJobAndApplication();
+  }, [id, user, token]);
 
   const toggleSave = () => {
     setConfirmAction(saved ? 'unsave' : 'save');
@@ -194,20 +182,19 @@ const JobDetails = () => {
             {saved ? 'Unsave' : 'Save'}
           </button>
 
-          {applied ? (
+          {application ? (
             <button
-              onClick={async () => {
-                try {
-                  const employerDetails = await getEmployerDetails(job.employer, token);
-                  joinRoom(job.employer, employerDetails.name, token);
-                } catch (error) {
-                  console.error("Could not fetch employer details for chat.", error);
-                }
-              }}
+              onClick={() =>
+                openChatForApplication(
+                  application._id,
+                  job.company,
+                  job.title
+                )
+              }
               className="inline-block text-sm text-center px-4 py-2 bg-green-600 text-white border border-green-600 rounded hover:bg-green-700 transition dark:bg-green-800 dark:border-gray-500 dark:hover:bg-green-700 dark:text-white"
               data-chat-opener="true"
             >
-              Message Employer
+              Message Recruiter
             </button>
           ) : (
             <button
