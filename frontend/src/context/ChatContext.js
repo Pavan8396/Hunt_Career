@@ -1,12 +1,12 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from './AuthContext';
-import { getChatHistory, deleteChatHistory } from '../services/api'; // Removed getNotifications
+import { getChatHistory, deleteChatHistory } from '../services/api';
 
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
-  const [messages, setMessages] = useState({}); // Store messages by roomId
+  const [messages, setMessages] = useState({});
   const [activeRoom, setActiveRoom] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [recipient, setRecipient] = useState(null);
@@ -17,15 +17,12 @@ const ChatProvider = ({ children }) => {
 
   useEffect(() => {
     if (user && token) {
-      // Cleanup previous socket instance if it exists
       if (socketRef.current) {
         socketRef.current.disconnect();
       }
 
       const socket = io('http://localhost:5000', {
         query: { token },
-        transports: ['websocket'],
-        upgrade: false,
       });
       socketRef.current = socket;
 
@@ -44,7 +41,6 @@ const ChatProvider = ({ children }) => {
         }));
       };
 
-      // Listen for the complete notification list from the server
       const onNotifications = (serverNotifications) => {
         console.log('[ChatContext] Received \'notifications\' event with data:', serverNotifications);
         setNotifications(serverNotifications);
@@ -55,7 +51,6 @@ const ChatProvider = ({ children }) => {
       socket.on('receiveMessage', onReceiveMessage);
       socket.on('notifications', onNotifications);
 
-      // Cleanup function to remove listeners and disconnect socket
       return () => {
         socket.off('connect', onConnect);
         socket.off('disconnect', onDisconnect);
@@ -73,7 +68,6 @@ const ChatProvider = ({ children }) => {
       setActiveRoom(roomId);
       setRecipient(recipientName);
 
-      // Fetch chat history if it's not already loaded
       if (!messages[roomId]) {
         try {
           const history = await getChatHistory(roomId, token);
@@ -91,7 +85,6 @@ const ChatProvider = ({ children }) => {
       }
 
       socketRef.current.emit('joinRoom', roomId);
-      // Tell the server we've read this room's messages
       socketRef.current.emit('markAsRead', { roomId, userId: user._id });
 
       setIsChatOpen(true);
