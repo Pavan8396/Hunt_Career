@@ -55,7 +55,7 @@ const AppliedJobs = () => {
     }
     const recipientName =
       application.job.employer.companyName || 'the employer';
-    openChatForApplication(application._id, recipientName);
+    openChatForApplication(application._id, recipientName, application.job.title);
   };
 
   if (loading) {

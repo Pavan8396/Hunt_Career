@@ -11,6 +11,7 @@ const Chatbox = () => {
     closeChat,
     recipient,
     deleteChat,
+    activeJobTitle,
   } = useContext(ChatContext);
   const { user } = useContext(AuthContext);
   const [newMessage, setNewMessage] = useState('');
@@ -71,9 +72,14 @@ const Chatbox = () => {
       className="fixed bottom-4 right-4 w-96 h-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg flex flex-col z-50"
     >
       <header className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">
-          Chat with {recipient}
-        </h3>
+        <div>
+          <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">
+            Chat with {recipient}
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+            {activeJobTitle}
+          </p>
+        </div>
         <div className="flex space-x-2">
           <button
             onClick={deleteChat}
