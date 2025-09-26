@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { MoonIcon, MenuIcon, XIcon, BellIcon } from '@heroicons/react/outline';
 import { ThemeContext } from '../context/ThemeContext';
 import { AuthContext } from '../context/AuthContext';
@@ -15,12 +15,15 @@ const Navbar = () => {
 
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const { isAuthenticated, user, userType, logout } = useContext(AuthContext);
-  const { notifications, openChatForApplication } = useContext(ChatContext);
+  const { notifications } = useContext(ChatContext);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const dropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const notificationRef = useRef(null);
+
+  const hideAuthLinksPaths = ['/', '/login', '/signup', '/employer/login', '/employer/signup'];
 
   const totalUnread = notifications.reduce((sum, notif) => sum + notif.count, 0);
 
@@ -222,22 +225,24 @@ const Navbar = () => {
           </button>
         </>
       ) : (
-        <>
-          <Link
-            to="/login"
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Login
-          </Link>
-          <Link
-            to="/signup"
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            Signup
-          </Link>
-        </>
+        !hideAuthLinksPaths.includes(location.pathname) && (
+          <>
+            <Link
+              to="/login"
+              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Login
+            </Link>
+            <Link
+              to="/signup"
+              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Signup
+            </Link>
+          </>
+        )
       )}
     </div>
   );
@@ -270,14 +275,16 @@ const Navbar = () => {
           {isAuthenticated ? (
             <UserMenu />
           ) : (
-            <>
-              <Link to="/login" className="hover:text-gray-200 transition">
-                Login
-              </Link>
-              <Link to="/signup" className="hover:text-gray-200 transition">
-                Signup
-              </Link>
-            </>
+            !hideAuthLinksPaths.includes(location.pathname) && (
+              <>
+                <Link to="/login" className="hover:text-gray-200 transition">
+                  Login
+                </Link>
+                <Link to="/signup" className="hover:text-gray-200 transition">
+                  Signup
+                </Link>
+              </>
+            )
           )}
         </div>
         {isMobileMenuOpen && <MobileMenu />}

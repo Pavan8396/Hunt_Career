@@ -24,6 +24,15 @@ const ProtectedRoute = ({ children }) => {
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
+const GuestOrAuthenticatedRoute = ({ children }) => {
+  const isAuthenticated = !!sessionStorage.getItem('token');
+  return isAuthenticated ? (
+    <AuthenticatedLayout>{children}</AuthenticatedLayout>
+  ) : (
+    <Layout>{children}</Layout>
+  );
+};
+
 function App() {
   return (
     <ThemeProvider>
@@ -33,20 +42,12 @@ function App() {
             <Routes>
               {/* Authenticated routes with the new sidebar layout */}
               <Route
-                path="/home"
-                element={<ProtectedRoute><AuthenticatedLayout><Home /></AuthenticatedLayout></ProtectedRoute>}
-              />
-              <Route
                 path="/saved"
                 element={<ProtectedRoute><AuthenticatedLayout><SavedJobs /></AuthenticatedLayout></ProtectedRoute>}
               />
               <Route
                 path="/applied"
                 element={<ProtectedRoute><AuthenticatedLayout><AppliedJobs /></AuthenticatedLayout></ProtectedRoute>}
-              />
-              <Route
-                path="/jobs/:id"
-                element={<ProtectedRoute><AuthenticatedLayout><JobDetails /></AuthenticatedLayout></ProtectedRoute>}
               />
               <Route
                 path="/employer"
@@ -56,6 +57,16 @@ function App() {
                 <Route path="post-job" element={<PostJobPage />} />
                 <Route path="posted-jobs" element={<PostedJobsPage />} />
               </Route>
+
+              {/* Public and guest-accessible routes */}
+              <Route
+                path="/home"
+                element={<GuestOrAuthenticatedRoute><Home /></GuestOrAuthenticatedRoute>}
+              />
+              <Route
+                path="/jobs/:id"
+                element={<GuestOrAuthenticatedRoute><JobDetails /></GuestOrAuthenticatedRoute>}
+              />
 
               {/* Public routes with the simple layout */}
               <Route path="/" element={<Layout><UserTypeSelection /></Layout>} />

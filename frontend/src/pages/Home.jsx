@@ -1,14 +1,19 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import JobCard from '../components/JobCard';
 import SkeletonCard from '../components/SkeletonCard';
 import { fetchJobs } from '../services/api';
 import SearchBar from '../components/SearchBar';
 import { toast } from 'react-toastify';
+import { AuthContext } from '../context/AuthContext';
 
 const JOBS_PER_PAGE = 6;
 const jobTypes = ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'];
 
 const Home = () => {
+  const { isAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [jobs, setJobs] = useState([]);
   const [location, setLocation] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -371,6 +376,11 @@ const Home = () => {
               id={job._id}
               {...job}
               onSave={() => {
+                if (!isAuthenticated) {
+                  toast.info('Please log in to save jobs.');
+                  navigate('/login');
+                  return;
+                }
                 showNotification(`Job "${job.title}" saved!`);
                 toast.success(`Job "${job.title}" saved!`);
               }}
