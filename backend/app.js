@@ -22,9 +22,12 @@ const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
+// Enable pre-flight for all routes
+app.options('*', cors());
+
 app.use(cors({
   origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'DELETE'],
   allowedHeaders: ['Authorization', 'Content-Type'],
   credentials: true,
 }));
