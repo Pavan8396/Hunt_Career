@@ -37,16 +37,17 @@ const AppliedJobs = () => {
   }, [user, fetchAppliedJobs]);
 
   useEffect(() => {
-    const { state } = location;
-    if (state?.openChatForJobId && applications.length > 0) {
-      const app = applications.find(
-        (app) => app.job && app.job._id === state.openChatForJobId
-      );
-      if (app) {
-        openChat(app);
+    const openChatFromState = () => {
+      const { state } = location;
+      if (state?.chatToOpen) {
+        const { applicationId, recipientName, jobTitle } = state.chatToOpen;
+        openChatForApplication(applicationId, recipientName, jobTitle);
+        // Clear the state to prevent re-triggering on navigation
+        navigate(location.pathname, { replace: true, state: {} });
       }
-    }
-  }, [location, applications, openChatForApplication]);
+    };
+    openChatFromState();
+  }, [location, openChatForApplication, navigate]);
 
   const openChat = (application) => {
     if (!application.job || !application.job.employer) {
