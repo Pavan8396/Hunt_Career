@@ -31,6 +31,8 @@ const getNotificationsForUser = async (userId) => {
           jobId: { $first: '$jobId' },
         },
       },
+      // Filter out any notifications that don't have a jobId (from old chats)
+      { $match: { jobId: { $exists: true, $ne: null } } },
       // Convert string _id to ObjectId for lookups
       {
         $addFields: {
