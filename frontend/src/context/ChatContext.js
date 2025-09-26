@@ -71,12 +71,27 @@ const ChatProvider = ({ children }) => {
 
   const sendMessage = (text) => {
     if (text.trim() && activeApplicationId && user && socketRef.current) {
-      const messageData = {
+      const messageDataForSocket = {
         applicationId: activeApplicationId,
         senderId: user._id,
         text,
       };
-      socketRef.current.emit('sendMessage', messageData);
+
+      const optimisticMessage = {
+        sender: { _id: user._id, name: user.name },
+        text,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => ({
+        ...prev,
+        [activeApplicationId]: [
+          ...(prev[activeApplicationId] || []),
+          optimisticMessage,
+        ],
+      }));
+
+      socketRef.current.emit('sendMessage', messageDataForSocket);
     }
   };
 
