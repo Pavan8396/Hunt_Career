@@ -26,6 +26,7 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
 };
 
 export const getNotifications = async (token) => {
+  console.log('[getNotifications] Using token:', token);
   try {
     const response = await fetch(`${API_URL}/chat/notifications`, {
       headers: {
