@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
 import { XIcon, TrashIcon } from '@heroicons/react/outline';
+import { PaperAirplaneIcon } from '@heroicons/react/solid';
 
 const Chatbox = () => {
   const {
@@ -69,28 +70,28 @@ const Chatbox = () => {
   return (
     <div
       ref={chatboxRef}
-      className="fixed bottom-4 right-4 w-96 h-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg flex flex-col z-50"
+      className="fixed bottom-4 right-4 w-96 h-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl flex flex-col z-50"
     >
-      <header className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-        <div>
-          <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">
-            Chat with {recipient}
+      <header className="bg-gray-50 dark:bg-gray-900 p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+        <div className="flex-grow">
+          <h3 className="font-bold text-md text-gray-800 dark:text-gray-100">
+            {recipient}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-            {activeJobTitle}
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">
+            RE: {activeJobTitle}
           </p>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex items-center space-x-2">
           <button
             onClick={deleteChat}
-            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             aria-label="Delete chat"
           >
             <TrashIcon className="h-5 w-5" />
           </button>
           <button
             onClick={closeChat}
-            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
             aria-label="Close chat"
           >
             <XIcon className="h-5 w-5" />
@@ -98,7 +99,7 @@ const Chatbox = () => {
         </div>
       </header>
 
-      <main className="flex-grow p-4 overflow-y-auto h-80 flex flex-col space-y-3">
+      <main className="flex-grow p-3 overflow-y-auto h-80 flex flex-col space-y-2">
         {messages.map((msg, index) => {
           const isSender = getSenderId(msg) === user._id;
           return (
@@ -108,13 +109,13 @@ const Chatbox = () => {
             >
               <div
                 onClick={() => toggleTimestamp(index)}
-                className={`px-4 py-2 rounded-2xl max-w-[75%] break-words cursor-pointer ${
+                className={`px-3 py-2 rounded-xl max-w-[75%] break-words cursor-pointer ${
                   isSender
                     ? 'bg-lime-200 text-black rounded-br-none'
                     : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100 rounded-bl-none'
                 }`}
               >
-                <p>{msg.text}</p>
+                <p className="text-sm">{msg.text}</p>
                 {visibleTimestamps[index] && (
                   <p
                     className={`text-xs mt-1 ${
@@ -133,21 +134,21 @@ const Chatbox = () => {
         <div ref={messagesEndRef} />
       </main>
 
-      <footer className="p-4 border-t dark:border-gray-700">
-        <form onSubmit={handleSendMessage} className="flex">
+      <footer className="bg-gray-50 dark:bg-gray-900 p-3 border-t border-gray-200 dark:border-gray-700">
+        <form onSubmit={handleSendMessage} className="flex items-center">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            className="flex-grow p-2 border rounded-l-lg dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-1 focus:ring-lime-400"
+            className="flex-grow p-2 text-sm border-gray-300 rounded-full focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             placeholder="Type a message..."
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-lime-300 hover:bg-lime-400 text-black rounded-r-lg"
+            className="ml-2 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             aria-label="Send message"
           >
-            Send
+            <PaperAirplaneIcon className="h-5 w-5 transform rotate-45" />
           </button>
         </form>
       </footer>
