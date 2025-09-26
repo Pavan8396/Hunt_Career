@@ -48,11 +48,18 @@ const PostedJobsPage = () => {
   }, [token, fetchJobs]);
 
   useEffect(() => {
-    const { state } = location;
-    if (state?.openChatForJobId) {
-      handleViewApplications(state.openChatForJobId);
-    }
-  }, [location, handleViewApplications]);
+    const openChatFromState = async () => {
+      const { state } = location;
+      if (state?.chatToOpen) {
+        const { applicationId, recipientName, jobTitle, jobId } = state.chatToOpen;
+        await handleViewApplications(jobId);
+        openChatForApplication(applicationId, recipientName, jobTitle);
+        // Clear the state to prevent re-triggering on navigation
+        navigate(location.pathname, { replace: true, state: {} });
+      }
+    };
+    openChatFromState();
+  }, [location, handleViewApplications, openChatForApplication, navigate]);
 
   const handleShortlist = async (applicationId, jobId) => {
     try {
