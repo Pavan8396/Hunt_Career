@@ -4,8 +4,14 @@ import { AuthContext } from '../context/AuthContext';
 import { XIcon, TrashIcon } from '@heroicons/react/outline';
 
 const Chatbox = () => {
-  const { messages, isChatOpen, sendMessage, closeChat, recipient, deleteChat } =
-    useContext(ChatContext);
+  const {
+    messages,
+    isChatOpen,
+    sendMessage,
+    closeChat,
+    recipient,
+    deleteChat,
+  } = useContext(ChatContext);
   const { user } = useContext(AuthContext);
   const [newMessage, setNewMessage] = useState('');
   const [visibleTimestamps, setVisibleTimestamps] = useState({});
@@ -41,21 +47,22 @@ const Chatbox = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [closeChat]);
 
-  if (!isChatOpen) {
-    return null;
-  }
+  if (!isChatOpen) return null;
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return '';
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(timestamp).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   const toggleTimestamp = (index) => {
-    setVisibleTimestamps((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+    setVisibleTimestamps((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  const getSenderId = (msg) => {
+    return typeof msg.sender === 'object' ? msg.sender._id : msg.sender;
   };
 
   return (
@@ -63,8 +70,7 @@ const Chatbox = () => {
       ref={chatboxRef}
       className="fixed bottom-4 right-4 w-96 h-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg flex flex-col z-50"
     >
-      {/* Header */}
-      <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
+      <header className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
         <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">
           Chat with {recipient}
         </h3>
@@ -72,25 +78,26 @@ const Chatbox = () => {
           <button
             onClick={deleteChat}
             className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            aria-label="Delete chat"
           >
             <TrashIcon className="h-5 w-5" />
           </button>
           <button
             onClick={closeChat}
             className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            aria-label="Close chat"
           >
             <XIcon className="h-5 w-5" />
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Messages */}
-      <div className="flex-grow p-4 overflow-y-auto h-80 flex flex-col space-y-3">
+      <main className="flex-grow p-4 overflow-y-auto h-80 flex flex-col space-y-3">
         {messages.map((msg, index) => {
-          const isSender = msg.sender === user._id;
+          const isSender = getSenderId(msg) === user._id;
           return (
             <div
-              key={index}
+              key={msg._id || index}
               className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
             >
               <div
@@ -118,14 +125,10 @@ const Chatbox = () => {
           );
         })}
         <div ref={messagesEndRef} />
-      </div>
+      </main>
 
-      {/* Input */}
-      <form
-        onSubmit={handleSendMessage}
-        className="p-4 border-t dark:border-gray-700"
-      >
-        <div className="flex">
+      <footer className="p-4 border-t dark:border-gray-700">
+        <form onSubmit={handleSendMessage} className="flex">
           <input
             type="text"
             value={newMessage}
@@ -136,11 +139,12 @@ const Chatbox = () => {
           <button
             type="submit"
             className="px-4 py-2 bg-lime-300 hover:bg-lime-400 text-black rounded-r-lg"
+            aria-label="Send message"
           >
             Send
           </button>
-        </div>
-      </form>
+        </form>
+      </footer>
     </div>
   );
 };

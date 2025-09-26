@@ -1,4 +1,11 @@
-import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useCallback,
+} from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from './AuthContext';
 import { getChatHistory, deleteChatHistory } from '../services/api';
@@ -7,135 +14,100 @@ const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState({});
-  const [activeRoom, setActiveRoom] = useState(null);
+  const [activeApplicationId, setActiveApplicationId] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [recipient, setRecipient] = useState(null);
-  const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const { user, token } = useContext(AuthContext);
   const socketRef = useRef(null);
-  const [notifications, setNotifications] = useState([]);
+
+  const handleNewMessage = useCallback((data) => {
+    const { applicationId, ...message } = data;
+    setMessages((prev) => ({
+      ...prev,
+      [applicationId]: [...(prev[applicationId] || []), message],
+    }));
+  }, []);
+
+  const handleNotifications = useCallback((serverNotifications) => {
+    setNotifications(serverNotifications);
+  }, []);
 
   useEffect(() => {
     if (user && token) {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-
-      const socket = io('http://localhost:5000', {
-        query: { token },
-      });
+      const socket = io('http://localhost:5000', { query: { token } });
       socketRef.current = socket;
 
-      const onConnect = () => setIsSocketConnected(true);
-      const onDisconnect = () => setIsSocketConnected(false);
-
-      const onReceiveMessage = (data) => {
-        const message = {
-          sender: data.sender,
-          text: data.text,
-          timestamp: data.timestamp,
-        };
-        setMessages((prev) => ({
-          ...prev,
-          [data.roomId]: [...(prev[data.roomId] || []), message],
-        }));
-      };
-
-      const onNotifications = (serverNotifications) => {
-        console.log('[ChatContext] Received \'notifications\' event with data:', serverNotifications);
-        setNotifications(serverNotifications);
-      };
-
-      socket.on('connect', onConnect);
-      socket.on('disconnect', onDisconnect);
-      socket.on('receiveMessage', onReceiveMessage);
-      socket.on('notifications', onNotifications);
+      socket.on('receiveMessage', handleNewMessage);
+      socket.on('notifications', handleNotifications);
 
       return () => {
-        socket.off('connect', onConnect);
-        socket.off('disconnect', onDisconnect);
-        socket.off('receiveMessage', onReceiveMessage);
-        socket.off('notifications', onNotifications);
+        socket.off('receiveMessage', handleNewMessage);
+        socket.off('notifications', handleNotifications);
         socket.disconnect();
-        socketRef.current = null;
       };
     }
-  }, [user, token]);
+  }, [user, token, handleNewMessage, handleNotifications]);
 
-  const joinRoom = async (otherUserId, recipientName) => {
-    if (user && isSocketConnected) {
-      const roomId = [user._id, otherUserId].sort().join('_');
-      setActiveRoom(roomId);
-      setRecipient(recipientName);
+  const openChatForApplication = async (applicationId, recipientName) => {
+    if (!user || !socketRef.current) return;
 
-      if (!messages[roomId]) {
-        try {
-          const history = await getChatHistory(roomId, token);
-          setMessages((prev) => ({
-            ...prev,
-            [roomId]: history.map(msg => ({
-              sender: msg.user,
-              text: msg.text,
-              timestamp: msg.timestamp,
-            })),
-          }));
-        } catch (error) {
-          console.error("Failed to fetch chat history", error);
-        }
+    setActiveApplicationId(applicationId);
+    setRecipient(recipientName);
+
+    if (!messages[applicationId]) {
+      try {
+        const history = await getChatHistory(applicationId, token);
+        setMessages((prev) => ({ ...prev, [applicationId]: history }));
+      } catch (error) {
+        console.error('Failed to fetch chat history', error);
       }
-
-      socketRef.current.emit('joinRoom', roomId);
-      socketRef.current.emit('markAsRead', { roomId, userId: user._id });
-
-      setIsChatOpen(true);
     }
+
+    socketRef.current.emit('joinRoom', { applicationId });
+    socketRef.current.emit('markAsRead', { applicationId });
+    setIsChatOpen(true);
   };
 
   const sendMessage = (text) => {
-    if (text.trim() && activeRoom && user && socketRef.current) {
+    if (text.trim() && activeApplicationId && user && socketRef.current) {
       const messageData = {
-        roomId: activeRoom,
-        sender: user._id,
+        applicationId: activeApplicationId,
+        senderId: user._id,
         text,
-        timestamp: new Date(),
       };
-      setMessages((prev) => ({
-        ...prev,
-        [activeRoom]: [...(prev[activeRoom] || []), messageData],
-      }));
       socketRef.current.emit('sendMessage', messageData);
     }
   };
 
-  const closeChat = () => {
-    setIsChatOpen(false);
-  };
+  const closeChat = () => setIsChatOpen(false);
 
   const deleteChat = async () => {
-    if (activeRoom) {
+    if (activeApplicationId) {
       try {
-        await deleteChatHistory(activeRoom, token);
+        await deleteChatHistory(activeApplicationId, token);
         setMessages((prev) => {
           const newMessages = { ...prev };
-          delete newMessages[activeRoom];
+          delete newMessages[activeApplicationId];
           return newMessages;
         });
+        closeChat();
       } catch (error) {
-        console.error("Failed to delete chat history", error);
+        console.error('Failed to delete chat history', error);
       }
     }
   };
 
   const value = {
-    messages: messages[activeRoom] || [],
-    activeRoom,
+    messages: messages[activeApplicationId] || [],
     isChatOpen,
     recipient,
     notifications,
-    joinRoom,
+    openChatForApplication,
     sendMessage,
     closeChat,
     deleteChat,
+    activeApplicationId,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
