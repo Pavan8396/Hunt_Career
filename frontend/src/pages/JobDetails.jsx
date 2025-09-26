@@ -27,6 +27,31 @@ const JobDetails = () => {
 
   const [hasApplied, setHasApplied] = useState(false);
 
+  useEffect(() => {
+    const loadJobAndApplicationStatus = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // First, fetch the job details
+        const foundJob = await fetchJobById(id);
+        setJob(foundJob);
+        setSaved(isJobSaved(foundJob._id));
+
+        // Then, if the user is a logged-in job seeker, check their application status
+        if (user && user.type === 'user' && token) {
+          const app = await getApplicationForJob(id, token);
+          setHasApplied(!!app);
+        }
+      } catch (err) {
+        setError('Failed to load job details. Please ensure the backend server is running and try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadJobAndApplicationStatus();
+  }, [id, user, token]);
+
   const handleApply = async () => {
     try {
       await applyForJob(job._id, token);
@@ -37,40 +62,6 @@ const JobDetails = () => {
     }
   };
 
-  const checkApplicationStatus = useCallback(async () => {
-    if (user && user.type === 'user' && token) {
-      try {
-        const app = await getApplicationForJob(id, token);
-        setHasApplied(!!app);
-      } catch (error) {
-        console.error('Failed to check application status:', error);
-      }
-    }
-  }, [id, user, token]);
-
-  useEffect(() => {
-    const loadJobDetails = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const foundJob = await fetchJobById(id);
-        setJob(foundJob);
-        setSaved(isJobSaved(foundJob._id));
-      } catch (err) {
-        setError('Failed to load job details. Please ensure the backend server is running and try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadJobDetails();
-  }, [id]);
-
-  useEffect(() => {
-    if (job) {
-      checkApplicationStatus();
-    }
-  }, [job, checkApplicationStatus]);
-
   const handleMessageRecruiter = async () => {
     try {
       const app = await getApplicationForJob(job._id, token);
@@ -78,7 +69,7 @@ const JobDetails = () => {
         openChatForApplication(app._id, job.company, job.title);
       } else {
         toast.error('Could not find application details to start chat.');
-        setHasApplied(false);
+        setHasApplied(false); // Correct the state if something is out of sync
       }
     } catch (error) {
       toast.error('An error occurred while trying to start the chat.');
