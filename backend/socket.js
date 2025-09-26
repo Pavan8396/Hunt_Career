@@ -1,105 +1,106 @@
-const { Server } = require("socket.io");
+const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('./config/env');
 const Chat = require('./models/chatModel');
-const User = require('./models/userModel');
+const Application = require('./models/applicationModel');
 const notificationService = require('./services/notificationService');
+const mongoose = require('mongoose');
 
 const initSocket = (server) => {
   const io = new Server(server, {
-    cors: {
-      origin: "http://localhost:3000",
-      methods: ["GET", "POST"],
-    },
+    cors: { origin: 'http://localhost:3000', methods: ['GET', 'POST'] },
   });
 
   const userSockets = new Map();
 
-  // Middleware to authenticate socket connections
   io.use((socket, next) => {
     const token = socket.handshake.query.token;
-    if (token) {
-      jwt.verify(token, JWT_SECRET, (err, decoded) => {
-        if (err) return next(new Error('Authentication error'));
-        socket.user = decoded; // Attach user info to the socket
-        next();
-      });
-    } else {
-      next(new Error('Authentication error: Token not provided'));
-    }
+    if (!token) return next(new Error('Authentication error: Token not provided'));
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+      if (err) return next(new Error('Authentication error'));
+      socket.user = decoded;
+      next();
+    });
   });
 
   const sendNotifications = async (userId) => {
     const userSocket = userSockets.get(userId.toString());
-    if (userSocket) {
+    if (!userSocket) return;
+    try {
       const notifications = await notificationService.getNotificationsForUser(userId);
-      console.log(`[Socket] Emitting 'notifications' to userId: ${userId} with data:`, JSON.stringify(notifications, null, 2));
       userSocket.emit('notifications', notifications);
-    } else {
-      console.log(`[Socket] Could not find socket for userId: ${userId} to send notifications.`);
+    } catch (error) {
+      console.error(`Failed to send notifications to ${userId}:`, error);
     }
   };
 
-  io.on("connection", (socket) => {
+  io.on('connection', (socket) => {
     const userId = socket.user._id;
-    console.log(`User connected: ${userId} with socketId: ${socket.id}`);
     userSockets.set(userId.toString(), socket);
 
-    // Send initial notifications on connect
     sendNotifications(userId);
 
-    socket.on("joinRoom", (roomId) => {
-      socket.join(roomId);
+    socket.on('joinRoom', ({ applicationId }) => {
+      socket.join(applicationId);
     });
 
-    socket.on("sendMessage", async ({ roomId, sender, text }) => {
-      try {
-        let chat = await Chat.findOne({ roomId });
-        if (!chat) {
-          chat = new Chat({ roomId, messages: [] });
+    socket.on(
+      'sendMessage',
+      async ({ applicationId, senderId, text }) => {
+        try {
+          const application = await Application.findById(applicationId).populate('job');
+          if (!application) return;
+
+          const recipientId =
+            userId.toString() === application.user.toString()
+              ? application.job.employer
+              : application.user;
+
+          let chat = await Chat.findOne({ application: applicationId });
+          if (!chat) {
+            chat = new Chat({
+              application: applicationId,
+              job: application.job._id,
+              participants: [senderId, recipientId],
+              messages: [],
+            });
+          }
+
+          const newMessage = { sender: senderId, text, timestamp: new Date(), read: false };
+          chat.messages.push(newMessage);
+          await chat.save();
+
+          io.to(applicationId).emit('receiveMessage', {
+            ...newMessage,
+            applicationId,
+            sender: { _id: senderId, name: socket.user.name },
+          });
+
+          sendNotifications(recipientId.toString());
+        } catch (error) {
+          console.error('Error handling sendMessage:', error);
         }
-        const newMessage = { user: sender, text, timestamp: new Date(), read: false };
-        chat.messages.push(newMessage);
-        await chat.save();
-
-        const senderInfo = await User.findById(sender).select('name').lean();
-
-        // Emit message to the room
-        socket.to(roomId).emit("receiveMessage", {
-          roomId,
-          sender,
-          senderName: senderInfo ? senderInfo.name : 'Unknown',
-          text,
-          timestamp: newMessage.timestamp,
-          read: newMessage.read,
-        });
-
-        // Find recipient and send them updated notifications
-        const recipientId = roomId.split('_').find(id => id !== sender);
-        if (recipientId) {
-          sendNotifications(recipientId);
-        }
-      } catch (error) {
-        console.error('Error saving or sending message:', error);
       }
-    });
+    );
 
-    socket.on('markAsRead', async ({ roomId, userId }) => {
+    socket.on('markAsRead', async ({ applicationId }) => {
       try {
         await Chat.updateOne(
-          { roomId },
+          { application: applicationId },
           { $set: { 'messages.$[elem].read': true } },
-          { arrayFilters: [{ 'elem.user': { $ne: userId }, 'elem.read': false }] }
+          {
+            arrayFilters: [
+              { 'elem.sender': { $ne: new mongoose.Types.ObjectId(userId) }, 'elem.read': false },
+            ],
+          }
         );
-        // After marking as read, send updated notifications back to the user who read them
         sendNotifications(userId);
       } catch (error) {
         console.error('Error marking messages as read:', error);
       }
     });
 
-    socket.on("disconnect", () => {
-      console.log(`User disconnected: ${userId}`);
+    socket.on('disconnect', () => {
       userSockets.delete(userId.toString());
     });
   });

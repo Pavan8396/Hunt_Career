@@ -3,96 +3,79 @@ const mongoose = require('mongoose');
 
 const getNotificationsForUser = async (userId) => {
   try {
-    console.log(`[notificationService] Fetching notifications for userId: ${userId}`);
-
     const notifications = await Chat.aggregate([
-      // Match rooms the user is part of
       {
         $match: {
-          $or: [{ roomId: { $regex: `^${userId}_` } }, { roomId: { $regex: `_${userId}$` } }],
+          participants: new mongoose.Types.ObjectId(userId),
         },
       },
-      // Unwind the messages array
       { $unwind: '$messages' },
-      // Filter for unread messages not sent by the current user
       {
         $match: {
           'messages.read': false,
-          'messages.user': { $ne: userId.toString() },
+          'messages.sender': { $ne: new mongoose.Types.ObjectId(userId) },
         },
       },
-      // Group by sender to count messages
       {
         $group: {
-          _id: '$messages.user',
+          _id: {
+            sender: '$messages.sender',
+            job: '$job',
+            application: '$application',
+          },
           count: { $sum: 1 },
-          roomId: { $first: '$roomId' },
           lastMessage: { $last: '$messages.text' },
         },
       },
-      // Convert string _id to ObjectId for lookups
-      {
-        $addFields: {
-          senderIdObj: { $toObjectId: '$_id' }
-        }
-      },
-      // Lookup in the Users collection
       {
         $lookup: {
-          from: 'Users',
-          localField: 'senderIdObj',
+          from: 'users',
+          localField: '_id.sender',
           foreignField: '_id',
-          as: 'userInfo',
+          as: 'senderInfo',
         },
       },
-      // Lookup in the Employers collection
       {
         $lookup: {
           from: 'employers',
-          localField: 'senderIdObj',
+          localField: '_id.sender',
           foreignField: '_id',
           as: 'employerInfo',
         },
       },
-      // Combine user and employer info
       {
         $addFields: {
-          senderInfo: {
+          senderDetails: {
             $cond: {
-              if: { $gt: [{ $size: '$userInfo' }, 0] },
-              then: { $arrayElemAt: ['$userInfo', 0] },
+              if: { $gt: [{ $size: '$senderInfo' }, 0] },
+              then: { $arrayElemAt: ['$senderInfo', 0] },
               else: { $arrayElemAt: ['$employerInfo', 0] },
             },
           },
         },
       },
-      // Filter out documents where sender was not found in either collection
-      { $match: { senderInfo: { $exists: true, $ne: null } } },
-      // Project the final notification shape
+      { $match: { senderDetails: { $exists: true, $ne: null } } },
       {
         $project: {
           _id: 0,
-          senderId: '$_id',
-          // Use the correct name field based on the sender type
+          senderId: '$_id.sender',
           senderName: {
-            $cond: {
-              if: { $ifNull: ['$senderInfo.name', false] },
-              then: '$senderInfo.name',
-              else: '$senderInfo.companyName'
-            }
+            $ifNull: ['$senderDetails.name', '$senderDetails.companyName'],
           },
+          jobId: '$_id.job',
+          applicationId: '$_id.application',
           count: '$count',
-          roomId: '$roomId',
           lastMessage: '$lastMessage',
         },
       },
     ]);
-
-    console.log(`[notificationService] Found ${notifications.length} notifications for userId: ${userId}`, JSON.stringify(notifications, null, 2));
     return notifications;
   } catch (error) {
-    console.error(`[notificationService] Error fetching notifications for userId: ${userId}`, error);
-    return []; // Return an empty array in case of an error
+    console.error(
+      `[notificationService] Error fetching notifications for userId: ${userId}`,
+      error
+    );
+    throw new Error('Failed to fetch notifications');
   }
 };
 

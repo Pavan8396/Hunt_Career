@@ -1,25 +1,25 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
-import { getEmployerJobs, getApplicationsForJob, deleteJob, shortlistCandidate } from '../services/api';
+import {
+  getEmployerJobs,
+  getApplicationsForJob,
+  deleteJob,
+  shortlistCandidate,
+} from '../services/api';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState({});
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedJobId, setSelectedJobId] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
   const { token } = useContext(AuthContext);
-  const { joinRoom } = useContext(ChatContext);
+  const { openChatForApplication } = useContext(ChatContext);
+  const location = useLocation();
 
-  const handleShortlist = async (applicationId) => {
-    try {
-      await shortlistCandidate(applicationId, token);
-      handleViewApplications(selectedJob);
-    } catch (error) {
-      console.error('Failed to shortlist candidate:', error);
-    }
-  };
-
-  const fetchJobs = React.useCallback(async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       const employerJobs = await getEmployerJobs(token);
       setJobs(employerJobs);
@@ -28,43 +28,62 @@ const PostedJobsPage = () => {
     }
   }, [token]);
 
+  const handleViewApplications = useCallback(
+    async (jobId) => {
+      try {
+        const jobApplications = await getApplicationsForJob(jobId, token);
+        setApplications((prev) => ({ ...prev, [jobId]: jobApplications }));
+        setSelectedJobId(jobId);
+      } catch (error) {
+        console.error('Failed to fetch applications:', error);
+      }
+    },
+    [token]
+  );
+
   useEffect(() => {
     if (token) {
       fetchJobs();
     }
   }, [token, fetchJobs]);
 
-  const handleViewApplications = async (jobId) => {
+  useEffect(() => {
+    const { state } = location;
+    if (state?.openChatForJobId) {
+      handleViewApplications(state.openChatForJobId);
+    }
+  }, [location, handleViewApplications]);
+
+  const handleShortlist = async (applicationId, jobId) => {
     try {
-      const jobApplications = await getApplicationsForJob(jobId, token);
-      setApplications({ ...applications, [jobId]: jobApplications });
-      setSelectedJob(jobId);
+      await shortlistCandidate(applicationId, token);
+      handleViewApplications(jobId);
     } catch (error) {
-      console.error('Failed to fetch applications:', error);
+      console.error('Failed to shortlist candidate:', error);
     }
   };
 
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [confirmAction, setConfirmAction] = useState(null);
-
-  const handleDeleteJob = async (jobId) => {
-    setConfirmAction(() => () => deleteJobAction(jobId));
+  const handleDeleteJob = (jobId) => {
+    setConfirmAction(() => async () => {
+      try {
+        await deleteJob(jobId, token);
+        fetchJobs();
+      } catch (error) {
+        console.error('Failed to delete job:', error);
+      }
+      setShowConfirm(false);
+    });
     setShowConfirm(true);
-  };
-
-  const deleteJobAction = async (jobId) => {
-    try {
-      await deleteJob(jobId, token);
-      fetchJobs();
-    } catch (error) {
-      console.error('Failed to delete job:', error);
-    }
-    setShowConfirm(false);
   };
 
   const handleCancel = () => {
     setShowConfirm(false);
     setConfirmAction(null);
+  };
+
+  const openChat = (application) => {
+    const recipientName = `${application.applicant.firstName} ${application.applicant.lastName}`;
+    openChatForApplication(application._id, recipientName);
   };
 
   return (
@@ -73,7 +92,10 @@ const PostedJobsPage = () => {
       <div className="space-y-4">
         {jobs.length > 0 ? (
           jobs.map((job) => (
-            <div key={job._id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+            <div
+              key={job._id}
+              className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md"
+            >
               <h3 className="text-lg font-semibold">{job.title}</h3>
               <p>{job.company}</p>
               <div className="flex space-x-2 mt-2">
@@ -90,60 +112,56 @@ const PostedJobsPage = () => {
                   Delete
                 </button>
               </div>
-              {selectedJob === job._id && (() => {
-                const jobApplications = applications[job._id] || [];
-
-                return (
-                  <div className="mt-4">
-                    <h4 className="text-md font-semibold">
-                      Applications ({jobApplications.length})
-                    </h4>
-                    {jobApplications.length > 0 ? (
-                      jobApplications.map((app) => (
-                        <div
-                          key={app._id}
-                          className="p-2 border-t flex justify-between items-center"
-                        >
-                          {app.applicant ? (
-                            <>
-                              <div>
-                                <p>
-                                  {app.applicant.firstName} {app.applicant.lastName}
-                                </p>
-                                <p>{app.applicant.email}</p>
-                              </div>
-                              <div>
-                                {app.status !== "shortlisted" ? (
-                                  <button
-                                    onClick={() => handleShortlist(app._id)}
-                                    className="px-2 py-1 bg-green-600 text-white rounded text-sm"
-                                  >
-                                    Shortlist
-                                  </button>
-                                ) : (
-                                  <button
-                                    onClick={() => joinRoom(app.applicant._id, `${app.applicant.firstName} ${app.applicant.lastName}`, token)}
-                                    className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
-                                    data-chat-opener="true"
-                                  >
-                                    Chat
-                                  </button>
-                                )}
-                              </div>
-                            </>
-                          ) : (
-                            <p className="text-red-500">
-                              Applicant details not available.
-                            </p>
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <p>No applications to display.</p>
-                    )}
-                  </div>
-                );
-              })()}
+              {selectedJobId === job._id && (
+                <div className="mt-4">
+                  <h4 className="text-md font-semibold">
+                    Applications ({(applications[job._id] || []).length})
+                  </h4>
+                  {(applications[job._id] || []).length > 0 ? (
+                    (applications[job._id] || []).map((app) => (
+                      <div
+                        key={app._id}
+                        className="p-2 border-t flex justify-between items-center"
+                      >
+                        {app.applicant ? (
+                          <>
+                            <div>
+                              <p>
+                                {app.applicant.firstName} {app.applicant.lastName}
+                              </p>
+                              <p>{app.applicant.email}</p>
+                            </div>
+                            <div>
+                              {app.status !== 'shortlisted' ? (
+                                <button
+                                  onClick={() => handleShortlist(app._id, job._id)}
+                                  className="px-2 py-1 bg-green-600 text-white rounded text-sm"
+                                >
+                                  Shortlist
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => openChat(app)}
+                                  className="px-2 py-1 bg-blue-600 text-white rounded text-sm"
+                                  data-chat-opener="true"
+                                >
+                                  Chat
+                                </button>
+                              )}
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-red-500">
+                            Applicant details not available.
+                          </p>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p>No applications to display.</p>
+                  )}
+                </div>
+              )}
             </div>
           ))
         ) : (
