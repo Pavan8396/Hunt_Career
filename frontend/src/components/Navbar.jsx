@@ -68,9 +68,13 @@ const Navbar = () => {
 
   const handleNotificationClick = (notification) => {
     const { applicationId, senderName, jobId } = notification;
-    const path =
-      userType === 'employer' ? '/employer/posted-jobs' : '/applied-jobs';
-    navigate(path, { state: { openChatForJobId: jobId } });
+    if (userType === 'employer') {
+      navigate('/employer/posted-jobs', {
+        state: { openChatForJobId: jobId },
+      });
+    } else {
+      navigate('/applied-jobs', { state: { openChatForJobId: jobId } });
+    }
     openChatForApplication(applicationId, senderName);
     setIsNotificationOpen(false);
   };
