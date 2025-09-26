@@ -23,7 +23,7 @@ const JobDetails = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const { openChatForApplication } = useContext(ChatContext);
-  const { token, user } = useContext(AuthContext);
+  const { token, user, isAuthenticated } = useContext(AuthContext);
 
   const [hasApplied, setHasApplied] = useState(false);
 
@@ -35,7 +35,9 @@ const JobDetails = () => {
       try {
         const foundJob = await fetchJobById(id);
         setJob(foundJob);
-        setSaved(isJobSaved(foundJob._id));
+        if (isAuthenticated) {
+          setSaved(isJobSaved(foundJob._id));
+        }
       } catch (err) {
         setError('Failed to load job details. Please ensure the backend server is running and try again.');
       } finally {
@@ -43,7 +45,7 @@ const JobDetails = () => {
       }
     };
     loadJobDetails();
-  }, [id]);
+  }, [id, isAuthenticated]);
 
   // Effect for checking the application status, dependent on user and job
   useEffect(() => {
@@ -62,6 +64,11 @@ const JobDetails = () => {
 
 
   const handleApply = async () => {
+    if (!isAuthenticated) {
+      toast.info('Please log in to apply for jobs.');
+      navigate('/login');
+      return;
+    }
     try {
       await applyForJob(job._id, token);
       setHasApplied(true);
@@ -86,6 +93,11 @@ const JobDetails = () => {
   };
 
   const toggleSave = () => {
+    if (!isAuthenticated) {
+      toast.info('Please log in to save jobs.');
+      navigate('/login');
+      return;
+    }
     setConfirmAction(saved ? 'unsave' : 'save');
     setShowConfirm(true);
   };
@@ -112,14 +124,6 @@ const JobDetails = () => {
     setConfirmAction(null);
   };
 
-  const handleHomeClick = (e) => {
-    const isAuthenticated = !!sessionStorage.getItem('token');
-    if (!isAuthenticated) {
-      e.preventDefault();
-      toast.error('Please log in to continue.');
-      navigate('/login');
-    }
-  };
 
   if (loading) {
     return (
@@ -142,8 +146,9 @@ const JobDetails = () => {
       <div className="p-4 max-w-3xl mx-auto text-center">
         <p className="text-red-500 dark:text-red-400">{error}</p>
         <Link
-          to="/"
-          onClick={handleHomeClick}
+          to="/home"
+          to="/home"
+          to="/home"
           className="text-blue-600 hover:underline text-sm mt-4 inline-block dark:text-blue-200 dark:hover:text-blue-100"
           aria-label="Back to home"
         >
