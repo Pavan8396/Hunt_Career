@@ -2,10 +2,11 @@ const express = require('express');
 const { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getEmployerById } = require('../controllers/employerController');
 const { ensureDb } = require('../middleware/dbMiddleware');
 const { authenticateToken, isEmployer } = require('../middleware/authMiddleware');
+const { validateEmployerRegistration } = require('../middleware/validationMiddleware');
 
 const router = express.Router();
 
-router.post('/register', ensureDb, registerEmployer);
+router.post('/register', ensureDb, validateEmployerRegistration, registerEmployer);
 router.post('/login', ensureDb, loginEmployer);
 router.get('/applications', ensureDb, authenticateToken, isEmployer, getEmployerApplications);
 router.get('/stats/applications-over-time', ensureDb, authenticateToken, isEmployer, getApplicationsOverTime);

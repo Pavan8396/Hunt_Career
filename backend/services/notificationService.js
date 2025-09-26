@@ -95,10 +95,6 @@ const getNotificationsForUser = async (userId) => {
     ]);
     return notifications;
   } catch (error) {
-    console.error(
-      `[notificationService] Error fetching notifications for userId: ${userId}`,
-      error
-    );
     throw new Error('Failed to fetch notifications');
   }
 };

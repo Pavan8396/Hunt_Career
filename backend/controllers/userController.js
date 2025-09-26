@@ -1,5 +1,4 @@
 const userService = require('../services/userService');
-const Application = require('../models/applicationModel');
 
 const getUserDetails = async (req, res) => {
   try {
@@ -10,36 +9,24 @@ const getUserDetails = async (req, res) => {
       res.status(404).json({ message: "User not found" });
     }
   } catch (err) {
-    console.error("Fetch user error:", err.message);
     res.status(500).json({ message: "Failed to fetch user details" });
   }
 };
 
 const getUserApplications = async (req, res) => {
   try {
-    let applications = await Application.find({
-      applicant: req.user._id,
-    }).populate({
-      path: 'job',
-      populate: {
-        path: 'employer',
-        model: 'Employer',
-      },
-    });
+    const applications = await userService.getUserApplications(req.user._id);
     res.json(applications);
   } catch (error) {
-    console.error('Failed to fetch user applications:', error);
     res.status(500).json({ message: 'Failed to fetch user applications' });
   }
 };
 
 const getAppliedJobs = async (req, res) => {
   try {
-    const applications = await Application.find({ applicant: req.user._id }).populate('job');
-    const appliedJobs = applications.map(app => app.job).filter(job => job != null);
+    const appliedJobs = await userService.getAppliedJobs(req.user._id);
     res.json(appliedJobs);
   } catch (error) {
-    console.error('Error fetching applied jobs:', error);
     res.status(500).json({ message: 'Failed to fetch applied jobs' });
   }
 };

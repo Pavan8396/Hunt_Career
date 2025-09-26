@@ -11,6 +11,14 @@ const jobSchema = new mongoose.Schema({
   timestamps: true,
 });
 
+jobSchema.index({
+  title: 'text',
+  company: 'text',
+  description: 'text',
+  candidate_required_location: 'text',
+  job_type: 'text',
+});
+
 const Job = mongoose.model('Job', jobSchema, 'Jobs');
 
 module.exports = Job;

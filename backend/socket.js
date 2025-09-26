@@ -30,7 +30,6 @@ const initSocket = (server) => {
       const notifications = await notificationService.getNotificationsForUser(userId);
       userSocket.emit('notifications', notifications);
     } catch (error) {
-      console.error(`Failed to send notifications to ${userId}:`, error);
     }
   };
 
@@ -66,7 +65,8 @@ const initSocket = (server) => {
             });
           }
 
-          const newMessage = { sender: senderId, text, timestamp: new Date(), read: false };
+          const senderType = socket.user.type === 'user' ? 'User' : 'Employer';
+          const newMessage = { sender: senderId, senderType, text, timestamp: new Date(), read: false };
           chat.messages.push(newMessage);
           await chat.save();
 
@@ -78,7 +78,6 @@ const initSocket = (server) => {
 
           sendNotifications(recipientId.toString());
         } catch (error) {
-          console.error('Error handling sendMessage:', error);
         }
       }
     );
@@ -96,7 +95,6 @@ const initSocket = (server) => {
         );
         sendNotifications(userId);
       } catch (error) {
-        console.error('Error marking messages as read:', error);
       }
     });
 

@@ -5,6 +5,12 @@ const messageSchema = new Schema({
   sender: {
     type: Schema.Types.ObjectId,
     required: true,
+    refPath: 'messages.senderType',
+  },
+  senderType: {
+    type: String,
+    required: true,
+    enum: ['User', 'Employer'],
   },
   text: {
     type: String,
