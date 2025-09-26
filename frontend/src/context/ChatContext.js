@@ -69,7 +69,7 @@ const ChatProvider = ({ children }) => {
       socketRef.current.emit('markAsRead', { applicationId });
       setIsChatOpen(true);
     },
-    [user, token]
+    [user, token, setActiveApplicationId, setRecipient, setActiveJobTitle, setIsChatOpen]
   );
 
   const sendMessage = useCallback(
@@ -116,7 +116,7 @@ const ChatProvider = ({ children }) => {
         console.error('Failed to delete chat history', error);
       }
     }
-  }, [activeApplicationId, token, closeChat]);
+  }, [activeApplicationId, token]);
 
   const value = {
     messages: messages[activeApplicationId] || [],
