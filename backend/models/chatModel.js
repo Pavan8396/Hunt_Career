@@ -4,7 +4,17 @@ const chatSchema = new mongoose.Schema({
   roomId: {
     type: String,
     required: true,
+    unique: true,
   },
+  jobId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Job',
+    required: true,
+  },
+  participants: [{
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  }],
   messages: [
     {
       user: {

@@ -199,7 +199,7 @@ const JobDetails = () => {
               onClick={async () => {
                 try {
                   const employerDetails = await getEmployerDetails(job.employer, token);
-                  joinRoom(job.employer, employerDetails.name, token);
+                  joinRoom(job.employer, employerDetails.name, job._id, job.title);
                 } catch (error) {
                   console.error("Could not fetch employer details for chat.", error);
                 }

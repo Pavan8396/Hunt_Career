@@ -10,6 +10,8 @@ const ChatProvider = ({ children }) => {
   const [activeRoom, setActiveRoom] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [recipient, setRecipient] = useState(null);
+  const [currentJobId, setCurrentJobId] = useState(null);
+  const [currentJobTitle, setCurrentJobTitle] = useState(null); // For the surprise feature
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const { user, token } = useContext(AuthContext);
   const socketRef = useRef(null);
@@ -42,7 +44,6 @@ const ChatProvider = ({ children }) => {
       };
 
       const onNotifications = (serverNotifications) => {
-        console.log('[ChatContext] Received \'notifications\' event with data:', serverNotifications);
         setNotifications(serverNotifications);
       };
 
@@ -62,11 +63,13 @@ const ChatProvider = ({ children }) => {
     }
   }, [user, token]);
 
-  const joinRoom = async (otherUserId, recipientName) => {
+  const joinRoom = async (otherUserId, recipientName, jobId, jobTitle) => {
     if (user && isSocketConnected) {
       const roomId = [user._id, otherUserId].sort().join('_');
       setActiveRoom(roomId);
       setRecipient(recipientName);
+      setCurrentJobId(jobId);
+      setCurrentJobTitle(jobTitle); // Set the job title for context
 
       if (!messages[roomId]) {
         try {
@@ -97,6 +100,7 @@ const ChatProvider = ({ children }) => {
         roomId: activeRoom,
         sender: user._id,
         text,
+        jobId: currentJobId,
         timestamp: new Date(),
       };
       setMessages((prev) => ({
@@ -109,6 +113,7 @@ const ChatProvider = ({ children }) => {
 
   const closeChat = () => {
     setIsChatOpen(false);
+    setCurrentJobTitle(null); // Clear job title when chat closes
   };
 
   const deleteChat = async () => {
@@ -132,6 +137,7 @@ const ChatProvider = ({ children }) => {
     isChatOpen,
     recipient,
     notifications,
+    currentJobTitle, // Pass job title to consumers
     joinRoom,
     sendMessage,
     closeChat,

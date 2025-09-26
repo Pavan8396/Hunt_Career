@@ -21,13 +21,14 @@ const getNotificationsForUser = async (userId) => {
           'messages.user': { $ne: userId.toString() },
         },
       },
-      // Group by sender to count messages
+      // Group by sender to count messages and keep jobId
       {
         $group: {
           _id: '$messages.user',
           count: { $sum: 1 },
           roomId: { $first: '$roomId' },
           lastMessage: { $last: '$messages.text' },
+          jobId: { $first: '$jobId' },
         },
       },
       // Convert string _id to ObjectId for lookups
@@ -36,7 +37,7 @@ const getNotificationsForUser = async (userId) => {
           senderIdObj: { $toObjectId: '$_id' }
         }
       },
-      // Lookup in the Users collection
+      // Lookup sender in Users
       {
         $lookup: {
           from: 'Users',
@@ -45,7 +46,7 @@ const getNotificationsForUser = async (userId) => {
           as: 'userInfo',
         },
       },
-      // Lookup in the Employers collection
+      // Lookup sender in Employers
       {
         $lookup: {
           from: 'employers',
@@ -54,7 +55,16 @@ const getNotificationsForUser = async (userId) => {
           as: 'employerInfo',
         },
       },
-      // Combine user and employer info
+      // Lookup job title
+      {
+        $lookup: {
+          from: 'jobs',
+          localField: 'jobId',
+          foreignField: '_id',
+          as: 'jobInfo',
+        },
+      },
+      // Combine and deconstruct lookup results
       {
         $addFields: {
           senderInfo: {
@@ -64,16 +74,16 @@ const getNotificationsForUser = async (userId) => {
               else: { $arrayElemAt: ['$employerInfo', 0] },
             },
           },
+          job: { $arrayElemAt: ['$jobInfo', 0] },
         },
       },
-      // Filter out documents where sender was not found in either collection
+      // Filter out docs where sender was not found
       { $match: { senderInfo: { $exists: true, $ne: null } } },
       // Project the final notification shape
       {
         $project: {
           _id: 0,
           senderId: '$_id',
-          // Use the correct name field based on the sender type
           senderName: {
             $cond: {
               if: { $ifNull: ['$senderInfo.name', false] },
@@ -84,6 +94,8 @@ const getNotificationsForUser = async (userId) => {
           count: '$count',
           roomId: '$roomId',
           lastMessage: '$lastMessage',
+          jobId: '$jobId',
+          jobTitle: '$job.title',
         },
       },
     ]);
@@ -92,7 +104,7 @@ const getNotificationsForUser = async (userId) => {
     return notifications;
   } catch (error) {
     console.error(`[notificationService] Error fetching notifications for userId: ${userId}`, error);
-    return []; // Return an empty array in case of an error
+    return [];
   }
 };
 

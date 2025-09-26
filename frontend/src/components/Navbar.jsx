@@ -71,8 +71,11 @@ const Navbar = () => {
 
   const handleCancelLogout = () => setShowConfirm(false);
 
-  const handleNotificationClick = (senderId, senderName) => {
-    joinRoom(senderId, senderName);
+  const handleNotificationClick = (notification) => {
+    // Navigate to the job details page first
+    navigate(`/jobs/${notification.jobId}`);
+    // Then open the chat
+    joinRoom(notification.senderId, notification.senderName, notification.jobId, notification.jobTitle);
     setIsNotificationOpen(false);
   };
 
@@ -118,11 +121,14 @@ const Navbar = () => {
                       notifications.map((notif) => (
                         <div
                           key={notif.senderId}
-                          onClick={() => handleNotificationClick(notif.senderId, notif.senderName)}
+                          onClick={() => handleNotificationClick(notif)}
                           className="p-4 border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
                         >
                           <div className="font-semibold">{notif.senderName}</div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="font-medium">Job:</span> {notif.jobTitle}
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-300 truncate mt-1">
                             {notif.lastMessage}
                           </div>
                           <div className="text-xs text-blue-500 mt-1">{notif.count} new messages</div>

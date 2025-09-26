@@ -4,8 +4,15 @@ import { AuthContext } from '../context/AuthContext';
 import { XIcon, TrashIcon } from '@heroicons/react/outline';
 
 const Chatbox = () => {
-  const { messages, isChatOpen, sendMessage, closeChat, recipient, deleteChat } =
-    useContext(ChatContext);
+  const {
+    messages,
+    isChatOpen,
+    sendMessage,
+    closeChat,
+    recipient,
+    deleteChat,
+    currentJobTitle, // Surprise feature!
+  } = useContext(ChatContext);
   const { user } = useContext(AuthContext);
   const [newMessage, setNewMessage] = useState('');
   const [visibleTimestamps, setVisibleTimestamps] = useState({});
@@ -65,9 +72,16 @@ const Chatbox = () => {
     >
       {/* Header */}
       <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
-        <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">
-          Chat with {recipient}
-        </h3>
+        <div>
+          <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-200">
+            Chat with {recipient}
+          </h3>
+          {currentJobTitle && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+              Regarding: {currentJobTitle}
+            </p>
+          )}
+        </div>
         <div className="flex space-x-2">
           <button
             onClick={deleteChat}

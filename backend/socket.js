@@ -52,19 +52,31 @@ const initSocket = (server) => {
       socket.join(roomId);
     });
 
-    socket.on("sendMessage", async ({ roomId, sender, text }) => {
+    socket.on("sendMessage", async ({ roomId, sender, text, jobId }) => {
       try {
         let chat = await Chat.findOne({ roomId });
         if (!chat) {
-          chat = new Chat({ roomId, messages: [] });
+          // If chat doesn't exist, a jobId must be provided to create it.
+          if (!jobId) {
+            console.error(`[Socket] Cannot create chat for roomId ${roomId} without a jobId.`);
+            // Optionally, emit an error back to the client.
+            return;
+          }
+          const participantIds = roomId.split('_');
+          chat = new Chat({
+            roomId,
+            jobId,
+            participants: participantIds,
+            messages: [],
+          });
         }
+
         const newMessage = { user: sender, text, timestamp: new Date(), read: false };
         chat.messages.push(newMessage);
         await chat.save();
 
         const senderInfo = await User.findById(sender).select('name').lean();
 
-        // Emit message to the room
         socket.to(roomId).emit("receiveMessage", {
           roomId,
           sender,
@@ -74,7 +86,6 @@ const initSocket = (server) => {
           read: newMessage.read,
         });
 
-        // Find recipient and send them updated notifications
         const recipientId = roomId.split('_').find(id => id !== sender);
         if (recipientId) {
           sendNotifications(recipientId);
