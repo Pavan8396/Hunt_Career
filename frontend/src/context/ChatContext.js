@@ -104,6 +104,7 @@ const ChatProvider = ({ children }) => {
         jobId: currentJobId,
         timestamp: new Date(),
       };
+      console.log('[ChatContext] Emitting sendMessage with data:', messageData); // Diagnostic log
       setMessages((prev) => ({
         ...prev,
         [activeRoom]: [...(prev[activeRoom] || []), messageData],
