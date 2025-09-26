@@ -1,4 +1,5 @@
 const Chat = require('../models/chatModel');
+const mongoose = require('mongoose');
 
 const getNotificationsForUser = async (userId) => {
   try {
@@ -28,11 +29,17 @@ const getNotificationsForUser = async (userId) => {
           lastMessage: { $last: '$messages.text' },
         },
       },
+      // Convert the string _id to ObjectId for lookup
+      {
+        $addFields: {
+          senderIdObj: { $toObjectId: '$_id' }
+        }
+      },
       // Get sender's information from the Users collection
       {
         $lookup: {
           from: 'Users',
-          localField: '_id',
+          localField: 'senderIdObj', // Use the new ObjectId field for joining
           foreignField: '_id',
           as: 'senderInfo',
         },
