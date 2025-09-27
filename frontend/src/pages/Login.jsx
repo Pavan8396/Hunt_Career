@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { login as apiLogin } from '../services/api'; // Import the login function
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { isValidEmail } from '../utils/validation';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -29,8 +30,7 @@ const Login = () => {
       setError('Email is required.');
       return false;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!isValidEmail(email)) {
       setError('Please enter a valid email address.');
       return false;
     }
