@@ -57,4 +57,27 @@ describe('isValidEmail', () => {
     expect(isValidEmail('user@domain.c_m')).toBe(false);
     expect(isValidEmail(' user@example.com ')).toBe(false);
   });
+
+  describe('user-reported invalid formats', () => {
+    test('should return false for emails with spaces in the local part', () => {
+      expect(isValidEmail('u pavan@mailinator.com')).toBe(false);
+    });
+
+    test('should return false for emails with spaces in the domain part', () => {
+      expect(isValidEmail('test@domain name.com')).toBe(false);
+    });
+
+    test('should return false for emails with unclosed or invalid quotes', () => {
+      expect(isValidEmail("'upavan@mailinator.com")).toBe(false);
+      expect(isValidEmail("u'pavan@mailinator.com")).toBe(false);
+    });
+
+    test('should return false for emails with leading spaces', () => {
+      expect(isValidEmail(' user@example.com')).toBe(false);
+    });
+
+    test('should return false for emails with trailing spaces', () => {
+      expect(isValidEmail('user@example.com ')).toBe(false);
+    });
+  });
 });

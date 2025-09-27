@@ -24,6 +24,11 @@ export const isValidEmail = (email) => {
       return false;
   }
 
+  // Rule: Disallow single quotes, as per user feedback
+  if (email.includes("'")) {
+    return false;
+  }
+
   // This regex is based on the original but with fixes:
   // 1. Removed the quoted local-part alternative.
   // 2. Made the domain part stricter to disallow leading/trailing hyphens.
