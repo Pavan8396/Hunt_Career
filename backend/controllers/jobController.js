@@ -106,13 +106,13 @@ const deleteJob = async (req, res) => {
 };
 
 const getApplicationForJob = async (req, res) => {
-  console.log(`[getApplicationForJob] Checking for job: ${req.params.id}, applicant: ${req.user._id}`);
+  //console.log(`[getApplicationForJob] Checking for job: ${req.params.id}, applicant: ${req.user._id}`);
   try {
     const application = await Application.findOne({
       job: req.params.id,
       applicant: req.user._id,
     });
-    console.log(`[getApplicationForJob] Found application:`, application);
+    //console.log(`[getApplicationForJob] Found application:`, application);
     res.json(application);
   } catch (error) {
     console.error('[getApplicationForJob] Error fetching application for job:', error);

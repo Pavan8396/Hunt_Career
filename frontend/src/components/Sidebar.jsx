@@ -4,7 +4,6 @@ import { AuthContext } from '../context/AuthContext';
 import {
   HomeIcon,
   BookmarkIcon,
-  BriefcaseIcon,
   ClipboardListIcon,
   PlusCircleIcon,
   CollectionIcon
