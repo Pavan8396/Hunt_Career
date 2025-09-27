@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { employerSignup } from '../services/api';
 import { FaBuilding, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { isValidEmail } from '../utils/validation';
 
 const EmployerSignup = () => {
   const [formData, setFormData] = useState({
@@ -36,8 +37,7 @@ const EmployerSignup = () => {
       setError('Email is required.');
       return false;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!isValidEmail(email)) {
       setError('Please enter a valid email address.');
       return false;
     }

@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { signup as apiSignup } from '../services/api'; // Correct import
 import { FaUser, FaEnvelope, FaLock, FaPhone, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { isValidEmail } from '../utils/validation';
 
 const Signup = () => {
   const [firstName, setFirstName] = useState('');
@@ -40,11 +41,10 @@ const Signup = () => {
         return 'Last Name is required.';
       }
     } else if (step === 2) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!email.trim()) {
         return 'Email is required.';
       }
-      if (!emailRegex.test(email)) {
+      if (!isValidEmail(email)) {
         return 'Please enter a valid email address.';
       }
       if (password.length < 8) {
