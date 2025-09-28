@@ -37,6 +37,10 @@ const EmployerLogin = () => {
       setError('Password is required.');
       return false;
     }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return false;
+    }
     return true;
   };
 
