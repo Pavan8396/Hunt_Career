@@ -24,7 +24,6 @@ const EmployerSignup = () => {
   };
 
   const setError = (message) => {
-    setErrorMessage(message);
     toast.error(message);
   };
 

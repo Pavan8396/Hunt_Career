@@ -41,10 +41,24 @@ export const isValidEmail = (email) => {
   }
 
   // Additional checks for robustness
-  if (email.length > 320) {
+  const [localPart, domain] = email.split('@');
+
+  if (email.length > 190) {
     return false;
   }
   if (email.split('@')[0].length > 64) {
+    return false;
+  }
+
+  // Check each label in domain <= 63 characters
+  const domainParts = domain.split('.');
+  if (domainParts.some(part => part.length > 63)) {
+    return false;
+  }
+
+  // Check TLD length specifically (last part of domain)
+  const tld = domainParts[domainParts.length - 1];
+  if (tld.length < 2 || tld.length > 63) {
     return false;
   }
 

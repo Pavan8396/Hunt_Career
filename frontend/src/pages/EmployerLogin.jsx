@@ -20,7 +20,6 @@ const EmployerLogin = () => {
   };
 
   const setError = (message) => {
-    setErrorMessage(message);
     toast.error(message);
   };
 

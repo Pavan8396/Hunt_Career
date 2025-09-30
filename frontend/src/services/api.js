@@ -311,8 +311,7 @@ export const employerSignup = async (companyName, email, password) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    toast.error(`Signup failed: ${error.message}`);
-    throw new Error(`Signup failed: ${error.message}`);
+    throw error;
   }
 };
 
@@ -338,8 +337,7 @@ export const employerLogin = async (email, password) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    toast.error(`Login failed: ${error.message}`);
-    throw new Error(`Login failed: ${error.message}`);
+    throw error;
   }
 };
 
