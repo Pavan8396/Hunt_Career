@@ -5,7 +5,11 @@ on:
 
 jobs:
   build-frontend:
+    name: Build Frontend
     runs-on: ubuntu-latest
+
+    env:
+      REACT_APP_API_URL: ${{ secrets.FRONTEND_API_URL }}
 
     steps:
       - name: Checkout code
