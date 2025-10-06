@@ -1,19 +1,26 @@
 name: Frontend CI
 
 on:
-  workflow_call:   # Make it reusable
+  workflow_call:
+    inputs:
+      REACT_APP_API_URL:
+        description: "Backend API URL"
+        required: true
+        type: string
 
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
 
     env:
-      REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+      REACT_APP_API_URL: ${{ inputs.REACT_APP_API_URL }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
 

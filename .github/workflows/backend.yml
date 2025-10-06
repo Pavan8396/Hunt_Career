@@ -1,7 +1,14 @@
 name: Backend CI
 
 on:
-  workflow_call:   # Make it reusable
+  workflow_call:
+    secrets:
+      MONGO_URI:
+        required: true
+      JWT_SECRET:
+        required: true
+      CLIENT_URL:
+        required: true
 
 jobs:
   build-backend:
@@ -18,9 +25,11 @@ jobs:
       CLIENT_URL: ${{ secrets.CLIENT_URL }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '18'
 
