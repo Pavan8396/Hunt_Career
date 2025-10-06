@@ -6,13 +6,13 @@ on:
 jobs:
   frontend:
     uses: ./.github/workflows/frontend.yml
-    with:
+    secrets:
       REACT_APP_API_URL: http://localhost:5000/api
 
   backend:
     needs: frontend
     uses: ./.github/workflows/backend.yml
-    with:
+    secrets:
       MONGO_URI: mongodb://localhost:27017/hcdb
       JWT_SECRET: MySuperSecretKey123!@#$%^&*()_+=123
       CLIENT_URL: http://localhost:3000
