@@ -5,14 +5,50 @@ on:
 
 jobs:
   frontend:
-    uses: ./.github/workflows/frontend.yml
-    with:
-      REACT_APP_API_URL: http://localhost:5000/api
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frontend repo
+        uses: actions/checkout@v3
+        with:
+          repository: Pavan8396/Hunt_Career/frontend
+          path: frontend
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: frontend
+
+      - name: Start frontend server
+        run: nohup npm start &
+        working-directory: frontend
 
   backend:
     needs: frontend
-    uses: ./.github/workflows/backend.yml
-    secrets:
+    runs-on: ubuntu-latest
+    env:
       MONGO_URI: ${{ secrets.MONGO_URI }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CLIENT_URL: ${{ secrets.CLIENT_URL }}
+    steps:
+      - name: Checkout backend repo
+        uses: actions/checkout@v3
+        with:
+          repository: Pavan8396/Hunt_Career/backend
+          path: backend
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: backend
+
+      - name: Start backend server
+        run: nohup npm start &
+        working-directory: backend
+
+      - name: Wait for backend to start
+        run: |
+          for i in {1..30}; do
+            nc -z localhost 5000 && echo "Backend up!" && exit 0
+            echo "Waiting for backend..."
+            sleep 2
+          done
+          echo "Backend did not start in time" && exit 1
+        working-directory: backend
