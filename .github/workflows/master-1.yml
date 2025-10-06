@@ -4,9 +4,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  frontend:
-    uses: ./.github/workflows/frontend.yml
+  build:
+    runs-on: ubuntu-latest
 
-  backend:
-    needs: frontend
-    uses: ./.github/workflows/backend.yml
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Run Frontend CI
+        run: |
+          cd frontend
+          npm install
+          CI=false npm run build
+
+      - name: Run Backend CI
+        run: |
+          cd backend
+          npm install
+          npm start &
+          npx wait-on http://localhost:5000
