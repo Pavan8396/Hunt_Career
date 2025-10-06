@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      CI: false
       REACT_APP_API_URL: ${{ secrets.FRONTEND_API_URL }}
 
     steps:
