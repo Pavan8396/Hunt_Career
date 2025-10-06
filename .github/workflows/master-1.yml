@@ -1,0 +1,12 @@
+name: Master Pipeline 1
+
+on:
+  workflow_dispatch:
+
+jobs:
+  frontend:
+    uses: ./.github/workflows/frontend.yml
+
+  backend:
+    needs: frontend
+    uses: ./.github/workflows/backend.yml
