@@ -4,22 +4,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  frontend:
+    uses: ./.github/workflows/frontend.yml
+    with:
+      REACT_APP_API_URL: http://localhost:5000/api
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Run Frontend CI
-        run: |
-          cd frontend
-          npm install
-          CI=false npm run build
-
-      - name: Run Backend CI
-        run: |
-          cd backend
-          npm install
-          npm start &
-          npx wait-on http://localhost:5000
+  backend:
+    needs: frontend
+    uses: ./.github/workflows/backend.yml
+    with:
+      MONGO_URI: mongodb://localhost:27017/hcdb
+      JWT_SECRET: MySuperSecretKey123!@#$%^&*()_+=123
+      CLIENT_URL: http://localhost:3000

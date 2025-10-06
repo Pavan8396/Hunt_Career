@@ -1,38 +1,27 @@
 name: Frontend CI
 
 on:
-  workflow_dispatch:
+  workflow_call:   # Make it reusable
 
 jobs:
   build-frontend:
-    name: Build Frontend
     runs-on: ubuntu-latest
 
     env:
-      CI: false
-      REACT_APP_API_URL: ${{ secrets.FRONTEND_API_URL }}
+      REACT_APP_API_URL: ${{ inputs.REACT_APP_API_URL }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '18'
-
-      - name: Cache Node Modules
-        uses: actions/cache@v3
-        with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-node-frontend-${{ hashFiles('frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-frontend-
 
       - name: Install Dependencies
         run: npm install
         working-directory: frontend
 
       - name: Build Frontend
-        run: npm run build
+        run: |
+          CI=false npm run build
         working-directory: frontend

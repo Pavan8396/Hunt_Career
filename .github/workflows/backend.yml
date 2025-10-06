@@ -1,11 +1,10 @@
 name: Backend CI
 
 on:
-  workflow_dispatch:
+  workflow_call:   # Make it reusable
 
 jobs:
   build-backend:
-    name: Build and Start Backend
     runs-on: ubuntu-latest
     services:
       mongo:
@@ -14,26 +13,16 @@ jobs:
           - 27017:27017
 
     env:
-      MONGO_URI: ${{ secrets.MONGO_URI }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      CLIENT_URL: ${{ secrets.CLIENT_URL }}
+      MONGO_URI: ${{ inputs.MONGO_URI }}
+      JWT_SECRET: ${{ inputs.JWT_SECRET }}
+      CLIENT_URL: ${{ inputs.CLIENT_URL }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '18'
-
-      - name: Cache Node Modules
-        uses: actions/cache@v3
-        with:
-          path: backend/node_modules
-          key: ${{ runner.os }}-node-backend-${{ hashFiles('backend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-backend-
 
       - name: Install Dependencies
         run: npm install
@@ -45,6 +34,3 @@ jobs:
           echo "Waiting for backend to start..."
           npx wait-on http://localhost:5000
         working-directory: backend
-
-      - name: Check Backend
-        run: curl -f http://localhost:5000 || exit 1
