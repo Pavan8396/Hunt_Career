@@ -1,7 +1,7 @@
 name: Master Pipeline 1
 
 on:
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   frontend:
