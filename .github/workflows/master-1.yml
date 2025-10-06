@@ -7,11 +7,8 @@ jobs:
   frontend:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout frontend repo
+      - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          repository: Pavan8396/Hunt_Career/frontend
-          path: frontend
 
       - name: Install dependencies
         run: npm install
@@ -29,11 +26,8 @@ jobs:
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       CLIENT_URL: ${{ secrets.CLIENT_URL }}
     steps:
-      - name: Checkout backend repo
+      - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          repository: Pavan8396/Hunt_Career/backend
-          path: backend
 
       - name: Install dependencies
         run: npm install
