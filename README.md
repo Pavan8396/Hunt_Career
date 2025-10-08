@@ -1,121 +1,109 @@
 # Hunt-Career: A Modern Job Application Platform
 
-Hunt-Career is a full-stack web application designed to connect job seekers with employers. It provides a seamless experience for finding jobs, applying for them, and managing the application process.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+
+Hunt-Career is a full-stack web application designed to bridge the gap between job seekers and employers. It offers a seamless, real-time, and intuitive platform for discovering job opportunities, managing applications, and connecting with potential candidates.
 
 ## Features
 
-### For Job Seekers:
-- **Job Search:** Search for jobs with filters for keywords, locations, and job types.
-- **User Authentication:** Secure registration and login for job seekers.
-- **Apply for Jobs:** Easily apply for jobs with a single click.
-- **Saved Jobs:** Save interesting jobs to review later.
-- **Applied Jobs:** View a list of all the jobs you have applied for and their status.
-- **Real-time Chat:** Communicate with employers in real-time.
+### For Job Seekers
+- **Advanced Job Search:** Filter jobs by keywords, location, and type.
+- **One-Click Apply:** Streamline the application process.
+- **Application Tracking:** Keep track of all submitted applications and their statuses.
+- **Saved Jobs:** Bookmark jobs to apply for later.
+- **Real-time Chat:** Communicate directly with employers.
 
-### For Employers:
-- **Employer Authentication:** Secure registration and login for employers.
-- **Post a Job:** Create and publish new job postings.
-- **View Posted Jobs:** Manage all the jobs you have posted.
-- **View Applications:** See a list of all candidates who have applied for your jobs.
-- **Shortlist Candidates:** Shortlist promising candidates for further review.
-- **Shortlisted Candidates Page:** View all shortlisted candidates, grouped by job posting.
-- **Real-time Chat:** Communicate with job seekers in real-time.
-- **Enhanced Dashboard:** An informative dashboard with graphs showing applications over time and a summary of job postings by type.
+### For Employers
+- **Effortless Job Posting:** Create, manage, and publish job listings with ease.
+- **Candidate Management:** View and organize all applications in one place.
+- **Shortlisting:** Shortlist promising candidates for easy follow-up.
+- **Analytics Dashboard:** Gain insights into application trends and job posting performance.
+- **Real-time Chat:** Engage with potential hires instantly.
 
 ## Technology Stack
 
-### Frontend:
-- **React:** A JavaScript library for building user interfaces.
-- **React Router:** For declarative routing in the application.
-- **Tailwind CSS:** A utility-first CSS framework for rapid UI development.
-- **Recharts:** A composable charting library built on React components.
-- **Socket.io-client:** For real-time, bidirectional event-based communication.
+The application is built with a modern, robust technology stack to ensure scalability and performance.
 
-### Backend:
-- **Node.js:** A JavaScript runtime built on Chrome's V8 JavaScript engine.
-- **Express:** A minimal and flexible Node.js web application framework.
-- **MongoDB:** A NoSQL database for storing application data.
-- **Mongoose:** An elegant mongodb object modeling for node.js.
-- **Socket.io:** For real-time, bidirectional event-based communication.
-- **JSON Web Tokens (JWT):** For secure authentication.
+- **Frontend:** React, React Router, Tailwind CSS, Socket.io-client, Recharts
+- **Backend:** Node.js, Express, MongoDB, Mongoose, JWT, Socket.io
 
 ## Project Structure
 
-The project is organized as a monorepo with two main directories:
+This project is a monorepo containing the frontend and backend applications in separate directories.
 
--   `frontend/`: Contains the React frontend application.
--   `backend/`: Contains the Node.js/Express backend application.
+-   `frontend/`: Contains the React frontend application. For more details, see the [frontend README](./frontend/README.md).
+-   `backend/`: Contains the Node.js/Express backend API. For more details, see the [backend README](./backend/README.md).
 
 ## Getting Started
 
-To get a local copy up and running follow these simple steps.
+To get a local copy up and running, follow these simple steps.
 
 ### Prerequisites
 
--   Node.js and npm
--   MongoDB
+- Node.js and npm
+- MongoDB
 
 ### Installation
 
-1.  Clone the repo
+1.  **Clone the repo:**
     ```sh
-    git clone https://github.com/your_username_/Project-Name.git
+    git clone https://github.com/your-username/hunt-career.git
+    cd hunt-career
     ```
-2.  Install NPM packages for the backend
+
+2.  **Install backend dependencies:**
     ```sh
     cd backend
     npm install
     ```
-3.  Install NPM packages for the frontend
+
+3.  **Install frontend dependencies:**
     ```sh
     cd ../frontend
     npm install
     ```
-4.  Create a `.env` file in the `backend` directory and add the following:
-    ```
-    PORT=5000
-    MONGO_URI=your_mongodb_connection_string
-    JWT_SECRET=your_jwt_secret
-    ```
+
+4.  **Set up environment variables:**
+    - In the `backend` directory, create a `.env` file. See `backend/README.md` for required variables.
+    - In the `frontend` directory, create a `.env` file. See `frontend/README.md` for required variables.
 
 ### Running the Application
 
-You can run the frontend and backend servers concurrently from the root directory:
+You can run both the frontend and backend servers concurrently from the root directory:
 
 ```sh
 npm start
 ```
 
+This will start the backend server on `http://localhost:5000` and the frontend development server on `http://localhost:3000`.
+
 ## API Endpoints
 
-### Auth
--   `POST /api/auth/register`: Register a new job seeker.
--   `POST /api/auth/login`: Login a job seeker.
+The backend provides a comprehensive set of API endpoints for all application functionalities. For a detailed list of all endpoints, please refer to the [backend README](./backend/README.md).
 
-### Employer
--   `POST /api/employer/register`: Register a new employer.
--   `POST /api/employer/login`: Login an employer.
--   `GET /api/employer/applications`: Get all applications for the employer's jobs.
--   `GET /api/employer/shortlisted-candidates`: Get all shortlisted candidates for the employer's jobs, grouped by job.
--   `GET /api/employer/stats/applications-over-time`: Get statistics on applications over time.
--   `GET /api/employer/stats/job-postings-summary`: Get a summary of job postings by type.
+## Deployment
 
-### Jobs
--   `GET /api/jobs`: Get all jobs with optional filters.
--   `GET /api/jobs/:id`: Get a single job by ID.
--   `POST /api/jobs`: Create a new job (employer only).
--   `DELETE /api/jobs/:id`: Delete a job (employer only).
--   `GET /api/jobs/employer`: Get all jobs posted by the logged-in employer.
+Both the frontend and backend are designed to be deployed independently.
 
-### Applications
--   `POST /api/applications/apply/:jobId`: Apply for a job.
--   `GET /api/applications/job/:jobId`: Get all applications for a specific job.
-   -`POST /api/applications/shortlist/:applicationId`: Shortlist a candidate for a job.
+-   **Frontend:** Can be deployed to any static site hosting service like Netlify, Vercel, or AWS S3.
+-   **Backend:** Can be deployed to platforms like Heroku, AWS, or DigitalOcean.
 
-### User
--   `GET /api/user`: Get details for the logged-in job seeker.
--   `GET /api/user/applications`: Get all applications for the logged-in job seeker.
--   `GET /api/user/applied-jobs`: Get all jobs the logged-in job seeker has applied for.
+Refer to the individual `README.md` files in the `frontend` and `backend` directories for more detailed deployment instructions.
 
-### Chat
--   `GET /api/chat/:roomId`: Get the chat history for a specific chat room.
+## Contributing
+
+Contributions make the open-source community an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
+
+## License
+
+Distributed under the MIT License. See the `LICENSE` file for more information.
