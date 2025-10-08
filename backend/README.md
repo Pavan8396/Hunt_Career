@@ -1,113 +1,118 @@
-# Job Aggregator Backend
+# Hunt-Career Backend
+
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 
 ## Overview
 
-This backend provides API endpoints for user authentication, job listings, and user profiles for the Job Aggregator application. It handles data storage, business logic, and secure communication with the frontend application.
+This is the backend for Hunt-Career, a comprehensive job application platform. It is a robust RESTful API built with Node.js and Express, designed to handle all business logic, data storage, and user authentication. It provides a secure and scalable foundation for the frontend application to consume.
 
-## Prerequisites
+## Features
 
-*   **Node.js and npm (or yarn):** Ensure you have a recent version of Node.js installed, which includes npm. Alternatively, you can use yarn.
-*   **MongoDB:** A MongoDB instance needs to be running. You can use a local installation or a cloud-hosted service like MongoDB Atlas. The connection string will be configured via an environment variable.
+- **User & Employer Authentication:** Secure user and employer registration and login using JSON Web Tokens (JWT).
+- **Job Management:** Full CRUD (Create, Read, Update, Delete) functionality for job postings.
+- **Application Tracking:** Allows users to apply for jobs and employers to manage applications.
+- **Candidate Shortlisting:** Enables employers to shortlist candidates for further review.
+- **Real-time Communication:** Integrated with Socket.io for real-time chat between job seekers and employers.
+- **Dashboard Analytics:** Provides employers with statistics on job applications and postings.
 
-## Setup & Installation
+## Getting Started
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone <repository_url>
-    cd <repository_name>/backend
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v14 or later recommended)
+- [npm](https://www.npmjs.com/)
+- [MongoDB](https://www.mongodb.com/try/download/community) (or a MongoDB Atlas account)
+
+### Installation
+
+1.  **Clone the repository:**
+    ```sh
+    git clone https://github.com/your-username/hunt-career.git
+    cd hunt-career/backend
     ```
-    (If you've already cloned, navigate to the `backend` directory.)
 
-2.  **Configure Environment Variables:**
-    Create a `.env` file in the `backend` directory. This file will store your environment-specific configurations.
-    ```bash
-    touch .env
-    ```
-    Add the following variables to your `.env` file, replacing the example values with your actual configuration:
-
-    ```env
-    PORT=5000
-    MONGO_URI=mongodb://localhost:27017/job-aggregator
-    JWT_SECRET=yourSuperSecretAndLongEnoughJwtSecretKey
-    CLIENT_URL=http://localhost:3000
-    ```
-
-    *   `PORT`: The port on which the backend server will run (default is 5000).
-    *   `MONGO_URI`: The connection string for your MongoDB database.
-        *   For a local MongoDB instance, it might look like: `mongodb://localhost:27017/your_db_name`
-        *   For MongoDB Atlas, it will be provided by Atlas (e.g., `mongodb+srv://<username>:<password>@clustername.mongodb.net/your_db_name`).
-    *   `JWT_SECRET`: A strong, unique secret key used for signing JSON Web Tokens (JWTs) for authentication. Make this a long, random string.
-    *   `CLIENT_URL`: The URL of the frontend application, used for CORS configuration.
-
-3.  **Install Dependencies:**
-    Navigate to the `backend` directory in your terminal and run:
-    ```bash
+2.  **Install dependencies:**
+    ```sh
     npm install
     ```
-    Or, if you are using yarn:
-    ```bash
-    yarn install
+
+3.  **Set up environment variables:**
+    Create a `.env` file in the `backend` directory:
+    ```sh
+    touch .env
     ```
+    Add the following configuration to your `.env` file:
+    ```env
+    PORT=5000
+    MONGO_URI=your_mongodb_connection_string
+    JWT_SECRET=your_jwt_secret
+    ```
+    - `PORT`: The port for the server to run on (e.g., 5000).
+    - `MONGO_URI`: Your MongoDB connection string.
+    - `JWT_SECRET`: A secret key for signing JWTs.
 
-## Running the Application
+### Running the Application
 
-To start the backend server, run the following command from the `backend` directory:
+- **Development Mode:**
+  ```sh
+  npm run dev
+  ```
+  This command starts the server with `nodemon`, which will automatically restart the server on file changes.
 
-```bash
-npm start
-```
+- **Production Mode:**
+  ```sh
 
-Or, if you are using yarn:
+  npm start
+  ```
+  This command starts the server in a production-ready mode.
 
-```bash
-yarn start
-```
-
-This command typically uses `nodemon` for development, which will automatically restart the server when file changes are detected. The server will listen on the `PORT` specified in your `.env` file.
+The server will be running at `http://localhost:5000`.
 
 ## Project Structure
 
-The backend follows a modular structure to organize code effectively:
+The project follows a modular architecture to keep the codebase organized and maintainable.
 
-*   `config/`: Contains configuration files, primarily for database connections (`db.js`) and environment variable loading.
-*   `controllers/`: Holds the request handler functions for various API routes. Controllers process incoming requests, interact with services, and send responses.
-*   `middleware/`: Contains custom middleware functions used in the request-response cycle. Examples include authentication checks (`authMiddleware.js`), error handling, and database connection checks (`dbMiddleware.js`).
-*   `models/`: Defines the Mongoose schemas for database collections (e.g., `User.js`, `Job.js`).
-*   `routes/`: Contains the API route definitions. Each file typically groups routes for a specific resource (e.g., `authRoutes.js`, `jobRoutes.js`).
-*   `services/`: Implements the business logic and interacts with the database models. Controllers delegate tasks to services.
-*   `utils/`: Includes utility functions that can be reused across the application (e.g., token generation, password hashing).
+```
+backend/
+├── config/           # Database and environment configurations
+├── controllers/      # Request handlers (logic for routes)
+├── middleware/       # Custom middleware (e.g., auth, error handling)
+├── models/           # Mongoose schemas for MongoDB
+├── routes/           # API route definitions
+├── services/         # Business logic and database interactions
+├── utils/            # Utility functions (e.g., JWT helpers)
+├── app.js            # Express application setup
+├── index.js          # Server entry point
+└── socket.js         # Socket.io setup and event handling
+```
 
 ## API Endpoints
 
-The backend exposes the following main groups of API endpoints:
+For a detailed list of all available API endpoints, please refer to the main `README.md` file in the root directory.
 
-### Auth
+## Deployment
 
-*   **`POST /api/auth/register`**
-    *   Registers a new user.
-    *   **Request Body:** `{ "firstName": "John", "lastName": "Doe", "email": "john.doe@example.com", "password": "password123", "phoneNumber": "1234567890" }`
-*   **`POST /api/auth/login`**
-    *   Logs in an existing user.
-    *   **Request Body:** `{ "email": "john.doe@example.com", "password": "password123" }`
-    *   **Response:** `{ "token": "jwt_token", "user": { ...user_details } }`
+To deploy this backend, you can use platforms like Heroku, AWS, or DigitalOcean. Here are some general steps:
 
-### Jobs
+1.  **Set Environment Variables:** Ensure all required environment variables (`MONGO_URI`, `JWT_SECRET`, `PORT`) are set in your deployment environment.
+2.  **Build Your Application:** If you have a build step, run it.
+3.  **Start the Server:** Use `npm start` to run the application.
 
-*   **`GET /api/jobs`**
-    *   Retrieves a list of jobs.
-    *   **Query Parameters:**
-        *   `search` (string): Search term to filter jobs by title, company, etc.
-        *   `locations` (string): Semicolon-separated list of locations to filter by (e.g., "New York;Remote").
-        *   `jobTypes` (string): Comma-separated list of job types to filter by (e.g., "Full-time,Part-time").
-*   **`GET /api/jobs/:id`**
-    *   Retrieves details for a specific job by its ID.
+## Contributing
 
-### User
+Contributions are welcome! If you have any ideas, suggestions, or bug reports, please open an issue or submit a pull request.
 
-*   **`GET /api/user`**
-    *   Retrieves the profile of the currently authenticated user.
-    *   **Protected:** Requires a valid JWT in the `Authorization` header (e.g., `Bearer <token>`).
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
----
+## License
 
-This README provides a foundational guide for setting up and running the Job Aggregator backend. Refer to the source code and specific route/controller files for more detailed information on each endpoint and its functionality.
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
