@@ -22,6 +22,23 @@ const PostJob = ({ onJobPosted }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!title) {
+      toast.error('Job title is required');
+      return;
+    }
+    if (!company) {
+      toast.error('Company name is required');
+      return;
+    }
+    if (!description) {
+      toast.error('Description is required');
+      return;
+    }
+    if (!candidate_required_location) {
+      toast.error('Location is required');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await createJob(formData, token);
@@ -47,19 +64,19 @@ const PostJob = ({ onJobPosted }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Job Title</label>
-        <input type="text" id="title" value={title} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required />
+        <input type="text" id="title" value={title} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
       </div>
       <div>
         <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company</label>
-        <input type="text" id="company" value={company} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required />
+        <input type="text" id="company" value={company} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
       </div>
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-        <textarea id="description" value={description} onChange={handleChange} rows="4" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required></textarea>
+        <textarea id="description" value={description} onChange={handleChange} rows="4" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></textarea>
       </div>
       <div>
         <label htmlFor="candidate_required_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
-        <input type="text" id="candidate_required_location" value={candidate_required_location} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" required />
+        <input type="text" id="candidate_required_location" value={candidate_required_location} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
       </div>
       <div>
         <label htmlFor="job_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Job Type</label>
