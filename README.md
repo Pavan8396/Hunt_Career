@@ -51,7 +51,7 @@ To get a local copy up and running, follow these simple steps.
 
 1.  **Clone the repo:**
     ```sh
-    git clone https://github.com/your-username/hunt-career.git
+    git clone https://github.com/<your-github-username>/hunt-career.git
     cd hunt-career
     ```
 
@@ -83,7 +83,7 @@ This will start the backend server on `http://localhost:5000` and the frontend d
 
 ## API Endpoints
 
-The backend provides a comprehensive set of API endpoints for all application functionalities. For a detailed list of all endpoints, please refer to the [backend README](./backend/README.md).
+For a detailed list of all available API endpoints, please refer to the [backend README](./backend/README.md).
 
 ## Deployment
 

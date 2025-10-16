@@ -32,7 +32,7 @@ Follow these instructions to get a copy of the project up and running on your lo
 
 1.  **Clone the repository:**
     ```sh
-    git clone https://github.com/your-username/hunt-career.git
+    git clone https://github.com/<your-github-username>/hunt-career.git
     cd hunt-career/backend
     ```
 
@@ -93,7 +93,50 @@ backend/
 
 ## API Endpoints
 
-For a detailed list of all available API endpoints, please refer to the main `README.md` file in the root directory.
+The API is organized into the following sections:
+
+### Authentication (`/api/auth`)
+
+-   `POST /register`: Register a new user.
+-   `POST /login`: Log in an existing user.
+
+### Jobs (`/api/jobs`)
+
+-   `GET /`: Retrieve a list of all available jobs.
+-   `GET /:id`: Fetch a single job by its ID.
+-   `POST /`: Create a new job posting (Employer only).
+-   `DELETE /:id`: Remove a job posting (Employer only).
+-   `GET /employer`: Fetch all jobs posted by the authenticated employer.
+-   `GET /:id/application`: Retrieve the current user's application for a specific job.
+
+### Users (`/api/users`)
+
+-   `GET /`: Get the profile of the authenticated user.
+-   `GET /:id`: Get a user's public profile by their ID.
+-   `GET /applications`: Fetch all applications submitted by the authenticated user.
+-   `GET /applied-jobs`: Get a list of all jobs the authenticated user has applied for.
+
+### Employer (`/api/employer`)
+
+-   `POST /register`: Register a new employer account.
+-   `POST /login`: Log in an existing employer.
+-   `GET /:id`: Get an employer's public profile by their ID.
+-   `GET /applications`: Retrieve all applications for jobs posted by the authenticated employer.
+-   `GET /stats/applications-over-time`: Get statistics on the number of applications received over time.
+-   `GET /stats/job-postings-summary`: Fetch a summary of all job postings.
+-   `GET /stats/recent-activity`: Retrieve a log of recent employer activities.
+
+### Applications (`/api/applications`)
+
+-   `POST /apply/:jobId`: Submit an application for a job.
+-   `GET /job/:jobId`: Get all applications for a specific job (Employer only).
+-   `POST /shortlist/:applicationId`: Shortlist a candidate for a job (Employer only).
+
+### Chat (`/api/chat`)
+
+-   `GET /notifications`: Retrieve all notifications for the authenticated user.
+-   `GET /:applicationId`: Get the chat history for a specific application.
+-   `DELETE /:applicationId`: Delete the chat history for a specific application.
 
 ## Deployment
 

@@ -31,7 +31,7 @@ To get the frontend up and running on your local machine, follow these steps.
 
 1.  **Clone the repository:**
     ```sh
-    git clone https://github.com/your-username/hunt-career.git
+    git clone https://github.com/<your-github-username>/hunt-career.git
     cd hunt-career/frontend
     ```
 
