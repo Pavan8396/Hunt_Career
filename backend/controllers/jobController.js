@@ -58,6 +58,17 @@ const getJobById = async (req, res) => {
 
 const createJob = async (req, res) => {
   try {
+    const { title, company } = req.body;
+    const existingJob = await Job.findOne({
+      title,
+      company,
+      employer: req.user._id,
+    });
+
+    if (existingJob) {
+      return res.status(409).json({ message: 'A job with the same title and company already exists.' });
+    }
+
     const newJob = new Job({
       ...req.body,
       employer: req.user._id,
@@ -66,7 +77,7 @@ const createJob = async (req, res) => {
     const employer = await Employer.findById(req.user._id);
     if (!employer) {
       await Job.findByIdAndDelete(savedJob._id);
-      return res.status(404).json({ message: "Employer not found." });
+      return res.status(404).json({ message: 'Employer not found.' });
     }
     employer.postedJobs.push(savedJob._id);
     await employer.save();
@@ -120,4 +131,65 @@ const getApplicationForJob = async (req, res) => {
   }
 };
 
-module.exports = { getJobs, getJobById, createJob, getEmployerJobs, deleteJob, getApplicationForJob };
+const updateJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const job = await Job.findById(id);
+
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+
+    if (job.employer.toString() !== req.user._id) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const { title, company } = req.body;
+    const existingJob = await Job.findOne({
+      title,
+      company,
+      employer: req.user._id,
+      _id: { $ne: id },
+    });
+
+    if (existingJob) {
+      return res.status(409).json({ message: 'A job with the same title and company already exists.' });
+    }
+
+    const updatedJob = await Job.findByIdAndUpdate(id, req.body, { new: true });
+    res.json(updatedJob);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const deleteAllJobs = async (req, res) => {
+  try {
+    await Job.deleteMany({ employer: req.user._id });
+    res.json({ message: 'All jobs removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const deleteMultipleJobs = async (req, res) => {
+  try {
+    const { jobIds } = req.body;
+    await Job.deleteMany({ _id: { $in: jobIds }, employer: req.user._id });
+    res.json({ message: 'Selected jobs removed' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  getJobs,
+  getJobById,
+  createJob,
+  getEmployerJobs,
+  deleteJob,
+  getApplicationForJob,
+  updateJob,
+  deleteAllJobs,
+  deleteMultipleJobs,
+};

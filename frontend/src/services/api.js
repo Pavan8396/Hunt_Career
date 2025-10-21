@@ -184,6 +184,88 @@ export const login = async (email, password) => {
   }
 };
 
+export const deleteAllJobs = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/jobs/delete-all`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      let errorMessage = 'Failed to delete all jobs';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    toast.error(error.message);
+    throw new Error(error.message);
+  }
+};
+
+export const deleteMultipleJobs = async (jobIds, token) => {
+  try {
+    const response = await fetch(`${API_URL}/jobs/delete-multiple`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ jobIds }),
+    });
+    if (!response.ok) {
+      let errorMessage = 'Failed to delete multiple jobs';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    toast.error(error.message);
+    throw new Error(error.message);
+  }
+};
+
+export const updateJob = async (jobId, jobData, token) => {
+  try {
+    const response = await fetch(`${API_URL}/jobs/${jobId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(jobData),
+    });
+    if (!response.ok) {
+      let errorMessage = 'Failed to update job';
+      try {
+        const errorBody = await response.json();
+        errorMessage = errorBody.message || errorMessage;
+      } catch (jsonError) {
+        console.warn('Could not parse error response:', jsonError);
+      }
+      throw new Error(errorMessage);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    toast.error(error.message);
+    throw new Error(error.message);
+  }
+};
+
 export const getUserDetails = async (userId, token) => {
   try {
     const response = await fetch(`${API_URL}/user/${userId}`, {
