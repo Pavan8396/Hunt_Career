@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { createJob, updateJob } from '../services/api';
@@ -13,6 +14,7 @@ const PostJob = ({ onJobPosted, jobData }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (jobData) {
@@ -69,6 +71,9 @@ const PostJob = ({ onJobPosted, jobData }) => {
       });
       if (onJobPosted) {
         onJobPosted();
+      }
+      if (jobData) {
+        navigate('/posted-jobs');
       }
     } catch (error) {
       toast.error(`Failed to ${jobData ? 'update' : 'post'} job.`);
