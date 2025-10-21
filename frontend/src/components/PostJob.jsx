@@ -1,9 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
-import { createJob } from '../services/api';
+import { createJob, updateJob } from '../services/api';
 
-const PostJob = ({ onJobPosted }) => {
+const PostJob = ({ onJobPosted, jobData }) => {
   const [formData, setFormData] = useState({
     title: '',
     company: '',
@@ -13,6 +13,18 @@ const PostJob = ({ onJobPosted }) => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (jobData) {
+      setFormData({
+        title: jobData.title,
+        company: jobData.company,
+        description: jobData.description,
+        candidate_required_location: jobData.candidate_required_location,
+        job_type: jobData.job_type,
+      });
+    }
+  }, [jobData]);
 
   const { title, company, description, candidate_required_location, job_type } = formData;
 
@@ -41,8 +53,13 @@ const PostJob = ({ onJobPosted }) => {
 
     setIsLoading(true);
     try {
-      await createJob(formData, token);
-      toast.success('Job posted successfully!');
+      if (jobData) {
+        await updateJob(jobData._id, formData, token);
+        toast.success('Job updated successfully!');
+      } else {
+        await createJob(formData, token);
+        toast.success('Job posted successfully!');
+      }
       setFormData({
         title: '',
         company: '',
@@ -54,7 +71,7 @@ const PostJob = ({ onJobPosted }) => {
         onJobPosted();
       }
     } catch (error) {
-      toast.error('Failed to post job.');
+      toast.error(`Failed to ${jobData ? 'update' : 'post'} job.`);
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +106,7 @@ const PostJob = ({ onJobPosted }) => {
         </select>
       </div>
       <button type="submit" disabled={isLoading} className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-        {isLoading ? 'Posting...' : 'Post Job'}
+        {isLoading ? (jobData ? 'Updating...' : 'Posting...') : (jobData ? 'Update Job' : 'Post Job')}
       </button>
     </form>
   );

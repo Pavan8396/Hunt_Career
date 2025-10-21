@@ -6,6 +6,8 @@ import {
   getEmployerJobs,
   getApplicationsForJob,
   deleteJob,
+  deleteAllJobs,
+  deleteMultipleJobs,
   shortlistCandidate,
 } from '../services/api';
 
@@ -13,8 +15,10 @@ const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState({});
   const [selectedJobId, setSelectedJobId] = useState(null);
+  const [selectedJobs, setSelectedJobs] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState('');
   const { token } = useContext(AuthContext);
   const { openChatForApplication } = useContext(ChatContext);
   const location = useLocation();
@@ -55,7 +59,6 @@ const PostedJobsPage = () => {
         const { applicationId, recipientName, jobTitle, jobId } = state.chatToOpen;
         await handleViewApplications(jobId);
         openChatForApplication(applicationId, recipientName, jobTitle);
-        // Clear the state to prevent re-triggering on navigation
         navigate(location.pathname, { replace: true, state: {} });
       }
     };
@@ -72,6 +75,7 @@ const PostedJobsPage = () => {
   };
 
   const handleDeleteJob = (jobId) => {
+    setConfirmMessage('Are you sure you want to delete this job?');
     setConfirmAction(() => async () => {
       try {
         await deleteJob(jobId, token);
@@ -82,6 +86,41 @@ const PostedJobsPage = () => {
       setShowConfirm(false);
     });
     setShowConfirm(true);
+  };
+
+  const handleDeleteAllJobs = () => {
+    setConfirmMessage('Are you sure you want to delete all jobs?');
+    setConfirmAction(() => async () => {
+      try {
+        await deleteAllJobs(token);
+        fetchJobs();
+      } catch (error) {
+        console.error('Failed to delete all jobs:', error);
+      }
+      setShowConfirm(false);
+    });
+    setShowConfirm(true);
+  };
+
+  const handleDeleteMultipleJobs = () => {
+    setConfirmMessage(`Are you sure you want to delete ${selectedJobs.length} selected jobs?`);
+    setConfirmAction(() => async () => {
+      try {
+        await deleteMultipleJobs(selectedJobs, token);
+        fetchJobs();
+        setSelectedJobs([]);
+      } catch (error) {
+        console.error('Failed to delete multiple jobs:', error);
+      }
+      setShowConfirm(false);
+    });
+    setShowConfirm(true);
+  };
+
+  const handleCheckboxChange = (jobId) => {
+    setSelectedJobs((prev) =>
+      prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]
+    );
   };
 
   const handleCancel = () => {
@@ -97,21 +136,51 @@ const PostedJobsPage = () => {
   return (
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Your Posted Jobs</h1>
+      <div className="flex space-x-2 mb-4">
+        <button
+          onClick={handleDeleteAllJobs}
+          className="px-4 py-2 bg-red-600 text-white rounded"
+          disabled={jobs.length === 0}
+        >
+          Delete All
+        </button>
+        <button
+          onClick={handleDeleteMultipleJobs}
+          className="px-4 py-2 bg-red-600 text-white rounded"
+          disabled={selectedJobs.length === 0}
+        >
+          Delete Selected
+        </button>
+      </div>
       <div className="space-y-4">
         {jobs.length > 0 ? (
           jobs.map((job) => (
             <div
               key={job._id}
-              className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md"
+              className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex items-center"
             >
-              <h3 className="text-lg font-semibold">{job.title}</h3>
-              <p>{job.company}</p>
+              <input
+                type="checkbox"
+                onChange={() => handleCheckboxChange(job._id)}
+                checked={selectedJobs.includes(job._id)}
+                className="mr-4"
+              />
+              <div className="flex-grow">
+                <h3 className="text-lg font-semibold">{job.title}</h3>
+                <p>{job.company}</p>
+              </div>
               <div className="flex space-x-2 mt-2">
                 <button
                   onClick={() => handleViewApplications(job._id)}
                   className="px-4 py-2 bg-blue-600 text-white rounded"
                 >
                   View Applications
+                </button>
+                <button
+                  onClick={() => navigate(`/post-job/${job._id}`)}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded"
+                >
+                  Edit
                 </button>
                 <button
                   onClick={() => handleDeleteJob(job._id)}
@@ -182,7 +251,7 @@ const PostedJobsPage = () => {
               Confirm Delete
             </h3>
             <p className="text-gray-600 dark:text-gray-200 mb-6">
-              Are you sure you want to delete this job?
+              {confirmMessage}
             </p>
             <div className="flex justify-end gap-4">
               <button

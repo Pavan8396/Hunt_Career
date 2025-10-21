@@ -1,23 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import PostJob from '../components/PostJob';
-import { getEmployerJobs } from '../services/api';
+import { getEmployerJobs, fetchJobById } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import { useContext } from 'react';
 
 const PostJobPage = () => {
-    const { token } = useContext(AuthContext);
-    const fetchJobs = async () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
+  const [jobData, setJobData] = useState(null);
+
+  useEffect(() => {
+    if (id) {
+      const getJobData = async () => {
         try {
-          await getEmployerJobs(token);
+          const data = await fetchJobById(id);
+          setJobData(data);
         } catch (error) {
-          console.error('Failed to fetch employer jobs:', error);
+          console.error('Failed to fetch job data:', error);
         }
       };
+      getJobData();
+    }
+  }, [id]);
+
+  const handleJobPosted = async () => {
+    try {
+      await getEmployerJobs(token);
+      navigate('/posted-jobs');
+    } catch (error) {
+      console.error('Failed to fetch employer jobs:', error);
+    }
+  };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Post a New Job</h1>
-      <PostJob onJobPosted={fetchJobs} />
+      <h1 className="text-2xl font-bold mb-4">{id ? 'Edit Job' : 'Post a New Job'}</h1>
+      <PostJob onJobPosted={handleJobPosted} jobData={jobData} />
     </div>
   );
 };
