@@ -60,8 +60,8 @@ const createJob = async (req, res) => {
   try {
     const { title, company } = req.body;
     const existingJob = await Job.findOne({
-      title,
-      company,
+      title: { $regex: new RegExp(`^${title}$`, 'i') },
+      company: { $regex: new RegExp(`^${company}$`, 'i') },
       employer: req.user._id,
     });
 
@@ -146,8 +146,8 @@ const updateJob = async (req, res) => {
 
     const { title, company } = req.body;
     const existingJob = await Job.findOne({
-      title,
-      company,
+      title: { $regex: new RegExp(`^${title}$`, 'i') },
+      company: { $regex: new RegExp(`^${company}$`, 'i') },
       employer: req.user._id,
       _id: { $ne: id },
     });

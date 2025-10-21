@@ -27,7 +27,7 @@ const PostJobPage = () => {
   const handleJobPosted = async () => {
     try {
       await getEmployerJobs(token);
-      navigate('/posted-jobs');
+      navigate('/employer/posted-jobs');
     } catch (error) {
       console.error('Failed to fetch employer jobs:', error);
     }
@@ -36,7 +36,7 @@ const PostJobPage = () => {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">{id ? 'Edit Job' : 'Post a New Job'}</h1>
-      <PostJob onJobPosted={handleJobPosted} jobData={jobData} />
+      {(jobData || !id) && <PostJob onJobPosted={handleJobPosted} jobData={jobData} />}
     </div>
   );
 };

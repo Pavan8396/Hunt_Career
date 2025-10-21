@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
+import { FaEdit, FaTrash, FaTrashAlt } from 'react-icons/fa';
 import {
   getEmployerJobs,
   getApplicationsForJob,
@@ -140,16 +141,16 @@ const PostedJobsPage = () => {
         <div className="flex space-x-2 mb-4">
           <button
             onClick={handleDeleteAllJobs}
-            className="px-4 py-2 bg-red-600 text-white rounded"
+            className="p-2 bg-red-600 text-white rounded"
           >
-            Delete All
+            <FaTrashAlt />
           </button>
           <button
             onClick={handleDeleteMultipleJobs}
-            className="px-4 py-2 bg-red-600 text-white rounded"
+            className="p-2 bg-red-600 text-white rounded"
             disabled={selectedJobs.length === 0}
           >
-            Delete Selected
+            <FaTrash />
           </button>
         </div>
       )}
@@ -179,15 +180,15 @@ const PostedJobsPage = () => {
                 </button>
                 <button
                   onClick={() => navigate(`/post-job/${job._id}`)}
-                  className="px-4 py-2 bg-yellow-600 text-white rounded"
+                  className="p-2 bg-yellow-600 text-white rounded"
                 >
-                  Edit
+                  <FaEdit />
                 </button>
                 <button
                   onClick={() => handleDeleteJob(job._id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded"
+                  className="p-2 bg-red-600 text-white rounded"
                 >
-                  Delete
+                  <FaTrash />
                 </button>
               </div>
               {selectedJobId === job._id && (
