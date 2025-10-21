@@ -136,22 +136,23 @@ const PostedJobsPage = () => {
   return (
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Your Posted Jobs</h1>
-      <div className="flex space-x-2 mb-4">
-        <button
-          onClick={handleDeleteAllJobs}
-          className="px-4 py-2 bg-red-600 text-white rounded"
-          disabled={jobs.length === 0}
-        >
-          Delete All
-        </button>
-        <button
-          onClick={handleDeleteMultipleJobs}
-          className="px-4 py-2 bg-red-600 text-white rounded"
-          disabled={selectedJobs.length === 0}
-        >
-          Delete Selected
-        </button>
-      </div>
+      {jobs.length > 0 && (
+        <div className="flex space-x-2 mb-4">
+          <button
+            onClick={handleDeleteAllJobs}
+            className="px-4 py-2 bg-red-600 text-white rounded"
+          >
+            Delete All
+          </button>
+          <button
+            onClick={handleDeleteMultipleJobs}
+            className="px-4 py-2 bg-red-600 text-white rounded"
+            disabled={selectedJobs.length === 0}
+          >
+            Delete Selected
+          </button>
+        </div>
+      )}
       <div className="space-y-4">
         {jobs.length > 0 ? (
           jobs.map((job) => (
@@ -169,7 +170,7 @@ const PostedJobsPage = () => {
                 <h3 className="text-lg font-semibold">{job.title}</h3>
                 <p>{job.company}</p>
               </div>
-              <div className="flex space-x-2 mt-2">
+              <div className="flex flex-col space-y-2 mt-2">
                 <button
                   onClick={() => handleViewApplications(job._id)}
                   className="px-4 py-2 bg-blue-600 text-white rounded"

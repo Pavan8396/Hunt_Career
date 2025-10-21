@@ -17,10 +17,10 @@ const router = express.Router();
 
 router.get('/', ensureDb, getJobs);
 router.get('/employer', ensureDb, authenticateToken, isEmployer, getEmployerJobs);
-router.get('/:id', ensureDb, getJobById);
 router.post('/', ensureDb, authenticateToken, isEmployer, createJob);
 router.delete('/delete-all', ensureDb, authenticateToken, isEmployer, deleteAllJobs);
 router.post('/delete-multiple', ensureDb, authenticateToken, isEmployer, deleteMultipleJobs);
+router.get('/:id', ensureDb, getJobById);
 router.put('/:id', ensureDb, authenticateToken, isEmployer, updateJob);
 router.delete('/:id', ensureDb, authenticateToken, isEmployer, deleteJob);
 router.get('/:id/application', ensureDb, authenticateToken, isJobSeeker, getApplicationForJob);
