@@ -55,6 +55,7 @@ function App() {
               >
                 <Route path="dashboard" element={<EmployerDashboard />} />
                 <Route path="post-job" element={<PostJobPage />} />
+                <Route path="post-job/:id" element={<PostJobPage />} />
                 <Route path="posted-jobs" element={<PostedJobsPage />} />
               </Route>
 

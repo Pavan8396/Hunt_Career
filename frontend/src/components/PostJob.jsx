@@ -77,7 +77,7 @@ const PostJob = ({ onJobPosted, jobData }) => {
       }
     } catch (error) {
       if (error.message.includes('A job with the same title and company already exists.')) {
-        toast.error('A job with the same title and company already exists.');
+        //toast.error('A job with the same title and company already exists.');
       } else {
         toast.error(`Failed to ${jobData ? 'update' : 'post'} job.`);
       }

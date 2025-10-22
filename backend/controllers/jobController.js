@@ -59,9 +59,12 @@ const getJobById = async (req, res) => {
 const createJob = async (req, res) => {
   try {
     const { title, company } = req.body;
+    const escapedTitle = escapeRegex(title);
+    const escapedCompany = escapeRegex(company);
+
     const existingJob = await Job.findOne({
-      title: { $regex: new RegExp(`^${title}$`, 'i') },
-      company: { $regex: new RegExp(`^${company}$`, 'i') },
+      title: { $regex: new RegExp(`^${escapedTitle}$`, 'i') },
+      company: { $regex: new RegExp(`^${escapedCompany}$`, 'i') },
       employer: req.user._id,
     });
 
@@ -100,19 +103,40 @@ const getEmployerJobs = async (req, res) => {
   }
 };
 
-const deleteJob = async (req, res) => {
+const deleteJobs = async (req, res) => {
+  const { id } = req.params;
+  const { jobIds } = req.body;
+
   try {
-    const job = await Job.findById(req.params.id);
-    if (!job) {
-      return res.status(404).json({ message: 'Job not found' });
+    const employer = await Employer.findById(req.user._id);
+    if (!employer) {
+      return res.status(404).json({ message: 'Employer not found' });
     }
-    if (job.employer.toString() !== req.user._id) {
-      return res.status(401).json({ message: 'Not authorized' });
+
+    let jobsToDelete = [];
+    if (id) {
+      jobsToDelete.push(id);
+    } else if (jobIds) {
+      jobsToDelete = [...jobIds];
+    } else {
+      // Delete all jobs
+      await Job.deleteMany({ employer: req.user._id });
+      employer.postedJobs = [];
+      await employer.save();
+      return res.json({ message: 'All jobs have been removed successfully' });
     }
-    await job.deleteOne();
-    res.json({ message: 'Job removed' });
+
+    await Job.deleteMany({ _id: { $in: jobsToDelete }, employer: req.user._id });
+
+    employer.postedJobs = employer.postedJobs.filter(
+      (jobId) => !jobsToDelete.includes(jobId.toString())
+    );
+    await employer.save();
+
+    res.json({ message: 'Selected jobs have been removed successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Error deleting jobs:', error);
+    res.status(500).json({ message: 'An error occurred while deleting jobs' });
   }
 };
 
@@ -145,9 +169,11 @@ const updateJob = async (req, res) => {
     }
 
     const { title, company } = req.body;
+    const escapedTitle = escapeRegex(title);
+    const escapedCompany = escapeRegex(company);
     const existingJob = await Job.findOne({
-      title: { $regex: new RegExp(`^${title}$`, 'i') },
-      company: { $regex: new RegExp(`^${company}$`, 'i') },
+      title: { $regex: new RegExp(`^${escapedTitle}$`, 'i') },
+      company: { $regex: new RegExp(`^${escapedCompany}$`, 'i') },
       employer: req.user._id,
       _id: { $ne: id },
     });
@@ -163,33 +189,13 @@ const updateJob = async (req, res) => {
   }
 };
 
-const deleteAllJobs = async (req, res) => {
-  try {
-    await Job.deleteMany({ employer: req.user._id });
-    res.json({ message: 'All jobs removed' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const deleteMultipleJobs = async (req, res) => {
-  try {
-    const { jobIds } = req.body;
-    await Job.deleteMany({ _id: { $in: jobIds }, employer: req.user._id });
-    res.json({ message: 'Selected jobs removed' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
 module.exports = {
   getJobs,
   getJobById,
   createJob,
   getEmployerJobs,
-  deleteJob,
+  deleteJobs,
   getApplicationForJob,
   updateJob,
-  deleteAllJobs,
-  deleteMultipleJobs,
 };
