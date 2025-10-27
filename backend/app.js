@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swaggerConfig');
 
 // Pre-load all Mongoose models
 require('./models/userModel');
@@ -19,6 +21,9 @@ const { escapeRegex } = require('./utils/regexUtils'); // Used by jobController
 const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const userRoutes = require('./routes/userRoutes');
+const employerRoutes = require('./routes/employerRoutes');
+const applicationRoutes = require('./routes/applicationRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
 
@@ -34,14 +39,14 @@ app.use(cors({
 
 app.use(express.json());
 
+// Serve Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/user', userRoutes);
-const employerRoutes = require('./routes/employerRoutes');
 app.use('/api/employer', employerRoutes);
-const applicationRoutes = require('./routes/applicationRoutes');
-const chatRoutes = require('./routes/chatRoutes');
 app.use('/api/applications', applicationRoutes);
 app.use('/api/chat', chatRoutes);
 
