@@ -52,7 +52,7 @@ const EmployerLogin = () => {
 
     try {
       const data = await employerLogin(email, password);
-      login(data.token, data.user, 'employer');
+      login(data.token, data.employer, 'employer');
       toast.success('Logged in successfully!');
       navigate('/employer/dashboard');
     } catch (error) {

@@ -27,7 +27,7 @@ router.get('/', ensureDb, getJobs);
 
 /**
  * @swagger
- * /api/jobs/employer:
+ * /api/jobs/employers:
  *   get:
  *     summary: Get jobs for the logged-in employer
  *     tags: [Jobs]
@@ -41,7 +41,7 @@ router.get('/', ensureDb, getJobs);
  *       403:
  *         description: Forbidden
  */
-router.get('/employer', ensureDb, authenticateToken, isEmployer, getEmployerJobs);
+router.get('/employers', ensureDb, authenticateToken, isEmployer, getEmployerJobs);
 
 /**
  * @swagger

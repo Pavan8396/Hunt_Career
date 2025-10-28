@@ -85,7 +85,7 @@ export const deleteChatHistory = async (applicationId, token) => {
 
 export const getEmployerDetails = async (employerId, token) => {
   try {
-    const response = await fetch(`${API_URL}/employer/${employerId}`, {
+    const response = await fetch(`${API_URL}/employers/${employerId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -103,7 +103,7 @@ export const getEmployerDetails = async (employerId, token) => {
 
 export const getRecentActivity = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/employer/stats/recent-activity`, {
+    const response = await fetch(`${API_URL}/employers/stats/recent-activity`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -286,7 +286,7 @@ export const getUserDetails = async (userId, token) => {
 
 export const getApplicationsOverTime = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/employer/stats/applications-over-time`, {
+    const response = await fetch(`${API_URL}/employers/stats/applications-over-time`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -304,7 +304,7 @@ export const getApplicationsOverTime = async (token) => {
 
 export const getJobPostingsSummary = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/employer/stats/job-postings-summary`, {
+    const response = await fetch(`${API_URL}/employers/stats/job-postings-summary`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -322,7 +322,7 @@ export const getJobPostingsSummary = async (token) => {
 
 export const getEmployerApplications = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/employer/applications`, {
+    const response = await fetch(`${API_URL}/employers/applications`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -373,7 +373,7 @@ export const deleteJob = async (jobId, token) => {
 
 export const employerSignup = async (companyName, email, password) => {
   try {
-    const response = await fetch(`${API_URL}/employer/register`, {
+    const response = await fetch(`${API_URL}/employers/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -399,7 +399,7 @@ export const employerSignup = async (companyName, email, password) => {
 
 export const employerLogin = async (email, password) => {
   try {
-    const response = await fetch(`${API_URL}/employer/login`, {
+    const response = await fetch(`${API_URL}/employers/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -453,7 +453,7 @@ export const createJob = async (jobData, token) => {
 
 export const getEmployerJobs = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/jobs/employer`, {
+    const response = await fetch(`${API_URL}/jobs/employers`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
