@@ -74,6 +74,7 @@ router.get('/employer', ensureDb, authenticateToken, isEmployer, getEmployerJobs
  *                 type: string
  *               job_type:
  *                 type: string
+ *                 enum: [Full-Time, Part-Time, Contract, Internship, Freelance]
  *     responses:
  *       201:
  *         description: Job created successfully
@@ -188,6 +189,7 @@ router.get('/:id', ensureDb, getJobById);
  *                 type: string
  *               job_type:
  *                 type: string
+ *                 enum: [Full-Time, Part-Time, Contract, Internship, Freelance]
  *     responses:
  *       200:
  *         description: Job updated successfully
