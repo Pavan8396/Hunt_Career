@@ -13,8 +13,16 @@ const {
 } = require('../controllers/employerController');
 const { ensureDb } = require('../middleware/dbMiddleware');
 const { authenticateToken, isEmployer } = require('../middleware/authMiddleware');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
+
+// Ensure the uploads directory exists
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

@@ -6,7 +6,9 @@ import {
   BookmarkIcon,
   ClipboardListIcon,
   PlusCircleIcon,
-  CollectionIcon
+  CollectionIcon,
+  UserCircleIcon,
+  OfficeBuildingIcon,
 } from '@heroicons/react/outline';
 
 const Sidebar = () => {
@@ -16,12 +18,14 @@ const Sidebar = () => {
     { to: '/home', icon: <HomeIcon className="h-5 w-5 mr-3" />, text: 'Home' },
     { to: '/saved', icon: <BookmarkIcon className="h-5 w-5 mr-3" />, text: 'Saved Jobs' },
     { to: '/applied', icon: <ClipboardListIcon className="h-5 w-5 mr-3" />, text: 'Applied Jobs' },
+    { to: '/profile', icon: <UserCircleIcon className="h-5 w-5 mr-3" />, text: 'Profile' },
   ];
 
   const employerLinks = [
     { to: '/employer/dashboard', icon: <HomeIcon className="h-5 w-5 mr-3" />, text: 'Dashboard' },
     { to: '/employer/post-job', icon: <PlusCircleIcon className="h-5 w-5 mr-3" />, text: 'Post a Job' },
     { to: '/employer/posted-jobs', icon: <CollectionIcon className="h-5 w-5 mr-3" />, text: 'Posted Jobs' },
+    { to: '/employer/profile', icon: <OfficeBuildingIcon className="h-5 w-5 mr-3" />, text: 'Company Profile' },
   ];
 
   const links = userType === 'employer' ? employerLinks : jobSeekerLinks;
