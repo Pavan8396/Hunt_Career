@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { getEmployerProfile, updateEmployerProfile } from '../services/api';
 
 const EmployerProfilePage = () => {
   const [profile, setProfile] = useState(null);
@@ -9,7 +9,8 @@ const EmployerProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await api.get('/api/employers/profile');
+        const token = sessionStorage.getItem('token');
+        const data = await getEmployerProfile(token);
         setProfile(data);
         setLoading(false);
       } catch (error) {
@@ -31,11 +32,8 @@ const EmployerProfilePage = () => {
     }
 
     try {
-      const { data } = await api.put('/api/employers/profile', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const token = sessionStorage.getItem('token');
+      const data = await updateEmployerProfile(formData, token);
       setProfile(data);
       alert('Profile updated successfully!');
     } catch (error) {
