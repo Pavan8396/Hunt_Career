@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { getUserProfile, updateUserProfile } from '../services/api';
 
 const UserProfilePage = () => {
   const [profile, setProfile] = useState({
@@ -17,7 +17,8 @@ const UserProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const { data } = await api.get('/api/user/profile');
+        const token = sessionStorage.getItem('token');
+        const data = await getUserProfile(token);
         // Initialize with empty arrays if fields are missing
         setProfile({
           ...data,
@@ -44,7 +45,8 @@ const UserProfilePage = () => {
         skills: profile.skills.filter(skill => skill.trim() !== ''),
         portfolioLinks: profile.portfolioLinks.filter(link => link.trim() !== ''),
       };
-      const { data } = await api.put('/api/user/profile', profileToUpdate);
+      const token = sessionStorage.getItem('token');
+      const data = await updateUserProfile(profileToUpdate, token);
       setProfile(data);
       alert('Profile updated successfully!');
     } catch (error) {
