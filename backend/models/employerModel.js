@@ -21,15 +21,6 @@ const employerSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Job',
   }],
-  companyLogo: {
-    type: String,
-  },
-  companyDescription: {
-    type: String,
-  },
-  website: {
-    type: String,
-  },
 }, {
   timestamps: true,
 });
