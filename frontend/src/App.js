@@ -13,6 +13,8 @@ import EmployerSignup from './pages/EmployerSignup';
 import EmployerDashboard from './pages/EmployerDashboard';
 import PostJobPage from './pages/PostJobPage';
 import PostedJobsPage from './pages/PostedJobsPage';
+import UserProfilePage from './pages/UserProfilePage';
+import EmployerProfilePage from './pages/EmployerProfilePage';
 import Layout from './components/Layout';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import { ThemeProvider } from './context/ThemeContext';
@@ -50,6 +52,10 @@ function App() {
                 element={<ProtectedRoute><AuthenticatedLayout><AppliedJobs /></AuthenticatedLayout></ProtectedRoute>}
               />
               <Route
+                path="/profile"
+                element={<ProtectedRoute><AuthenticatedLayout><UserProfilePage /></AuthenticatedLayout></ProtectedRoute>}
+              />
+              <Route
                 path="/employer"
                 element={<ProtectedRoute><AuthenticatedLayout><Outlet /></AuthenticatedLayout></ProtectedRoute>}
               >
@@ -57,6 +63,7 @@ function App() {
                 <Route path="post-job" element={<PostJobPage />} />
                 <Route path="post-job/:id" element={<PostJobPage />} />
                 <Route path="posted-jobs" element={<PostedJobsPage />} />
+                <Route path="profile" element={<EmployerProfilePage />} />
               </Route>
 
               {/* Public and guest-accessible routes */}
