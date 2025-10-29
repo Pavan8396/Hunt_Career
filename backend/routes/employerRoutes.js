@@ -1,11 +1,43 @@
 const express = require('express');
-const { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getEmployerById } = require('../controllers/employerController');
+const multer = require('multer');
+const {
+  registerEmployer,
+  loginEmployer,
+  getEmployerApplications,
+  getApplicationsOverTime,
+  getJobPostingsSummary,
+  getRecentActivity,
+  getEmployerById,
+  getEmployerProfile,
+  updateEmployerProfile,
+} = require('../controllers/employerController');
 const { ensureDb } = require('../middleware/dbMiddleware');
 const { authenticateToken, isEmployer } = require('../middleware/authMiddleware');
 
 const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage: storage });
+
 router.post('/register', ensureDb, registerEmployer);
 router.post('/login', ensureDb, loginEmployer);
+router.get('/profile', ensureDb, authenticateToken, isEmployer, getEmployerProfile);
+router.put(
+  '/profile',
+  ensureDb,
+  authenticateToken,
+  isEmployer,
+  upload.single('companyLogo'),
+  updateEmployerProfile
+);
 router.get('/applications', ensureDb, authenticateToken, isEmployer, getEmployerApplications);
 router.get('/stats/applications-over-time', ensureDb, authenticateToken, isEmployer, getApplicationsOverTime);
 router.get('/stats/job-postings-summary', ensureDb, authenticateToken, isEmployer, getJobPostingsSummary);
