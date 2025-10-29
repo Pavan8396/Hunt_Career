@@ -21,9 +21,13 @@ const jobRoutes = require('./routes/jobRoutes');
 const userRoutes = require('./routes/userRoutes');
 const employerRoutes = require('./routes/employerRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
+const path = require('path');
 const chatRoutes = require('./routes/chatRoutes');
 
 const app = express();
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Enable pre-flight for all routes
 app.options('*', cors());
