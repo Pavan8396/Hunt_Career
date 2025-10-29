@@ -22,6 +22,31 @@ const userSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
   },
+  workExperience: [
+    {
+      title: { type: String },
+      company: { type: String },
+      location: { type: String },
+      startDate: { type: Date },
+      endDate: { type: Date },
+      description: { type: String },
+    },
+  ],
+  education: [
+    {
+      school: { type: String },
+      degree: { type: String },
+      fieldOfStudy: { type: String },
+      startDate: { type: Date },
+      endDate: { type: Date },
+    },
+  ],
+  skills: {
+    type: [String],
+  },
+  portfolioLinks: {
+    type: [String],
+  },
 });
 
 userSchema.pre('save', async function (next) {
