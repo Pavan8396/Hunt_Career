@@ -3,6 +3,53 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require('../config/env');
 const Employer = require('../models/employerModel');
 
+const getEmployerProfile = async (req, res) => {
+  try {
+    const employer = await Employer.findById(req.user._id).select('-password');
+    if (employer) {
+      res.json(employer);
+    } else {
+      res.status(404).json({ message: 'Employer not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch employer profile' });
+  }
+};
+
+const updateEmployerProfile = async (req, res) => {
+  try {
+    const employer = await Employer.findById(req.user._id);
+
+    if (employer) {
+      employer.companyName = req.body.companyName || employer.companyName;
+      employer.email = req.body.email || employer.email;
+      employer.companyDescription =
+        req.body.companyDescription || employer.companyDescription;
+      employer.website = req.body.website || employer.website;
+
+      if (req.file) {
+        employer.companyLogo = req.file.path;
+      }
+
+      const updatedEmployer = await employer.save();
+
+      res.json({
+        _id: updatedEmployer._id,
+        companyName: updatedEmployer.companyName,
+        email: updatedEmployer.email,
+        companyDescription: updatedEmployer.companyDescription,
+        website: updatedEmployer.website,
+        companyLogo: updatedEmployer.companyLogo,
+      });
+    } else {
+      res.status(404).json({ message: 'Employer not found' });
+    }
+  } catch (error) {
+    console.error('Failed to update employer profile', error);
+    res.status(500).json({ message: 'Failed to update employer profile' });
+  }
+};
+
 const registerEmployer = async (req, res) => {
   const { companyName, email, password } = req.body;
 
@@ -140,4 +187,14 @@ const getEmployerById = async (req, res) => {
   }
 };
 
-module.exports = { registerEmployer, loginEmployer, getEmployerApplications, getApplicationsOverTime, getJobPostingsSummary, getRecentActivity, getEmployerById };
+module.exports = {
+  registerEmployer,
+  loginEmployer,
+  getEmployerApplications,
+  getApplicationsOverTime,
+  getJobPostingsSummary,
+  getRecentActivity,
+  getEmployerById,
+  getEmployerProfile,
+  updateEmployerProfile,
+};

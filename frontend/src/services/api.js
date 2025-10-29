@@ -184,6 +184,83 @@ export const login = async (email, password) => {
   }
 };
 
+export const getUserProfile = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch user profile');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    toast.error('Could not load your profile.');
+    throw error;
+  }
+};
+
+export const updateUserProfile = async (profileData, token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(profileData),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update user profile');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    toast.error('Could not update your profile.');
+    throw error;
+  }
+};
+
+export const getEmployerProfile = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/employers/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch employer profile');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching employer profile:', error);
+    toast.error('Could not load company profile.');
+    throw error;
+  }
+};
+
+export const updateEmployerProfile = async (profileData, token) => {
+  try {
+    const response = await fetch(`${API_URL}/employers/profile`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: profileData, // FormData will set its own Content-Type
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update employer profile');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating employer profile:', error);
+    toast.error('Could not update company profile.');
+    throw error;
+  }
+};
+
 export const deleteAllJobs = async (token) => {
   try {
     const response = await fetch(`${API_URL}/jobs/delete-all`, {
