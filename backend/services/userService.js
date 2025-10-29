@@ -24,27 +24,10 @@ const getUserById = async (id) => {
   return getDb().collection("Users").findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } });
 };
 
-const updateUserProfile = async (email, userData) => {
-  const { ObjectId } = require('mongodb');
-  const db = getDb();
-
-  // Make sure not to update the _id
-  delete userData._id;
-
-  const result = await db.collection("Users").findOneAndUpdate(
-    { email: email },
-    { $set: userData },
-    { returnDocument: 'after', projection: { password: 0 } }
-  );
-
-  return result.value;
-};
-
 module.exports = {
   findUserByEmail,
   createUser,
   findUserForLogin,
   getUserProfile,
   getUserById,
-  updateUserProfile,
 };

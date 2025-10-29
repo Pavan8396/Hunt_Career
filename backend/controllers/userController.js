@@ -1,32 +1,5 @@
-const User = require('../models/userModel');
 const userService = require('../services/userService');
 const Application = require('../models/applicationModel');
-
-const getUserProfile = async (req, res) => {
-  try {
-    const user = await userService.getUserProfile(req.user.email);
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ message: 'User not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch user profile' });
-  }
-};
-
-const updateUserProfile = async (req, res) => {
-  try {
-    const updatedUser = await userService.updateUserProfile(req.user.email, req.body);
-    if (updatedUser) {
-      res.json(updatedUser);
-    } else {
-      res.status(404).json({ message: 'User not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to update user profile' });
-  }
-};
 
 const getUserDetails = async (req, res) => {
   try {
@@ -84,11 +57,4 @@ const getUserById = async (req, res) => {
   }
 };
 
-module.exports = {
-  getUserDetails,
-  getUserApplications,
-  getAppliedJobs,
-  getUserById,
-  getUserProfile,
-  updateUserProfile,
-};
+module.exports = { getUserDetails, getUserApplications, getAppliedJobs, getUserById };
