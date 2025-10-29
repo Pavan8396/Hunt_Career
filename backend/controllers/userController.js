@@ -4,7 +4,7 @@ const Application = require('../models/applicationModel');
 
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
+    const user = await userService.getUserProfile(req.user.email);
     if (user) {
       res.json(user);
     } else {
@@ -17,35 +17,9 @@ const getUserProfile = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
-
-    if (user) {
-      user.firstName = req.body.firstName || user.firstName;
-      user.lastName = req.body.lastName || user.lastName;
-      user.email = req.body.email || user.email;
-      user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
-      user.workExperience = req.body.workExperience || user.workExperience;
-      user.education = req.body.education || user.education;
-      user.skills = req.body.skills || user.skills;
-      user.portfolioLinks = req.body.portfolioLinks || user.portfolioLinks;
-
-      if (req.body.password) {
-        user.password = req.body.password;
-      }
-
-      const updatedUser = await user.save();
-
-      res.json({
-        _id: updatedUser._id,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        email: updatedUser.email,
-        phoneNumber: updatedUser.phoneNumber,
-        workExperience: updatedUser.workExperience,
-        education: updatedUser.education,
-        skills: updatedUser.skills,
-        portfolioLinks: updatedUser.portfolioLinks,
-      });
+    const updatedUser = await userService.updateUserProfile(req.user.email, req.body);
+    if (updatedUser) {
+      res.json(updatedUser);
     } else {
       res.status(404).json({ message: 'User not found' });
     }
