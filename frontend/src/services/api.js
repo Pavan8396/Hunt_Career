@@ -184,6 +184,79 @@ export const login = async (email, password) => {
   }
 };
 
+// Admin API calls
+export const getAdminStats = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/admin/stats`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to fetch admin stats');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllUsers = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/admin/users`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to fetch users');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteUser = async (userId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to delete user');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const submitReview = async (employerId, reviewData, token) => {
+  try {
+    const response = await fetch(`${API_URL}/employers/${employerId}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reviewData),
+    });
+    if (!response.ok) {
+      const errorBody = await response.json();
+      throw new Error(errorBody.message || 'Failed to submit review');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error submitting review:', error.message);
+    throw error; // Re-throw to be caught by the component
+  }
+};
+
+export const getReviewsForEmployer = async (employerId) => {
+  try {
+    const response = await fetch(`${API_URL}/employers/${employerId}/reviews`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch reviews');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching reviews:', error.message);
+    toast.error('Could not load company reviews.');
+    throw error;
+  }
+};
+
 export const getUserProfile = async (token) => {
   try {
     const response = await fetch(`${API_URL}/user/profile`, {

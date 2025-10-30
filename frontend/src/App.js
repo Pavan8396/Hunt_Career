@@ -16,15 +16,22 @@ import PostedJobsPage from './pages/PostedJobsPage';
 import UserProfilePage from './pages/UserProfilePage';
 import EmployerProfilePage from './pages/EmployerProfilePage';
 import ApplicantsPage from './pages/ApplicantsPage';
+import AdminDashboard from './pages/AdminDashboard';
 import Layout from './components/Layout';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import { ThemeProvider } from './context/ThemeContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ChatProvider } from './context/ChatContext';
+import { useContext } from 'react';
 
 const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = !!sessionStorage.getItem('token'); // Changed to sessionStorage
+  const isAuthenticated = !!sessionStorage.getItem('token');
   return isAuthenticated ? children : <Navigate to="/login" />;
+};
+
+const AdminRoute = ({ children }) => {
+  const { user } = useContext(AuthContext);
+  return user && user.isAdmin ? children : <Navigate to="/home" />;
 };
 
 const GuestOrAuthenticatedRoute = ({ children }) => {
@@ -67,6 +74,11 @@ function App() {
                 <Route path="jobs/:jobId/applicants" element={<ApplicantsPage />} />
                 <Route path="profile" element={<EmployerProfilePage />} />
               </Route>
+
+              <Route
+                path="/admin/dashboard"
+                element={<AdminRoute><AuthenticatedLayout><AdminDashboard /></AuthenticatedLayout></AdminRoute>}
+              />
 
               {/* Public and guest-accessible routes */}
               <Route
