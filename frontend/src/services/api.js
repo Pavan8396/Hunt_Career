@@ -25,6 +25,18 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const grantAdminPrivileges = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/grant-admin`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to grant admin privileges');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getApplicationForJob = async (jobId, token) => {
   try {
     const response = await fetch(`${API_URL}/jobs/${jobId}/application`, {
