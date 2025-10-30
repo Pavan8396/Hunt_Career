@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
-import { FaEdit, FaTrash, FaTrashAlt, FaEye } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaTrashAlt, FaUsers } from 'react-icons/fa';
 import {
   getEmployerJobs,
-  getApplicationsForJob,
   deleteJob,
   deleteAllJobs,
   deleteMultipleJobs,
-  shortlistCandidate,
 } from '../services/api';
 import { toast } from 'react-toastify';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
-  const [applications, setApplications] = useState({});
-  const [selectedJobId, setSelectedJobId] = useState(null);
   const [selectedJobs, setSelectedJobs] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -36,53 +32,11 @@ const PostedJobsPage = () => {
     }
   }, [token]);
 
-  const handleViewApplications = useCallback(
-    async (jobId) => {
-      if (selectedJobId === jobId) {
-        setSelectedJobId(null);
-        return;
-      }
-      try {
-        const jobApplications = await getApplicationsForJob(jobId, token);
-        setApplications((prev) => ({ ...prev, [jobId]: jobApplications }));
-        setSelectedJobId(jobId);
-      } catch (error) {
-        console.error('Failed to fetch applications:', error);
-        toast.error('Failed to fetch applications.');
-      }
-    },
-    [token, selectedJobId]
-  );
-
   useEffect(() => {
     if (token) {
       fetchJobs();
     }
   }, [token, fetchJobs]);
-
-  useEffect(() => {
-    const openChatFromState = async () => {
-      const { state } = location;
-      if (state?.chatToOpen) {
-        const { applicationId, recipientName, jobTitle, jobId } = state.chatToOpen;
-        await handleViewApplications(jobId);
-        openChatForApplication(applicationId, recipientName, jobTitle);
-        navigate(location.pathname, { replace: true, state: {} });
-      }
-    };
-    openChatFromState();
-  }, [location, handleViewApplications, openChatForApplication, navigate]);
-
-  const handleShortlist = async (applicationId, jobId) => {
-    try {
-      await shortlistCandidate(applicationId, token);
-      handleViewApplications(jobId);
-      toast.success('Candidate shortlisted successfully!');
-    } catch (error) {
-      console.error('Failed to shortlist candidate:', error);
-      toast.error('Failed to shortlist candidate.');
-    }
-  };
 
   const handleDeleteJob = (jobId) => {
     setConfirmMessage('Are you sure you want to delete this job?');
@@ -221,13 +175,13 @@ const PostedJobsPage = () => {
                     <td className="p-4">{job.title}</td>
                     <td className="p-4">{job.company}</td>
                     <td className="p-4 flex justify-center space-x-2">
-                      <button
-                        onClick={() => handleViewApplications(job._id)}
+                      <Link
+                        to={`/employer/jobs/${job._id}/applicants`}
                         className="p-2 bg-blue-600 text-white rounded"
-                        title="View Applications"
+                        title="View Applicants"
                       >
-                        <FaEye />
-                      </button>
+                        <FaUsers />
+                      </Link>
                       <button
                         onClick={() => navigate(`/employer/post-job/${job._id}`)}
                         className="p-2 bg-yellow-600 text-white rounded"
@@ -244,53 +198,6 @@ const PostedJobsPage = () => {
                       </button>
                     </td>
                   </tr>
-                  {selectedJobId === job._id && (
-                    <tr>
-                      <td colSpan="4" className="p-4 bg-gray-50 dark:bg-gray-900">
-                        <h4 className="text-md font-semibold mb-2">
-                          Applications ({(applications[job._id] || []).length})
-                        </h4>
-                        {(applications[job._id] || []).length > 0 ? (
-                          (applications[job._id] || []).map((app) => (
-                            <div
-                              key={app._id}
-                              className="p-2 border-t flex justify-between items-center"
-                            >
-                              {app.applicant ? (
-                                <>
-                                  <div>
-                                    <p>{`${app.applicant.firstName} ${app.applicant.lastName}`}</p>
-                                    <p>{app.applicant.email}</p>
-                                  </div>
-                                  <div className="flex space-x-2">
-                                    {app.status !== 'shortlisted' && (
-                                      <button
-                                        onClick={() => handleShortlist(app._id, job._id)}
-                                        className="px-4 py-2 bg-green-600 text-white rounded text-sm"
-                                      >
-                                        Shortlist
-                                      </button>
-                                    )}
-                                    <button
-                                      onClick={() => openChat(app, job.title)}
-                                      className="px-4 py-2 bg-blue-600 text-white rounded text-sm"
-                                      data-chat-opener="true"
-                                    >
-                                      Chat
-                                    </button>
-                                  </div>
-                                </>
-                              ) : (
-                                <p className="text-red-500">Applicant details not available.</p>
-                              )}
-                            </div>
-                          ))
-                        ) : (
-                          <p>No applications to display.</p>
-                        )}
-                      </td>
-                    </tr>
-                  )}
                 </React.Fragment>
               ))
             ) : (

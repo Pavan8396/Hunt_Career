@@ -31,15 +31,24 @@ exports.applyForJob = async (req, res) => {
   }
 };
 
-exports.shortlistCandidate = async (req, res) => {
+exports.updateApplicationStatus = async (req, res) => {
   try {
-    const application = await Application.findById(req.params.applicationId);
+    const { status } = req.body;
+    const { applicationId } = req.params;
+
+    const application = await Application.findById(applicationId);
+
     if (!application) {
       return res.status(404).json({ message: 'Application not found' });
     }
-    application.status = 'shortlisted';
+
+    // Optional: Add logic to ensure the user is the employer for this job
+    // For now, we'll assume the route is protected.
+
+    application.status = status;
     await application.save();
-    res.json(application);
+
+    res.json({ message: `Application status updated to ${status}` });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

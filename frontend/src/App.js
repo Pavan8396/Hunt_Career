@@ -15,6 +15,7 @@ import PostJobPage from './pages/PostJobPage';
 import PostedJobsPage from './pages/PostedJobsPage';
 import UserProfilePage from './pages/UserProfilePage';
 import EmployerProfilePage from './pages/EmployerProfilePage';
+import ApplicantsPage from './pages/ApplicantsPage';
 import Layout from './components/Layout';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import { ThemeProvider } from './context/ThemeContext';
@@ -63,6 +64,7 @@ function App() {
                 <Route path="post-job" element={<PostJobPage />} />
                 <Route path="post-job/:id" element={<PostJobPage />} />
                 <Route path="posted-jobs" element={<PostedJobsPage />} />
+                <Route path="jobs/:jobId/applicants" element={<ApplicantsPage />} />
                 <Route path="profile" element={<EmployerProfilePage />} />
               </Route>
 
