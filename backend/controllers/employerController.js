@@ -21,18 +21,20 @@ const updateEmployerProfile = async (req, res) => {
     const employer = await Employer.findById(req.user._id);
 
     if (employer) {
-      employer.companyName = req.body.companyName || employer.companyName;
-
       // Prevent email updates
       if (req.body.email && req.body.email !== employer.email) {
         return res.status(400).json({ message: 'Email address cannot be changed.' });
       }
 
-      // Allow clearing optional fields by checking if the property exists in the body
-      if (req.body.hasOwnProperty('companyDescription')) {
+      // Update fields if they are present in the request. The `in` operator is used
+      // for safety as req.body from multer may not have hasOwnProperty.
+      if ('companyName' in req.body) {
+        employer.companyName = req.body.companyName;
+      }
+      if ('companyDescription' in req.body) {
         employer.companyDescription = req.body.companyDescription;
       }
-      if (req.body.hasOwnProperty('website')) {
+      if ('website' in req.body) {
         employer.website = req.body.website;
       }
 
