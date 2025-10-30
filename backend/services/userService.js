@@ -28,12 +28,31 @@ const updateUserProfile = async (email, userData) => {
   const { ObjectId } = require('mongodb');
   const db = getDb();
 
+  const user = await db.collection("Users").findOne({ email: email });
+  if (!user) {
+    return null; // Or throw an error
+  }
+
+  // Prevent email updates
+  if (userData.email && userData.email !== user.email) {
+    throw new Error('Email address cannot be changed.');
+  }
+  delete userData.email; // Ensure email is not in the update set
+
   // Make sure not to update the _id
   delete userData._id;
 
+  // Prepare the update object, allowing fields to be cleared
+  const updateData = {};
+  for (const key in userData) {
+    if (userData.hasOwnProperty(key)) {
+      updateData[key] = userData[key];
+    }
+  }
+
   const result = await db.collection("Users").findOneAndUpdate(
     { email: email },
-    { $set: userData },
+    { $set: updateData },
     { returnDocument: 'after', projection: { password: 0 } }
   );
 

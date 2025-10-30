@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { toast } from 'react-toastify';
 import { getUserProfile, updateUserProfile } from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 import { PlusIcon, TrashIcon } from '@heroicons/react/outline';
 
 const UserProfilePage = () => {
@@ -13,7 +15,9 @@ const UserProfilePage = () => {
     skills: [],
     portfolioLinks: [],
   });
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
+  const { updateUser } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -36,8 +40,51 @@ const UserProfilePage = () => {
     fetchProfile();
   }, []);
 
+  const validate = () => {
+    const newErrors = {};
+    if (!profile.firstName) newErrors.firstName = 'First name is required.';
+    if (!profile.lastName) newErrors.lastName = 'Last name is required.';
+    if (!profile.phoneNumber) newErrors.phoneNumber = 'Phone number is required.';
+
+    const workExperienceErrors = profile.workExperience.map(exp => {
+      const expErrors = {};
+      if (!exp.title) expErrors.title = 'Job title is required.';
+      if (!exp.company) expErrors.company = 'Company is required.';
+      return expErrors;
+    });
+
+    if (workExperienceErrors.some(e => Object.keys(e).length > 0)) {
+      newErrors.workExperience = workExperienceErrors;
+    }
+
+    const educationErrors = profile.education.map(edu => {
+      const eduErrors = {};
+      if (!edu.school) eduErrors.school = 'School is required.';
+      if (!edu.degree) eduErrors.degree = 'Degree is required.';
+      return eduErrors;
+    });
+
+    if (educationErrors.some(e => Object.keys(e).length > 0)) {
+      newErrors.education = educationErrors;
+    }
+
+    profile.portfolioLinks.forEach((link, index) => {
+      if (link && !/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i.test(link)) {
+        if (!newErrors.portfolioLinks) newErrors.portfolioLinks = [];
+        newErrors.portfolioLinks[index] = 'Please enter a valid URL.';
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
+    if (!validate()) {
+      toast.error('Please fix the errors before submitting.');
+      return;
+    }
     try {
       const profileToUpdate = {
         ...profile,
@@ -47,17 +94,26 @@ const UserProfilePage = () => {
       const token = sessionStorage.getItem('token');
       const data = await updateUserProfile(profileToUpdate, token);
       setProfile(data);
-      alert('Profile updated successfully!');
+      updateUser(data);
+      toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Failed to update profile', error);
+      toast.error('Failed to update profile.');
     }
   };
 
   const handleChange = (e, index, section) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     if (section) {
       const updatedSection = [...profile[section]];
-      updatedSection[index] = { ...updatedSection[index], [name]: value };
+      if (type === 'checkbox') {
+        updatedSection[index] = { ...updatedSection[index], [name]: checked };
+        if (name === 'present' && checked) {
+          updatedSection[index].endDate = null;
+        }
+      } else {
+        updatedSection[index] = { ...updatedSection[index], [name]: value };
+      }
       setProfile({ ...profile, [section]: updatedSection });
     } else {
       setProfile({ ...profile, [name]: value });
@@ -72,7 +128,7 @@ const UserProfilePage = () => {
 
   const addSectionItem = (section) => {
     const newItem = section === 'workExperience'
-      ? { title: '', company: '', location: '', startDate: '', endDate: '', description: '' }
+      ? { title: '', company: '', location: '', startDate: '', endDate: '', description: '', present: false }
       : { school: '', degree: '', fieldOfStudy: '', startDate: '', endDate: '' };
     setProfile({ ...profile, [section]: [...profile[section], newItem] });
   };
@@ -107,18 +163,21 @@ const UserProfilePage = () => {
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
               <input type="text" name="firstName" id="firstName" value={profile.firstName} onChange={(e) => handleChange(e)} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:text-gray-200" />
+              {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
             </div>
             <div>
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
               <input type="text" name="lastName" id="lastName" value={profile.lastName} onChange={(e) => handleChange(e)} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:text-gray-200" />
+              {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-              <input type="email" name="email" id="email" value={profile.email} onChange={(e) => handleChange(e)} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:text-gray-200" />
+              <input type="email" name="email" id="email" value={profile.email} readOnly className="mt-1 block w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm sm:text-sm dark:text-gray-400" />
             </div>
             <div>
               <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
               <input type="tel" name="phoneNumber" id="phoneNumber" value={profile.phoneNumber} onChange={(e) => handleChange(e)} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:text-gray-200" />
+              {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>}
             </div>
           </div>
         </div>
@@ -130,11 +189,21 @@ const UserProfilePage = () => {
             {profile.workExperience.map((exp, index) => (
               <div key={index} className="p-4 border dark:border-gray-700 rounded-md space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input name="title" value={exp.title} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="Job Title" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
-                  <input name="company" value={exp.company} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="Company" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
+                  <div>
+                    <input name="title" value={exp.title} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="Job Title" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
+                    {errors.workExperience && errors.workExperience[index] && errors.workExperience[index].title && <p className="text-red-500 text-xs mt-1">{errors.workExperience[index].title}</p>}
+                  </div>
+                  <div>
+                    <input name="company" value={exp.company} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="Company" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
+                    {errors.workExperience && errors.workExperience[index] && errors.workExperience[index].company && <p className="text-red-500 text-xs mt-1">{errors.workExperience[index].company}</p>}
+                  </div>
                   <input name="location" value={exp.location} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="Location" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
                   <input name="startDate" type="date" value={exp.startDate ? new Date(exp.startDate).toISOString().split('T')[0] : ''} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="Start Date" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
-                  <input name="endDate" type="date" value={exp.endDate ? new Date(exp.endDate).toISOString().split('T')[0] : ''} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="End Date" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
+                  <input name="endDate" type="date" disabled={exp.present} value={exp.endDate ? new Date(exp.endDate).toISOString().split('T')[0] : ''} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="End Date" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200 disabled:bg-gray-100 dark:disabled:bg-gray-600" />
+                  <div className="flex items-center">
+                    <input type="checkbox" name="present" id={`present-${index}`} checked={exp.present} onChange={(e) => handleChange(e, index, 'workExperience')} className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                    <label htmlFor={`present-${index}`} className="ml-2 block text-sm text-gray-900 dark:text-gray-300">I currently work here</label>
+                  </div>
                 </div>
                 <textarea name="description" value={exp.description} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="Description" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200"></textarea>
                 <button type="button" onClick={() => removeSectionItem(index, 'workExperience')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500 flex items-center">
@@ -155,8 +224,14 @@ const UserProfilePage = () => {
             {profile.education.map((edu, index) => (
               <div key={index} className="p-4 border dark:border-gray-700 rounded-md space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input name="school" value={edu.school} onChange={(e) => handleChange(e, index, 'education')} placeholder="School" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
-                  <input name="degree" value={edu.degree} onChange={(e) => handleChange(e, index, 'education')} placeholder="Degree" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
+                  <div>
+                    <input name="school" value={edu.school} onChange={(e) => handleChange(e, index, 'education')} placeholder="School" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
+                    {errors.education && errors.education[index] && errors.education[index].school && <p className="text-red-500 text-xs mt-1">{errors.education[index].school}</p>}
+                  </div>
+                  <div>
+                    <input name="degree" value={edu.degree} onChange={(e) => handleChange(e, index, 'education')} placeholder="Degree" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
+                    {errors.education && errors.education[index] && errors.education[index].degree && <p className="text-red-500 text-xs mt-1">{errors.education[index].degree}</p>}
+                  </div>
                   <input name="fieldOfStudy" value={edu.fieldOfStudy} onChange={(e) => handleChange(e, index, 'education')} placeholder="Field of Study" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
                   <input name="startDate" type="date" value={edu.startDate ? new Date(edu.startDate).toISOString().split('T')[0] : ''} onChange={(e) => handleChange(e, index, 'education')} placeholder="Start Date" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
                   <input name="endDate" type="date" value={edu.endDate ? new Date(edu.endDate).toISOString().split('T')[0] : ''} onChange={(e) => handleChange(e, index, 'education')} placeholder="End Date" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
@@ -195,6 +270,7 @@ const UserProfilePage = () => {
                 <div key={index} className="flex items-center gap-2">
                   <input value={link} onChange={(e) => handleListChange(e, index, 'portfolioLinks')} placeholder="https://github.com/johndoe" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
                   <button type="button" onClick={() => removeListItem(index, 'portfolioLinks')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"><TrashIcon className="h-5 w-5" /></button>
+                  {errors.portfolioLinks && errors.portfolioLinks[index] && <p className="text-red-500 text-xs mt-1">{errors.portfolioLinks[index]}</p>}
                 </div>
               ))}
             </div>
