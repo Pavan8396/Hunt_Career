@@ -285,18 +285,22 @@ const JobDetails = () => {
           <ReactMarkdown>{job.description}</ReactMarkdown>
         </div>
 
-        <div className="border-t dark:border-gray-700 my-6 pt-6">
-          <ReviewList employerId={job.employer} />
-        </div>
+        {job && job.employer && (
+          <>
+            <div className="border-t dark:border-gray-700 my-6 pt-6">
+              <ReviewList employerId={job.employer} />
+            </div>
 
-        {isAuthenticated && user?.type !== 'employer' && (
-          <div className="border-t dark:border-gray-700 my-6 pt-6">
-            <ReviewForm
-              employerId={job.employer}
-              token={token}
-              onReviewSubmitted={handleReviewSubmitted}
-            />
-          </div>
+            {isAuthenticated && user?.type !== 'employer' && (
+              <div className="border-t dark:border-gray-700 my-6 pt-6">
+                <ReviewForm
+                  employerId={job.employer}
+                  token={token}
+                  onReviewSubmitted={handleReviewSubmitted}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
 

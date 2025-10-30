@@ -84,6 +84,21 @@ const getUserById = async (req, res) => {
   }
 };
 
+const grantAdminPrivileges = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      user.isAdmin = true;
+      await user.save();
+      res.json({ message: 'Admin privileges granted successfully.' });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to grant admin privileges.' });
+  }
+};
+
 module.exports = {
   getUserDetails,
   getUserApplications,
@@ -91,4 +106,5 @@ module.exports = {
   getUserById,
   getUserProfile,
   updateUserProfile,
+  grantAdminPrivileges,
 };
