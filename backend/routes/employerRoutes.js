@@ -52,4 +52,8 @@ router.get('/stats/job-postings-summary', ensureDb, authenticateToken, isEmploye
 router.get('/stats/recent-activity', ensureDb, authenticateToken, isEmployer, getRecentActivity);
 router.get('/:id', ensureDb, authenticateToken, getEmployerById);
 
+// Nested route for reviews
+const reviewRoutes = require('./reviewRoutes');
+router.use('/:employerId/reviews', reviewRoutes);
+
 module.exports = router;

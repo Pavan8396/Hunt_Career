@@ -9,10 +9,12 @@ import {
   CollectionIcon,
   UserCircleIcon,
   OfficeBuildingIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/outline';
 
 const Sidebar = () => {
-  const { userType } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+  const userType = user?.type;
 
   const jobSeekerLinks = [
     { to: '/home', icon: <HomeIcon className="h-5 w-5 mr-3" />, text: 'Home' },
@@ -49,6 +51,21 @@ const Sidebar = () => {
               </NavLink>
             </li>
           ))}
+          {user && user.isAdmin && (
+            <li className="mb-4">
+              <NavLink
+                to="/admin/dashboard"
+                className={({ isActive }) =>
+                  `flex items-center p-2 rounded-md transition-colors ${
+                    isActive ? 'bg-green-500 text-white' : 'hover:bg-gray-700'
+                  }`
+                }
+              >
+                <ShieldCheckIcon className="h-5 w-5 mr-3" />
+                <span>Admin</span>
+              </NavLink>
+            </li>
+          )}
         </ul>
       </nav>
     </aside>

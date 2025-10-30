@@ -47,6 +47,10 @@ const userSchema = new mongoose.Schema({
   portfolioLinks: {
     type: [String],
   },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 userSchema.pre('save', async function (next) {

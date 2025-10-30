@@ -21,6 +21,7 @@ const jobRoutes = require('./routes/jobRoutes');
 const userRoutes = require('./routes/userRoutes');
 const employerRoutes = require('./routes/employerRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const path = require('path');
 const chatRoutes = require('./routes/chatRoutes');
 
@@ -47,6 +48,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/employers', employerRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
 
 app.get("/", (req, res) => {

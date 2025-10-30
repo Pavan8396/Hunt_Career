@@ -7,7 +7,9 @@ import {
   removeJob,
   isJobSaved,
 } from '../utils/localStorageHelpers';
-import { fetchJobById, applyForJob, getApplicationForJob } from '../services/api';
+import { fetchJobById, applyForJob, getApplicationForJob, submitReview } from '../services/api';
+import ReviewForm from '../components/ReviewForm';
+import ReviewList from '../components/ReviewList';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'react-toastify';
 import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa';
@@ -156,6 +158,16 @@ const JobDetails = () => {
     setConfirmAction(null);
   };
 
+  const handleReviewSubmitted = async (reviewData) => {
+    try {
+      await submitReview(job.employer, reviewData, token);
+      // We can optionally refresh reviews here if they were displayed on this page
+    } catch (error) {
+      // The ReviewForm already shows a toast on failure, but re-throw for parent if needed
+      throw error;
+    }
+  };
+
   // ----------------- Render Section -----------------
 
   if (loading) {
@@ -272,6 +284,20 @@ const JobDetails = () => {
           </h2>
           <ReactMarkdown>{job.description}</ReactMarkdown>
         </div>
+
+        <div className="border-t dark:border-gray-700 my-6 pt-6">
+          <ReviewList employerId={job.employer} />
+        </div>
+
+        {isAuthenticated && user?.type !== 'employer' && (
+          <div className="border-t dark:border-gray-700 my-6 pt-6">
+            <ReviewForm
+              employerId={job.employer}
+              token={token}
+              onReviewSubmitted={handleReviewSubmitted}
+            />
+          </div>
+        )}
       </div>
 
       {notification.message && (
