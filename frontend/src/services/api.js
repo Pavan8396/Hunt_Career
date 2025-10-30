@@ -25,18 +25,6 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
-export const grantAdminPrivileges = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/user/grant-admin`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error('Failed to grant admin privileges');
-    return await response.json();
-  } catch (error) {
-    throw error;
-  }
-};
-
 export const getApplicationForJob = async (jobId, token) => {
   try {
     const response = await fetch(`${API_URL}/jobs/${jobId}/application`, {
@@ -221,6 +209,52 @@ export const getAllUsers = async (token) => {
   }
 };
 
+export const getAllEmployers = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/admin/employers`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to fetch employers');
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateUser = async (userId, userData, token) => {
+    try {
+        const response = await fetch(`${API_URL}/admin/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(userData),
+        });
+        if (!response.ok) throw new Error('Failed to update user');
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateEmployer = async (employerId, employerData, token) => {
+    try {
+        const response = await fetch(`${API_URL}/admin/employers/${employerId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(employerData),
+        });
+        if (!response.ok) throw new Error('Failed to update employer');
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const deleteUser = async (userId, token) => {
   try {
     const response = await fetch(`${API_URL}/admin/users/${userId}`, {
@@ -232,6 +266,70 @@ export const deleteUser = async (userId, token) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const deleteEmployer = async (employerId, token) => {
+    try {
+        const response = await fetch(`${API_URL}/admin/employers/${employerId}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) throw new Error('Failed to delete employer');
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const toggleUserStatus = async (userId, isActive, token) => {
+    try {
+        const response = await fetch(`${API_URL}/admin/users/${userId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ isActive }),
+        });
+        if (!response.ok) throw new Error('Failed to update user status');
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const toggleEmployerStatus = async (employerId, isActive, token) => {
+    try {
+        const response = await fetch(`${API_URL}/admin/employers/${employerId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ isActive }),
+        });
+        if (!response.ok) throw new Error('Failed to update employer status');
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const toggleUserAdminStatus = async (userId, isAdmin, token) => {
+    try {
+        const response = await fetch(`${API_URL}/admin/users/${userId}/make-admin`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ isAdmin }),
+        });
+        if (!response.ok) throw new Error('Failed to update user admin status');
+        return await response.json();
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const submitReview = async (employerId, reviewData, token) => {
