@@ -36,15 +36,142 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+// @desc    Get all employers
+// @route   GET /api/admin/employers
+// @access  Private (Admin)
+exports.getAllEmployers = async (req, res) => {
+  try {
+    const employers = await Employer.find({}).select('-password');
+    res.json(employers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update a user
+// @route   PUT /api/admin/users/:id
+// @access  Private (Admin)
+exports.updateUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+      user.firstName = req.body.firstName || user.firstName;
+      user.lastName = req.body.lastName || user.lastName;
+      user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
+
+      const updatedUser = await user.save();
+      res.json(updatedUser);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// @desc    Update an employer
+// @route   PUT /api/admin/employers/:id
+// @access  Private (Admin)
+exports.updateEmployer = async (req, res) => {
+  try {
+    const employer = await Employer.findById(req.params.id);
+
+    if (employer) {
+      employer.companyName = req.body.companyName || employer.companyName;
+
+      const updatedEmployer = await employer.save();
+      res.json(updatedEmployer);
+    } else {
+      res.status(404).json({ message: 'Employer not found' });
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
 // @desc    Delete a user
 // @route   DELETE /api/admin/users/:id
 // @access  Private (Admin)
 exports.deleteUser = async (req, res) => {
   try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (user) {
+      res.json({ message: 'User removed' });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete an employer
+// @route   DELETE /api/admin/employers/:id
+// @access  Private (Admin)
+exports.deleteEmployer = async (req, res) => {
+    try {
+        const employer = await Employer.findByIdAndDelete(req.params.id);
+
+        if (employer) {
+            // Optional: Also remove jobs associated with the employer
+            await Job.deleteMany({ employer: employer._id });
+            res.json({ message: 'Employer and associated jobs removed' });
+        } else {
+            res.status(404).json({ message: 'Employer not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Toggle user active status
+// @route   PUT /api/admin/users/:id/status
+// @access  Private (Admin)
+exports.toggleUserStatus = async (req, res) => {
+  try {
     const user = await User.findById(req.params.id);
     if (user) {
-      await user.remove();
-      res.json({ message: 'User removed' });
+      user.isActive = req.body.isActive;
+      await user.save();
+      res.json({ message: `User status updated to ${user.isActive ? 'active' : 'suspended'}.` });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Toggle employer active status
+// @route   PUT /api/admin/employers/:id/status
+// @access  Private (Admin)
+exports.toggleEmployerStatus = async (req, res) => {
+  try {
+    const employer = await Employer.findById(req.params.id);
+    if (employer) {
+      employer.isActive = req.body.isActive;
+      await employer.save();
+      res.json({ message: `Employer status updated to ${employer.isActive ? 'active' : 'suspended'}.` });
+    } else {
+      res.status(404).json({ message: 'Employer not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Toggle user admin status
+// @route   PUT /api/admin/users/:id/make-admin
+// @access  Private (Admin)
+exports.toggleUserAdminStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      user.isAdmin = req.body.isAdmin;
+      await user.save();
+      res.json({ message: `User admin status updated to ${user.isAdmin}.` });
     } else {
       res.status(404).json({ message: 'User not found' });
     }
