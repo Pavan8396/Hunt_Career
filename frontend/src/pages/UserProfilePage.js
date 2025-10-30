@@ -94,7 +94,12 @@ const UserProfilePage = () => {
       const token = sessionStorage.getItem('token');
       const data = await updateUserProfile(profileToUpdate, token);
       setProfile(data);
-      updateUser(data);
+      // Manually construct the name for the Navbar update
+      const updatedUserForContext = {
+        ...data,
+        name: `${data.firstName} ${data.lastName}`,
+      };
+      updateUser(updatedUserForContext);
       toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Failed to update profile', error);
