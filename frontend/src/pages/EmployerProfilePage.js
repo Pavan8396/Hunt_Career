@@ -38,6 +38,12 @@ const EmployerProfilePage = () => {
 
   const validate = () => {
     const newErrors = {};
+    if (!profile.companyName) {
+      newErrors.companyName = 'Company name is required.';
+    }
+    if (!profile.companyDescription) {
+      newErrors.companyDescription = 'Company description is required.';
+    }
     if (profile.website && !/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i.test(profile.website)) {
       newErrors.website = 'Please enter a valid URL.';
     }
@@ -106,6 +112,7 @@ const EmployerProfilePage = () => {
             <div>
               <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Name</label>
               <input type="text" name="companyName" id="companyName" value={profile.companyName} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:text-gray-200" />
+              {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName}</p>}
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
@@ -119,6 +126,7 @@ const EmployerProfilePage = () => {
             <div className="md:col-span-2">
               <label htmlFor="companyDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Description</label>
               <textarea name="companyDescription" id="companyDescription" value={profile.companyDescription} onChange={handleChange} rows="4" className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:text-gray-200"></textarea>
+              {errors.companyDescription && <p className="text-red-500 text-xs mt-1">{errors.companyDescription}</p>}
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Logo</label>

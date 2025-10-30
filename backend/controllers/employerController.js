@@ -28,13 +28,13 @@ const updateEmployerProfile = async (req, res) => {
         return res.status(400).json({ message: 'Email address cannot be changed.' });
       }
 
-      // Allow clearing optional fields
-      employer.companyDescription =
-        req.body.companyDescription !== undefined
-          ? req.body.companyDescription
-          : employer.companyDescription;
-      employer.website =
-        req.body.website !== undefined ? req.body.website : employer.website;
+      // Allow clearing optional fields by checking if the property exists in the body
+      if (req.body.hasOwnProperty('companyDescription')) {
+        employer.companyDescription = req.body.companyDescription;
+      }
+      if (req.body.hasOwnProperty('website')) {
+        employer.website = req.body.website;
+      }
 
       if (req.file) {
         employer.companyLogo = req.file.path;
