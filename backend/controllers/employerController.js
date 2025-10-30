@@ -22,10 +22,19 @@ const updateEmployerProfile = async (req, res) => {
 
     if (employer) {
       employer.companyName = req.body.companyName || employer.companyName;
-      employer.email = req.body.email || employer.email;
+
+      // Prevent email updates
+      if (req.body.email && req.body.email !== employer.email) {
+        return res.status(400).json({ message: 'Email address cannot be changed.' });
+      }
+
+      // Allow clearing optional fields
       employer.companyDescription =
-        req.body.companyDescription || employer.companyDescription;
-      employer.website = req.body.website || employer.website;
+        req.body.companyDescription !== undefined
+          ? req.body.companyDescription
+          : employer.companyDescription;
+      employer.website =
+        req.body.website !== undefined ? req.body.website : employer.website;
 
       if (req.file) {
         employer.companyLogo = req.file.path;

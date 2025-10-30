@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { toast } from 'react-toastify';
 import { getEmployerProfile, updateEmployerProfile } from '../services/api';
+import { AuthContext } from '../context/AuthContext';
 import { UploadIcon } from '@heroicons/react/outline';
 
 const EmployerProfilePage = () => {
@@ -10,9 +12,11 @@ const EmployerProfilePage = () => {
     website: '',
     companyLogo: '',
   });
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const { updateUser } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -32,6 +36,15 @@ const EmployerProfilePage = () => {
     fetchProfile();
   }, []);
 
+  const validate = () => {
+    const newErrors = {};
+    if (profile.website && !/^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i.test(profile.website)) {
+      newErrors.website = 'Please enter a valid URL.';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -46,11 +59,15 @@ const EmployerProfilePage = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    if (!validate()) {
+      toast.error('Please fix the errors before submitting.');
+      return;
+    }
     const formData = new FormData();
     formData.append('companyName', profile.companyName);
     formData.append('email', profile.email);
     formData.append('companyDescription', profile.companyDescription);
-    formData.append('website', profile.website);
+    formData.append('website', profile.website || '');
     if (selectedFile) {
       formData.append('companyLogo', selectedFile);
     }
@@ -62,9 +79,11 @@ const EmployerProfilePage = () => {
       if (data.companyLogo) {
         setPreview(`http://localhost:5000/${data.companyLogo}`);
       }
-      alert('Profile updated successfully!');
+      updateUser(data);
+      toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Failed to update employer profile', error);
+      toast.error('Failed to update profile.');
     }
   };
 
@@ -90,11 +109,12 @@ const EmployerProfilePage = () => {
             </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-              <input type="email" name="email" id="email" value={profile.email} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:text-gray-200" />
+              <input type="email" name="email" id="email" value={profile.email} readOnly className="mt-1 block w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm sm:text-sm dark:text-gray-400" />
             </div>
             <div className="md:col-span-2">
               <label htmlFor="website" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Website</label>
               <input type="url" name="website" id="website" value={profile.website} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:text-gray-200" />
+              {errors.website && <p className="text-red-500 text-xs mt-1">{errors.website}</p>}
             </div>
             <div className="md:col-span-2">
               <label htmlFor="companyDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company Description</label>

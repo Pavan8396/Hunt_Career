@@ -33,8 +33,14 @@ export const AuthProvider = ({ children }) => {
     setUserType('');
   };
 
+  const updateUser = (updatedUserData) => {
+    const userWithType = { ...updatedUserData, type: userType };
+    sessionStorage.setItem('user', JSON.stringify(userWithType));
+    setUser(userWithType);
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, token, userType, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, userType, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
