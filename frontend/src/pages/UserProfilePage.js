@@ -82,7 +82,6 @@ const UserProfilePage = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     if (!validate()) {
-      toast.error('Please fix the errors before submitting.');
       return;
     }
     try {
