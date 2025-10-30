@@ -74,6 +74,9 @@ const loginUser = async (req, res) => {
   try {
     const user = await userService.findUserForLogin(email);
     if (user && (await bcrypt.compare(password, user.password))) {
+      if (!user.isActive) {
+        return res.status(403).json({ message: "Your account has been suspended. Please contact support." });
+      }
       const token = jwt.sign({ _id: user._id, email: user.email, type: 'user', isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,

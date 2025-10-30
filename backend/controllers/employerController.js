@@ -112,6 +112,9 @@ const loginEmployer = async (req, res) => {
   try {
     const employer = await Employer.findOne({ email });
     if (employer && await bcrypt.compare(password, employer.password)) {
+      if (!employer.isActive) {
+        return res.status(403).json({ message: "Your account has been suspended. Please contact support." });
+      }
       const token = jwt.sign({ _id: employer._id, email: employer.email, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
