@@ -82,6 +82,7 @@ const UserProfilePage = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     if (!validate()) {
+      toast.error('Your profile has validation errors. Please check the fields below.');
       return;
     }
     try {
