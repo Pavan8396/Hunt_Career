@@ -561,46 +561,36 @@ export const getApplicationsForJob = async (jobId, token) => {
       },
     });
     if (!response.ok) {
-      let errorMessage = 'Failed to fetch applications';
-      try {
-        const errorBody = await response.json();
-        errorMessage = errorBody.message || errorMessage;
-      } catch (jsonError) {
-        console.warn('Could not parse error response:', jsonError);
-      }
-      throw new Error(errorMessage);
+      const errorText = await response.text();
+      throw new Error(`Failed to fetch applications: ${errorText || response.statusText}`);
     }
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    toast.error(error.message);
-    throw new Error(error.message);
+    console.error('Error fetching applications for job:', error.message);
+    toast.error('Failed to load applications.');
+    throw error;
   }
 };
 
-export const shortlistCandidate = async (applicationId, token) => {
+export const updateApplicationStatus = async (applicationId, status, token) => {
   try {
-    const response = await fetch(`${API_URL}/applications/shortlist/${applicationId}`, {
-      method: 'POST',
+    const response = await fetch(`${API_URL}/applications/${applicationId}/status`, {
+      method: 'PUT',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
+      body: JSON.stringify({ status }),
     });
     if (!response.ok) {
-      let errorMessage = 'Failed to shortlist candidate';
-      try {
-        const errorBody = await response.json();
-        errorMessage = errorBody.message || errorMessage;
-      } catch (jsonError) {
-        console.warn('Could not parse error response:', jsonError);
-      }
-      throw new Error(errorMessage);
+      const errorText = await response.text();
+      throw new Error(`Failed to update status: ${errorText || response.statusText}`);
     }
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    toast.error(error.message);
-    throw new Error(error.message);
+    console.error('Error updating application status:', error.message);
+    toast.error('Failed to update application status.');
+    throw error;
   }
 };
 
