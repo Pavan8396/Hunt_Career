@@ -7,9 +7,10 @@ const {
   getApplicationForJob,
   updateJob,
   deleteJobs,
+  getJobsByEmployerId,
 } = require('../controllers/jobController');
 const { ensureDb } = require('../middleware/dbMiddleware');
-const { authenticateToken, isEmployer, isJobSeeker } = require('../middleware/authMiddleware');
+const { authenticateToken, isEmployer, isJobSeeker, isAdmin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 router.get('/', ensureDb, getJobs);
@@ -17,6 +18,7 @@ router.get('/employers', ensureDb, authenticateToken, isEmployer, getEmployerJob
 router.post('/', ensureDb, authenticateToken, isEmployer, createJob);
 router.delete('/delete-all', ensureDb, authenticateToken, isEmployer, deleteJobs);
 router.post('/delete-multiple', ensureDb, authenticateToken, isEmployer, deleteJobs);
+router.get('/employer/:employerId', ensureDb, authenticateToken, isAdmin, getJobsByEmployerId);
 router.get('/:id', ensureDb, getJobById);
 router.put('/:id', ensureDb, authenticateToken, isEmployer, updateJob);
 router.delete('/:id', ensureDb, authenticateToken, isEmployer, deleteJobs);

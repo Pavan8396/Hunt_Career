@@ -103,6 +103,15 @@ const getEmployerJobs = async (req, res) => {
   }
 };
 
+const getJobsByEmployerId = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.params.employerId });
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const deleteJobs = async (req, res) => {
   const { id } = req.params;
   const { jobIds } = req.body;
@@ -198,4 +207,5 @@ module.exports = {
   deleteJobs,
   getApplicationForJob,
   updateJob,
+  getJobsByEmployerId,
 };
