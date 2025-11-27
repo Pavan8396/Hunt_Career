@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
   getAdminStats,
@@ -115,8 +116,6 @@ const AdminDashboard = () => {
     </div>
   );
 };
-
-import { Link } from 'react-router-dom';
 
 const UserManagement = ({ users, setUsers, fetchData }) => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);

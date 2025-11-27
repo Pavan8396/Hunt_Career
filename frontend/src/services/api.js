@@ -200,7 +200,7 @@ export const getAdminStats = async (token) => {
 export const getAllUsers = async (token, params = {}) => {
   try {
     const query = new URLSearchParams(params).toString();
-    const response = await fetch(`${APIURL}/admin/users?${query}`, {
+    const response = await fetch(`${API_URL}/admin/users?${query}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch users');
