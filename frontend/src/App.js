@@ -17,8 +17,6 @@ import UserProfilePage from './pages/UserProfilePage';
 import EmployerProfilePage from './pages/EmployerProfilePage';
 import ApplicantsPage from './pages/ApplicantsPage';
 import AdminDashboard from './pages/AdminDashboard';
-import AdminManageJobsPage from './pages/AdminManageJobsPage';
-import AdminPostJobPage from './pages/AdminPostJobPage';
 import Layout from './components/Layout';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
 import { ThemeProvider } from './context/ThemeContext';
@@ -80,14 +78,6 @@ function App() {
               <Route
                 path="/admin/dashboard"
                 element={<AdminRoute><AuthenticatedLayout><AdminDashboard /></AuthenticatedLayout></AdminRoute>}
-              />
-              <Route
-                path="/admin/employer/:employerId/jobs"
-                element={<AdminRoute><AuthenticatedLayout><AdminManageJobsPage /></AuthenticatedLayout></AdminRoute>}
-              />
-              <Route
-                path="/admin/post-job"
-                element={<AdminRoute><AuthenticatedLayout><AdminPostJobPage /></AuthenticatedLayout></AdminRoute>}
               />
 
               {/* Public and guest-accessible routes */}
