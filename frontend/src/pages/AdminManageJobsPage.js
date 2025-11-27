@@ -53,7 +53,7 @@ const AdminManageJobsPage = () => {
   return (
     <div className="p-4 sm:p-6 lg:p-8 dark:bg-gray-900 min-h-screen">
       <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Manage Jobs</h1>
-      <div className="overflow-x-auto">
+      <div>
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>

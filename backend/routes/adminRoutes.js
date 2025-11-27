@@ -11,6 +11,7 @@ const {
     toggleEmployerStatus,
     toggleUserAdminStatus,
     getAllEmployerNames,
+    getUserById,
 } = require('../controllers/adminController');
 const { ensureDb } = require('../middleware/dbMiddleware');
 const { authenticateToken, isAdmin } = require('../middleware/authMiddleware');
@@ -25,6 +26,7 @@ router.get('/stats', getStats);
 
 // User Management
 router.get('/users', getAllUsers);
+router.get('/users/:id', getUserById);
 router.put('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
 router.put('/users/:id/status', toggleUserStatus);

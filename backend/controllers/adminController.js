@@ -24,6 +24,22 @@ exports.getStats = async (req, res) => {
   }
 };
 
+// @desc    Get user by ID
+// @route   GET /api/admin/users/:id
+// @access  Private (Admin)
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get all employer names and IDs
 // @route   GET /api/admin/employers/names
 // @access  Private (Admin)

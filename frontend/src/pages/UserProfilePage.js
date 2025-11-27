@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getUserProfile, updateUserProfile } from '../services/api';
+import { getUserProfile, updateUserProfile, getUserById } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { PlusIcon, TrashIcon } from '@heroicons/react/outline';
 
@@ -18,12 +19,13 @@ const UserProfilePage = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const { updateUser } = useContext(AuthContext);
+  const { userId } = useParams();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = sessionStorage.getItem('token');
-        const data = await getUserProfile(token);
+        const data = userId ? await getUserById(userId, token) : await getUserProfile(token);
         setProfile({
           ...data,
           workExperience: data.workExperience || [],
@@ -38,7 +40,7 @@ const UserProfilePage = () => {
       }
     };
     fetchProfile();
-  }, []);
+  }, [userId]);
 
   const validate = () => {
     const newErrors = {};

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
@@ -26,11 +26,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('users');
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async (filters = {}) => {
+  const fetchData = useCallback(async (filters = {}) => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('token');
@@ -47,7 +43,11 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   if (loading) {
     return <div className="p-4 text-center">Loading...</div>;
@@ -134,7 +134,7 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
         return () => {
             clearTimeout(handler);
         };
-    }, [search, status, sortBy]);
+    }, [search, status, sortBy, fetchData]);
 
     const handleEdit = (user) => {
       setSelectedUser(user);
@@ -234,7 +234,7 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
                 <option value="date_desc">Date Desc</option>
             </select>
         </div>
-        <div className="overflow-x-auto">
+        <div>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
@@ -351,7 +351,7 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
             Create New Job
           </Link>
         </div>
-        <div className="overflow-x-auto">
+        <div>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
