@@ -197,25 +197,12 @@ export const getAdminStats = async (token) => {
   }
 };
 
-export const getAllUsers = async (token, params = {}) => {
+export const getAllUsers = async (token) => {
   try {
-    const query = new URLSearchParams(params).toString();
-    const response = await fetch(`${APIURL}/admin/users?${query}`, {
+    const response = await fetch(`${API_URL}/admin/users`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch users');
-    return await response.json();
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getAllEmployerNames = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/admin/employers/names`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error('Failed to fetch employer names');
     return await response.json();
   } catch (error) {
     throw error;
@@ -724,10 +711,9 @@ export const createJob = async (jobData, token) => {
   }
 };
 
-export const getEmployerJobs = async (token, employerId) => {
+export const getEmployerJobs = async (token) => {
   try {
-    const url = employerId ? `${API_URL}/jobs/employer/${employerId}` : `${API_URL}/jobs/employers`;
-    const response = await fetch(url, {
+    const response = await fetch(`${API_URL}/jobs/employers`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
