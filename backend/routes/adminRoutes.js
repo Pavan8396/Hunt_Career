@@ -10,6 +10,7 @@ const {
     toggleUserStatus,
     toggleEmployerStatus,
     toggleUserAdminStatus,
+    getAllEmployerNames,
 } = require('../controllers/adminController');
 const { ensureDb } = require('../middleware/dbMiddleware');
 const { authenticateToken, isAdmin } = require('../middleware/authMiddleware');
@@ -30,6 +31,7 @@ router.put('/users/:id/status', toggleUserStatus);
 router.put('/users/:id/make-admin', toggleUserAdminStatus);
 
 // Employer Management
+router.get('/employers/names', getAllEmployerNames);
 router.get('/employers', getAllEmployers);
 router.put('/employers/:id', updateEmployer);
 router.delete('/employers/:id', deleteEmployer);

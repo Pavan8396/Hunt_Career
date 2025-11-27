@@ -26,25 +26,27 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = sessionStorage.getItem('token');
-        const [statsData, usersData, employersData] = await Promise.all([
-          getAdminStats(token),
-          getAllUsers(token),
-          getAllEmployers(token),
-        ]);
-        setStats(statsData);
-        setUsers(usersData);
-        setEmployers(employersData);
-      } catch (error) {
-        toast.error('Failed to load admin data.');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
+
+  const fetchData = async (filters = {}) => {
+    setLoading(true);
+    try {
+      const token = sessionStorage.getItem('token');
+      const [statsData, usersData, employersData] = await Promise.all([
+        getAdminStats(token),
+        getAllUsers(token, filters),
+        getAllEmployers(token),
+      ]);
+      setStats(statsData);
+      setUsers(usersData);
+      setEmployers(employersData);
+    } catch (error) {
+      toast.error('Failed to load admin data.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return <div className="p-4 text-center">Loading...</div>;
@@ -103,7 +105,7 @@ const AdminDashboard = () => {
 
         <div className="mt-6">
           {activeTab === 'users' && (
-            <UserManagement users={users} setUsers={setUsers} />
+            <UserManagement users={users} setUsers={setUsers} fetchData={fetchData} />
           )}
           {activeTab === 'employers' && (
             <EmployerManagement employers={employers} setEmployers={setEmployers} />
@@ -114,11 +116,26 @@ const AdminDashboard = () => {
   );
 };
 
-const UserManagement = ({ users, setUsers }) => {
+import { Link } from 'react-router-dom';
+
+const UserManagement = ({ users, setUsers, fetchData }) => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [actionToConfirm, setActionToConfirm] = useState(null);
+    const [search, setSearch] = useState('');
+    const [status, setStatus] = useState('');
+    const [sortBy, setSortBy] = useState('');
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            fetchData({ search, status, sortBy });
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [search, status, sortBy]);
 
     const handleEdit = (user) => {
       setSelectedUser(user);
@@ -199,6 +216,25 @@ const UserManagement = ({ users, setUsers }) => {
 
     return (
       <>
+        <div className="flex justify-between mb-4">
+            <input
+                type="text"
+                placeholder="Search by name or email"
+                className="p-2 border rounded"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
+            <select className="p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value)}>
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+            </select>
+            <select className="p-2 border rounded" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="">Sort By</option>
+                <option value="date_asc">Date Asc</option>
+                <option value="date_desc">Date Desc</option>
+            </select>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
@@ -222,7 +258,8 @@ const UserManagement = ({ users, setUsers }) => {
                     <ToggleSwitch enabled={user.isAdmin} onChange={() => handleToggleAdmin(user)} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onClick={() => handleEdit(user)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"><PencilIcon className="h-5 w-5" /></button>
+                    <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">View Profile</Link>
+                    <button onClick={() => handleEdit(user)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 ml-4"><PencilIcon className="h-5 w-5" /></button>
                     <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"><TrashIcon className="h-5 w-5" /></button>
                   </td>
                 </tr>
@@ -310,6 +347,11 @@ const UserManagement = ({ users, setUsers }) => {
 
     return (
       <>
+        <div className="flex justify-end mb-4">
+          <Link to="/admin/post-job" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+            Create New Job
+          </Link>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
@@ -329,7 +371,8 @@ const UserManagement = ({ users, setUsers }) => {
                     <ToggleSwitch enabled={employer.isActive} onChange={() => handleToggleStatus(employer)} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"><PencilIcon className="h-5 w-5" /></button>
+                    <Link to={`/admin/employer/${employer._id}/jobs`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Manage Jobs</Link>
+                    <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 ml-4"><PencilIcon className="h-5 w-5" /></button>
                     <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"><TrashIcon className="h-5 w-5" /></button>
                   </td>
                 </tr>
