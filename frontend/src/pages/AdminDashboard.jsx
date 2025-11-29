@@ -25,28 +25,48 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('users');
 
-  const fetchData = useCallback(async (filters = {}) => {
-    setLoading(true);
+  const fetchUsers = useCallback(async (filters = {}) => {
+    // No top-level loading state here to prevent flicker
     try {
       const token = sessionStorage.getItem('token');
-      const [statsData, usersData, employersData] = await Promise.all([
-        getAdminStats(token),
-        getAllUsers(token, filters),
-        getAllEmployers(token),
-      ]);
-      setStats(statsData);
+      const usersData = await getAllUsers(token, filters);
       setUsers(usersData);
+    } catch (error) {
+      toast.error('Failed to load users.');
+    }
+  }, []);
+
+  const fetchEmployers = useCallback(async (filters = {}) => {
+    try {
+      const token = sessionStorage.getItem('token');
+      const employersData = await getAllEmployers(token, filters);
       setEmployers(employersData);
     } catch (error) {
-      toast.error('Failed to load admin data.');
-    } finally {
-      setLoading(false);
+      toast.error('Failed to load employers.');
     }
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const fetchInitialData = async () => {
+      setLoading(true);
+      try {
+        const token = sessionStorage.getItem('token');
+        const [statsData, usersData, employersData] = await Promise.all([
+          getAdminStats(token),
+          getAllUsers(token, {}),
+          getAllEmployers(token, {}),
+        ]);
+        setStats(statsData);
+        setUsers(usersData);
+        setEmployers(employersData);
+      } catch (error) {
+        toast.error('Failed to load admin data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInitialData();
+  }, []); // The empty dependency array ensures this runs only once on mount
 
   if (loading) {
     return <div className="p-4 text-center">Loading...</div>;
@@ -105,10 +125,10 @@ const AdminDashboard = () => {
 
         <div className="mt-6">
           {activeTab === 'users' && (
-            <UserManagement users={users} setUsers={setUsers} fetchData={fetchData} />
+            <UserManagement users={users} setUsers={setUsers} fetchUsers={fetchUsers} />
           )}
           {activeTab === 'employers' && (
-            <EmployerManagement employers={employers} setEmployers={setEmployers} />
+            <EmployerManagement employers={employers} setEmployers={setEmployers} fetchEmployers={fetchEmployers} />
           )}
         </div>
       </div>
@@ -116,8 +136,7 @@ const AdminDashboard = () => {
   );
 };
 
-const UserManagement = ({ users, setUsers, fetchData }) => {
-    const [isEditModalOpen, setEditModalOpen] = useState(false);
+const UserManagement = ({ users, setUsers, fetchUsers }) => {
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [actionToConfirm, setActionToConfirm] = useState(null);
@@ -127,23 +146,13 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            fetchData({ search, status, sortBy });
+            fetchUsers({ search, status, sortBy });
         }, 500);
 
         return () => {
             clearTimeout(handler);
         };
-    }, [search, status, sortBy, fetchData]);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            fetchData({ search, status, sortBy });
-        }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [search, status, sortBy, fetchData]);
+    }, [search, status, sortBy, fetchUsers]);
 
     const handleDelete = (user) => {
       setSelectedUser(user);
@@ -249,8 +258,9 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
                     <ToggleSwitch enabled={user.isAdmin} onChange={() => handleToggleAdmin(user)} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">View Profile</Link>
-                    <button onClick={() => handleEdit(user)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 ml-4"><PencilIcon className="h-5 w-5" /></button>
+                    <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                      <PencilIcon className="h-5 w-5" />
+                    </Link>
                     <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"><TrashIcon className="h-5 w-5" /></button>
                   </td>
                 </tr>
@@ -269,16 +279,23 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
     );
   };
 
-  const EmployerManagement = ({ employers, setEmployers }) => {
-    const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [selectedEmployer, setSelectedEmployer] = useState(null);
     const [actionToConfirm, setActionToConfirm] = useState(null);
+    const [search, setSearch] = useState('');
+    const [status, setStatus] = useState('');
+    const [sortBy, setSortBy] = useState('');
 
-    const handleEdit = (employer) => {
-      setSelectedEmployer(employer);
-      setEditModalOpen(true);
-    };
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            fetchEmployers({ search, status, sortBy });
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [search, status, sortBy, fetchEmployers]);
 
     const handleDelete = (employer) => {
       setSelectedEmployer(employer);
@@ -337,10 +354,24 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
 
     return (
       <>
-        <div className="flex justify-end mb-4">
-          <Link to="/admin/post-job" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-            Create New Job
-          </Link>
+        <div className="flex justify-between mb-4">
+            <input
+                type="text"
+                placeholder="Search by company or email"
+                className="p-2 border rounded"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
+            <select className="p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value)}>
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+            </select>
+            <select className="p-2 border rounded" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="">Sort By</option>
+                <option value="date_asc">Date Asc</option>
+                <option value="date_desc">Date Desc</option>
+            </select>
         </div>
         <div>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -362,7 +393,6 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Link to={`/admin/employer/${employer._id}/jobs`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Manage Jobs</Link>
-                    <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 ml-4"><PencilIcon className="h-5 w-5" /></button>
                     <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"><TrashIcon className="h-5 w-5" /></button>
                   </td>
                 </tr>
@@ -370,7 +400,6 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
             </tbody>
           </table>
         </div>
-        <EditEmployerModal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)} onSave={saveEmployer} employer={selectedEmployer} />
         <ConfirmationModal
           isOpen={isConfirmModalOpen}
           onClose={() => setConfirmModalOpen(false)}
