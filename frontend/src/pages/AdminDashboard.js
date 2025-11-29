@@ -117,12 +117,23 @@ const AdminDashboard = () => {
 };
 
 const UserManagement = ({ users, setUsers, fetchData }) => {
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [actionToConfirm, setActionToConfirm] = useState(null);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
     const [sortBy, setSortBy] = useState('');
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            fetchData({ search, status, sortBy });
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [search, status, sortBy, fetchData]);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -215,7 +226,7 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
                 <option value="date_desc">Date Desc</option>
             </select>
         </div>
-        <div className="overflow-x-auto">
+        <div>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
@@ -238,14 +249,9 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
                     <ToggleSwitch enabled={user.isAdmin} onChange={() => handleToggleAdmin(user)} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-4">
-                      <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                        <EyeIcon className="h-5 w-5" />
-                      </Link>
-                      <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </div>
+                    <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">View Profile</Link>
+                    <button onClick={() => handleEdit(user)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 ml-4"><PencilIcon className="h-5 w-5" /></button>
+                    <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"><TrashIcon className="h-5 w-5" /></button>
                   </td>
                 </tr>
               ))}
@@ -336,7 +342,7 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
             Create New Job
           </Link>
         </div>
-        <div className="overflow-x-auto">
+        <div>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
@@ -355,17 +361,9 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
                     <ToggleSwitch enabled={employer.isActive} onChange={() => handleToggleStatus(employer)} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-4">
-                      <Link to={`/admin/employer/${employer._id}/jobs`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                        <ClipboardListIcon className="h-5 w-5" />
-                      </Link>
-                      <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                        <PencilIcon className="h-5 w-5" />
-                      </button>
-                      <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </div>
+                    <Link to={`/admin/employer/${employer._id}/jobs`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Manage Jobs</Link>
+                    <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 ml-4"><PencilIcon className="h-5 w-5" /></button>
+                    <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"><TrashIcon className="h-5 w-5" /></button>
                   </td>
                 </tr>
               ))}

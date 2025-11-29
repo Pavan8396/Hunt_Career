@@ -68,16 +68,10 @@ const AdminManageJobsPage = () => {
               <tr key={job._id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{job.title}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{job.job_type}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{job.candidate_required_location}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{job.location}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex items-center space-x-4">
-                    <Link to={`/admin/edit-job/${job._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                      <PencilIcon className="h-5 w-5" />
-                    </Link>
-                    <button onClick={() => handleDelete(job._id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
-                  </div>
+                  <Link to={`/admin/edit-job/${job._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"><PencilIcon className="h-5 w-5" /></Link>
+                  <button onClick={() => handleDelete(job._id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"><TrashIcon className="h-5 w-5" /></button>
                 </td>
               </tr>
             ))}
