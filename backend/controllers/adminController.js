@@ -24,12 +24,63 @@ exports.getStats = async (req, res) => {
   }
 };
 
+// @desc    Get user by ID
+// @route   GET /api/admin/users/:id
+// @access  Private (Admin)
+exports.getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get all employer names and IDs
+// @route   GET /api/admin/employers/names
+// @access  Private (Admin)
+exports.getAllEmployerNames = async (req, res) => {
+  try {
+    const employers = await Employer.find({}).select('companyName');
+    res.json(employers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get all users
 // @route   GET /api/admin/users
 // @access  Private (Admin)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}).select('-password');
+    const { search, status, sortBy } = req.query;
+    let query = {};
+
+    if (search) {
+      const searchRegex = new RegExp(search, 'i');
+      query.$or = [
+        { firstName: searchRegex },
+        { lastName: searchRegex },
+        { email: searchRegex },
+      ];
+    }
+
+    if (status) {
+      query.isActive = status === 'active';
+    }
+
+    let sortOption = {};
+    if (sortBy === 'date_asc') {
+      sortOption.createdAt = 1;
+    } else if (sortBy === 'date_desc') {
+      sortOption.createdAt = -1;
+    }
+
+    const users = await User.find(query).sort(sortOption).select('-password');
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
