@@ -188,15 +188,21 @@ const getRecentActivity = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Get employer by ID
+ * @route   GET /api/employers/:id
+ * @access  Private (Employer)
+ */
 const getEmployerById = async (req, res) => {
   try {
-    const employer = await Employer.findById(req.params.id);
+    const employer = await Employer.findById(req.params.id).select('-password');
     if (employer) {
-      res.json({ name: employer.companyName });
+      res.json(employer);
     } else {
       res.status(404).json({ message: "Employer not found" });
     }
   } catch (err) {
+    console.error('Error fetching employer by ID:', err);
     res.status(500).json({ message: "Failed to fetch employer details" });
   }
 };

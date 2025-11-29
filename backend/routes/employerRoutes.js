@@ -50,7 +50,7 @@ router.get('/applications', ensureDb, authenticateToken, isEmployer, getEmployer
 router.get('/stats/applications-over-time', ensureDb, authenticateToken, isEmployer, getApplicationsOverTime);
 router.get('/stats/job-postings-summary', ensureDb, authenticateToken, isEmployer, getJobPostingsSummary);
 router.get('/stats/recent-activity', ensureDb, authenticateToken, isEmployer, getRecentActivity);
-router.get('/:id', ensureDb, authenticateToken, getEmployerById);
+router.get('/:id', ensureDb, authenticateToken, isEmployer, getEmployerById);
 
 // Nested route for reviews
 const reviewRoutes = require('./reviewRoutes');

@@ -112,29 +112,36 @@ const getJobsByEmployerId = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Delete one or more jobs
+ * @route   DELETE /api/jobs/:id
+ * @route   DELETE /api/jobs/delete-all
+ * @route   POST /api/jobs/delete-multiple
+ * @access  Private (Admin or Employer)
+ */
 const deleteJobs = async (req, res) => {
   const { id } = req.params;
   const { jobIds } = req.body;
 
   try {
-    // ADMIN PATH for single delete from manage jobs page
+    // Admin path for single delete
     if (req.user.isAdmin && id) {
-        const job = await Job.findById(id);
-        if (!job) {
-            return res.status(404).json({ message: 'Job not found' });
-        }
+      const job = await Job.findById(id);
+      if (!job) {
+        return res.status(404).json({ message: 'Job not found' });
+      }
 
-        await Job.findByIdAndDelete(id);
+      await Job.findByIdAndDelete(id);
 
-        // Also remove from employer's postedJobs array
-        await Employer.findByIdAndUpdate(job.employer, {
-            $pull: { postedJobs: job._id }
-        });
+      // Also remove from employer's postedJobs array
+      await Employer.findByIdAndUpdate(job.employer, {
+        $pull: { postedJobs: job._id },
+      });
 
-        return res.json({ message: 'Job deleted successfully by admin.' });
+      return res.json({ message: 'Job deleted successfully by admin.' });
     }
 
-    // EMPLOYER PATH (original logic)
+    // Employer path
     const employer = await Employer.findById(req.user._id);
     if (!employer) {
       return res.status(404).json({ message: 'Employer not found' });
@@ -153,7 +160,14 @@ const deleteJobs = async (req, res) => {
       return res.json({ message: 'All jobs have been removed successfully' });
     }
 
-    await Job.deleteMany({ _id: { $in: jobsToDelete }, employer: req.user._id });
+    const deleteResult = await Job.deleteMany({
+      _id: { $in: jobsToDelete },
+      employer: req.user._id,
+    });
+
+    if (deleteResult.deletedCount === 0) {
+      return res.status(404).json({ message: 'No matching jobs found to delete.' });
+    }
 
     employer.postedJobs = employer.postedJobs.filter(
       (jobId) => !jobsToDelete.includes(jobId.toString())
