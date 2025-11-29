@@ -92,7 +92,29 @@ exports.getAllUsers = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllEmployers = async (req, res) => {
   try {
-    const employers = await Employer.find({}).select('-password');
+    const { search, status, sortBy } = req.query;
+    let query = {};
+
+    if (search) {
+      const searchRegex = new RegExp(search, 'i');
+      query.$or = [
+        { companyName: searchRegex },
+        { email: searchRegex },
+      ];
+    }
+
+    if (status) {
+      query.isActive = status === 'active';
+    }
+
+    let sortOption = {};
+    if (sortBy === 'date_asc') {
+      sortOption.createdAt = 1;
+    } else if (sortBy === 'date_desc') {
+      sortOption.createdAt = -1;
+    }
+
+    const employers = await Employer.find(query).sort(sortOption).select('-password');
     res.json(employers);
   } catch (error) {
     res.status(500).json({ message: error.message });
