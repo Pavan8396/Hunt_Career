@@ -27,14 +27,14 @@ const User = require('../models/userModel');
 const Employer = require('../models/employerModel');
 
 const isEmployer = (req, res, next) => {
-  if (req.user.type !== 'employer') {
+  if (req.user.type !== 'employer' && !req.user.isAdmin) {
     return res.status(403).json({ message: 'Forbidden: Access denied' });
   }
   next();
 };
 
 const isJobSeeker = (req, res, next) => {
-  if (req.user.type !== 'user') {
+  if (req.user.type !== 'user' && !req.user.isAdmin) {
     return res.status(403).json({ message: 'Forbidden: Access denied' });
   }
   next();

@@ -24,11 +24,16 @@ const getUserById = async (id) => {
   return getDb().collection("Users").findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } });
 };
 
-const updateUserProfile = async (email, userData) => {
+const updateUserProfile = async (userId, userData) => {
   const { ObjectId } = require('mongodb');
   const db = getDb();
 
-  const user = await db.collection("Users").findOne({ email: email });
+  // Ensure userId is a valid ObjectId
+  if (!ObjectId.isValid(userId)) {
+      throw new Error('Invalid user ID provided.');
+  }
+
+  const user = await db.collection("Users").findOne({ _id: new ObjectId(userId) });
   if (!user) {
     return null; // Or throw an error
   }
@@ -51,7 +56,7 @@ const updateUserProfile = async (email, userData) => {
   }
 
   const result = await db.collection("Users").findOneAndUpdate(
-    { email: email },
+    { _id: new ObjectId(userId) },
     { $set: updateData },
     { returnDocument: 'after', projection: { password: 0 } }
   );

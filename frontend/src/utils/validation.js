@@ -14,8 +14,9 @@ export const isValidEmail = (email) => {
     return false;
   }
 
-  // Rule: Disallow non-ASCII characters
-  if (/[^\x00-\x7F]/.test(email)) {
+  // Rule: Disallow non-ASCII characters and control characters
+  // eslint-disable-next-line no-control-regex
+  if (/[^\x20-\x7E]/.test(email)) {
     return false;
   }
 
@@ -41,7 +42,7 @@ export const isValidEmail = (email) => {
   }
 
   // Additional checks for robustness
-  const [localPart, domain] = email.split('@');
+  const [, domain] = email.split('@');
 
   if (email.length > 190) {
     return false;

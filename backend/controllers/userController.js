@@ -17,14 +17,23 @@ const getUserProfile = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   try {
-    const updatedUser = await userService.updateUserProfile(req.user.email, req.body);
+    // Admins can update any user by ID, otherwise users can only update their own profile.
+    const targetUserId = (req.user.isAdmin && req.params.id) ? req.params.id : req.user._id;
+
+    if (!targetUserId) {
+        return res.status(400).json({ message: 'User ID is required.' });
+    }
+
+    const updatedUser = await userService.updateUserProfile(targetUserId, req.body);
     if (updatedUser) {
       res.json(updatedUser);
     } else {
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update user profile' });
+    // It's helpful to log the actual error on the server
+    console.error("Update user profile error:", error);
+    res.status(500).json({ message: error.message || 'Failed to update user profile' });
   }
 };
 

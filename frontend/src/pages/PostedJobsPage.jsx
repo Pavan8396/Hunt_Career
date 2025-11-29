@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { ChatContext } from '../context/ChatContext';
 import { FaEdit, FaTrash, FaTrashAlt, FaUsers } from 'react-icons/fa';
 import {
   getEmployerJobs,
@@ -18,8 +17,6 @@ const PostedJobsPage = () => {
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmMessage, setConfirmMessage] = useState('');
   const { token } = useContext(AuthContext);
-  const { openChatForApplication } = useContext(ChatContext);
-  const location = useLocation();
   const navigate = useNavigate();
 
   const fetchJobs = useCallback(async () => {
@@ -113,11 +110,6 @@ const PostedJobsPage = () => {
   const handleCancel = () => {
     setShowConfirm(false);
     setConfirmAction(null);
-  };
-
-  const openChat = (application, jobTitle) => {
-    const recipientName = `${application.applicant.firstName} ${application.applicant.lastName}`;
-    openChatForApplication(application._id, recipientName, jobTitle);
   };
 
   return (

@@ -103,11 +103,38 @@ const getEmployerJobs = async (req, res) => {
   }
 };
 
+const getJobsByEmployerId = async (req, res) => {
+  try {
+    const jobs = await Job.find({ employer: req.params.employerId });
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const deleteJobs = async (req, res) => {
   const { id } = req.params;
   const { jobIds } = req.body;
 
   try {
+    // ADMIN PATH for single delete from manage jobs page
+    if (req.user.isAdmin && id) {
+        const job = await Job.findById(id);
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
+        await Job.findByIdAndDelete(id);
+
+        // Also remove from employer's postedJobs array
+        await Employer.findByIdAndUpdate(job.employer, {
+            $pull: { postedJobs: job._id }
+        });
+
+        return res.json({ message: 'Job deleted successfully by admin.' });
+    }
+
+    // EMPLOYER PATH (original logic)
     const employer = await Employer.findById(req.user._id);
     if (!employer) {
       return res.status(404).json({ message: 'Employer not found' });
@@ -164,7 +191,7 @@ const updateJob = async (req, res) => {
       return res.status(404).json({ message: 'Job not found' });
     }
 
-    if (job.employer.toString() !== req.user._id) {
+    if (job.employer.toString() !== req.user._id && !req.user.isAdmin) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
@@ -198,4 +225,5 @@ module.exports = {
   deleteJobs,
   getApplicationForJob,
   updateJob,
+  getJobsByEmployerId,
 };
