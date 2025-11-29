@@ -16,6 +16,7 @@ import {
 import { PencilIcon, TrashIcon, EyeIcon, ClipboardListIcon } from '@heroicons/react/outline';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import EditEmployerModal from '../components/common/EditEmployerModal';
+import EditUserModal from '../components/common/EditUserModal';
 
 
 const AdminDashboard = () => {
@@ -25,28 +26,48 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('users');
 
-  const fetchData = useCallback(async (filters = {}) => {
-    setLoading(true);
+  const fetchUsers = useCallback(async (filters = {}) => {
+    // No top-level loading state here to prevent flicker
     try {
       const token = sessionStorage.getItem('token');
-      const [statsData, usersData, employersData] = await Promise.all([
-        getAdminStats(token),
-        getAllUsers(token, filters),
-        getAllEmployers(token),
-      ]);
-      setStats(statsData);
+      const usersData = await getAllUsers(token, filters);
       setUsers(usersData);
+    } catch (error) {
+      toast.error('Failed to load users.');
+    }
+  }, []);
+
+  const fetchEmployers = useCallback(async (filters = {}) => {
+    try {
+      const token = sessionStorage.getItem('token');
+      const employersData = await getAllEmployers(token, filters);
       setEmployers(employersData);
     } catch (error) {
-      toast.error('Failed to load admin data.');
-    } finally {
-      setLoading(false);
+      toast.error('Failed to load employers.');
     }
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const fetchInitialData = async () => {
+      setLoading(true);
+      try {
+        const token = sessionStorage.getItem('token');
+        const [statsData, usersData, employersData] = await Promise.all([
+          getAdminStats(token),
+          getAllUsers(token, {}),
+          getAllEmployers(token),
+        ]);
+        setStats(statsData);
+        setUsers(usersData);
+        setEmployers(employersData);
+      } catch (error) {
+        toast.error('Failed to load admin data.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInitialData();
+  }, []); // The empty dependency array ensures this runs only once on mount
 
   if (loading) {
     return <div className="p-4 text-center">Loading...</div>;
@@ -105,10 +126,10 @@ const AdminDashboard = () => {
 
         <div className="mt-6">
           {activeTab === 'users' && (
-            <UserManagement users={users} setUsers={setUsers} fetchData={fetchData} />
+            <UserManagement users={users} setUsers={setUsers} fetchUsers={fetchUsers} />
           )}
           {activeTab === 'employers' && (
-            <EmployerManagement employers={employers} setEmployers={setEmployers} />
+            <EmployerManagement employers={employers} setEmployers={setEmployers} fetchEmployers={fetchEmployers} />
           )}
         </div>
       </div>
@@ -116,7 +137,7 @@ const AdminDashboard = () => {
   );
 };
 
-const UserManagement = ({ users, setUsers, fetchData }) => {
+const UserManagement = ({ users, setUsers, fetchUsers }) => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -125,25 +146,32 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
     const [status, setStatus] = useState('');
     const [sortBy, setSortBy] = useState('');
 
+    const handleEdit = (user) => {
+        setSelectedUser(user);
+        setEditModalOpen(true);
+    };
+
+    const saveUser = async (userData) => {
+        try {
+            const token = sessionStorage.getItem('token');
+            const updatedUser = await apiUpdateUser(selectedUser._id, userData, token);
+            setUsers(users.map((u) => (u._id === selectedUser._id ? updatedUser : u)));
+            toast.success('User updated successfully.');
+            setEditModalOpen(false);
+        } catch (error) {
+            toast.error('Failed to update user.');
+        }
+    };
+
     useEffect(() => {
         const handler = setTimeout(() => {
-            fetchData({ search, status, sortBy });
+            fetchUsers({ search, status, sortBy });
         }, 500);
 
         return () => {
             clearTimeout(handler);
         };
-    }, [search, status, sortBy, fetchData]);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            fetchData({ search, status, sortBy });
-        }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [search, status, sortBy, fetchData]);
+    }, [search, status, sortBy, fetchUsers]);
 
     const handleDelete = (user) => {
       setSelectedUser(user);
@@ -265,15 +293,29 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
           title="Confirm Action"
           message="Are you sure you want to perform this action? This cannot be undone."
         />
+        <EditUserModal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)} onSave={saveUser} user={selectedUser} />
       </>
     );
   };
 
-  const EmployerManagement = ({ employers, setEmployers }) => {
+  const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [selectedEmployer, setSelectedEmployer] = useState(null);
     const [actionToConfirm, setActionToConfirm] = useState(null);
+    const [search, setSearch] = useState('');
+    const [status, setStatus] = useState('');
+    const [sortBy, setSortBy] = useState('');
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            fetchEmployers({ search, status, sortBy });
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [search, status, sortBy, fetchEmployers]);
 
     const handleEdit = (employer) => {
       setSelectedEmployer(employer);
@@ -337,10 +379,24 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
 
     return (
       <>
-        <div className="flex justify-end mb-4">
-          <Link to="/admin/post-job" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-            Create New Job
-          </Link>
+        <div className="flex justify-between mb-4">
+            <input
+                type="text"
+                placeholder="Search by company or email"
+                className="p-2 border rounded"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+            />
+            <select className="p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value)}>
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+            </select>
+            <select className="p-2 border rounded" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="">Sort By</option>
+                <option value="date_asc">Date Asc</option>
+                <option value="date_desc">Date Desc</option>
+            </select>
         </div>
         <div>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
