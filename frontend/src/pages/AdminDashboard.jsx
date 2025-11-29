@@ -16,6 +16,7 @@ import {
 import { PencilIcon, TrashIcon, EyeIcon, ClipboardListIcon } from '@heroicons/react/outline';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import EditEmployerModal from '../components/common/EditEmployerModal';
+import EditUserModal from '../components/common/EditUserModal';
 
 
 const AdminDashboard = () => {
@@ -54,7 +55,7 @@ const AdminDashboard = () => {
         const [statsData, usersData, employersData] = await Promise.all([
           getAdminStats(token),
           getAllUsers(token, {}),
-          getAllEmployers(token, {}),
+          getAllEmployers(token),
         ]);
         setStats(statsData);
         setUsers(usersData);
@@ -137,12 +138,30 @@ const AdminDashboard = () => {
 };
 
 const UserManagement = ({ users, setUsers, fetchUsers }) => {
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [actionToConfirm, setActionToConfirm] = useState(null);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
     const [sortBy, setSortBy] = useState('');
+
+    const handleEdit = (user) => {
+        setSelectedUser(user);
+        setEditModalOpen(true);
+    };
+
+    const saveUser = async (userData) => {
+        try {
+            const token = sessionStorage.getItem('token');
+            const updatedUser = await apiUpdateUser(selectedUser._id, userData, token);
+            setUsers(users.map((u) => (u._id === selectedUser._id ? updatedUser : u)));
+            toast.success('User updated successfully.');
+            setEditModalOpen(false);
+        } catch (error) {
+            toast.error('Failed to update user.');
+        }
+    };
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -275,6 +294,7 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
           title="Confirm Action"
           message="Are you sure you want to perform this action? This cannot be undone."
         />
+        <EditUserModal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)} onSave={saveUser} user={selectedUser} />
       </>
     );
   };

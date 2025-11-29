@@ -239,11 +239,8 @@ export const getUserById = async (userId, token) => {
 
 export const getAllEmployers = async (token, params = {}) => {
   try {
-    const query = new URLSearchParams();
-    if (params.search) query.set('search', params.search);
-    if (params.status) query.set('status', params.status);
-    if (params.sortBy) query.set('sortBy', params.sortBy);
-    const response = await fetch(`${API_URL}/admin/employers?${query.toString()}`, {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_URL}/admin/employers?${query}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch employers');
