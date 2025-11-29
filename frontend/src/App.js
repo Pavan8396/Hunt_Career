@@ -16,7 +16,7 @@ import PostedJobsPage from './pages/PostedJobsPage';
 import UserProfilePage from './pages/UserProfilePage.jsx';
 import EmployerProfilePage from './pages/EmployerProfilePage';
 import ApplicantsPage from './pages/ApplicantsPage';
-import AdminDashboard from './pages/AdminDashboard';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 import AdminManageJobsPage from './pages/AdminManageJobsPage';
 import AdminPostJobPage from './pages/AdminPostJobPage';
 import AdminEditJobPage from './pages/AdminEditJobPage';
