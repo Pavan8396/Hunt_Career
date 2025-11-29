@@ -13,7 +13,7 @@ import EmployerSignup from './pages/EmployerSignup';
 import EmployerDashboard from './pages/EmployerDashboard';
 import PostJobPage from './pages/PostJobPage';
 import PostedJobsPage from './pages/PostedJobsPage';
-import UserProfilePage from './pages/UserProfilePage';
+import UserProfilePage from './pages/UserProfilePage.jsx';
 import EmployerProfilePage from './pages/EmployerProfilePage';
 import ApplicantsPage from './pages/ApplicantsPage';
 import AdminDashboard from './pages/AdminDashboard';
