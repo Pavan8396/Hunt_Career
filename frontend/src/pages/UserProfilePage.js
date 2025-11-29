@@ -101,12 +101,11 @@ const UserProfilePage = () => {
       // Only update the context if the user is editing their own profile
       if (!userId) {
         // Manually construct the name for the Navbar update
-        const updatedUserForContext = {
-          ...data,
-          name: `${data.firstName} ${data.lastName}`,
-        };
-        updateUser(updatedUserForContext);
-      }
+      const updatedUserForContext = {
+        ...data,
+        name: `${data.firstName} ${data.lastName}`,
+      };
+      updateUser(updatedUserForContext);
       toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Failed to update profile', error);
