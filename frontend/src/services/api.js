@@ -410,9 +410,10 @@ export const getUserProfile = async (token) => {
   }
 };
 
-export const updateUserProfile = async (profileData, token) => {
+export const updateUserProfile = async (profileData, token, userId = null) => {
   try {
-    const response = await fetch(`${API_URL}/user/profile`, {
+    const url = userId ? `${API_URL}/user/profile/${userId}` : `${API_URL}/user/profile`;
+    const response = await fetch(url, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -426,7 +427,7 @@ export const updateUserProfile = async (profileData, token) => {
     return await response.json();
   } catch (error) {
     console.error('Error updating user profile:', error);
-    toast.error('Could not update your profile.');
+    toast.error('Could not update profile.');
     throw error;
   }
 };

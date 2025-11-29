@@ -94,9 +94,13 @@ const UserProfilePage = () => {
         portfolioLinks: profile.portfolioLinks.filter(link => link.trim() !== ''),
       };
       const token = sessionStorage.getItem('token');
-      const data = await updateUserProfile(profileToUpdate, token);
+      // If userId is present (admin editing), pass it to the API call
+      const data = await updateUserProfile(profileToUpdate, token, userId);
       setProfile(data);
-      // Manually construct the name for the Navbar update
+
+      // Only update the context if the user is editing their own profile
+      if (!userId) {
+        // Manually construct the name for the Navbar update
       const updatedUserForContext = {
         ...data,
         name: `${data.firstName} ${data.lastName}`,

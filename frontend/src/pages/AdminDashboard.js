@@ -13,9 +13,8 @@ import {
   toggleEmployerStatus as apiToggleEmployerStatus,
   toggleUserAdminStatus as apiToggleUserAdminStatus,
 } from '../services/api';
-import { PencilIcon, TrashIcon } from '@heroicons/react/outline';
+import { PencilIcon, TrashIcon, EyeIcon, ClipboardListIcon } from '@heroicons/react/outline';
 import ConfirmationModal from '../components/common/ConfirmationModal';
-import EditUserModal from '../components/common/EditUserModal';
 import EditEmployerModal from '../components/common/EditEmployerModal';
 
 
@@ -136,10 +135,15 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
         };
     }, [search, status, sortBy, fetchData]);
 
-    const handleEdit = (user) => {
-      setSelectedUser(user);
-      setEditModalOpen(true);
-    };
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            fetchData({ search, status, sortBy });
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [search, status, sortBy, fetchData]);
 
     const handleDelete = (user) => {
       setSelectedUser(user);
@@ -189,18 +193,6 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
         toast.success(`User admin status successfully updated.`);
       } catch (error) {
         toast.error('Failed to update user admin status.');
-      }
-    };
-
-    const saveUser = async (userData) => {
-      try {
-        const token = sessionStorage.getItem('token');
-        const updatedUser = await apiUpdateUser(selectedUser._id, userData, token);
-        setUsers(users.map((u) => (u._id === selectedUser._id ? updatedUser : u)));
-        toast.success('User updated successfully.');
-        setEditModalOpen(false);
-      } catch (error) {
-        toast.error('Failed to update user.');
       }
     };
 
@@ -266,7 +258,6 @@ const UserManagement = ({ users, setUsers, fetchData }) => {
             </tbody>
           </table>
         </div>
-        <EditUserModal isOpen={isEditModalOpen} onClose={() => setEditModalOpen(false)} onSave={saveUser} user={selectedUser} />
         <ConfirmationModal
           isOpen={isConfirmModalOpen}
           onClose={() => setConfirmModalOpen(false)}
