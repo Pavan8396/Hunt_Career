@@ -1,67 +1,50 @@
-const { getDb } = require('../config/db.js');
-const bcrypt = require('bcryptjs'); // bcrypt is needed for createUser's hashedPassword
+const User = require('../models/userModel');
 
 const findUserByEmail = async (email) => {
-  return getDb().collection("Users").findOne({ email });
+  return User.findOne({ email });
 };
 
 const createUser = async (userData) => {
-  // userData should already contain the hashedPassword
-  const result = await getDb().collection("Users").insertOne(userData);
-  return getDb().collection("Users").findOne({ _id: result.insertedId });
+  const user = new User(userData);
+  await user.save();
+  return user;
 };
 
 const findUserForLogin = async (email) => {
-  return getDb().collection("Users").findOne({ email });
+  return User.findOne({ email });
 };
 
 const getUserProfile = async (email) => {
-  return getDb().collection("Users").findOne({ email: email }, { projection: { password: 0 } });
+  return User.findOne({ email }).select('-password');
 };
 
 const getUserById = async (id) => {
-  const { ObjectId } = require('mongodb');
-  return getDb().collection("Users").findOne({ _id: new ObjectId(id) }, { projection: { password: 0 } });
+  return User.findById(id).select('-password');
 };
 
 const updateUserProfile = async (userId, userData) => {
-  const { ObjectId } = require('mongodb');
-  const db = getDb();
+  const user = await User.findById(userId);
 
-  // Ensure userId is a valid ObjectId
-  if (!ObjectId.isValid(userId)) {
-      throw new Error('Invalid user ID provided.');
-  }
-
-  const user = await db.collection("Users").findOne({ _id: new ObjectId(userId) });
   if (!user) {
-    return null; // Or throw an error
+    return null;
   }
 
   // Prevent email updates
   if (userData.email && userData.email !== user.email) {
     throw new Error('Email address cannot be changed.');
   }
-  delete userData.email; // Ensure email is not in the update set
 
-  // Make sure not to update the _id
-  delete userData._id;
+  // Dynamically update fields that are present in userData
+  const fieldsToUpdate = ['firstName', 'lastName', 'phoneNumber', 'workExperience', 'education', 'skills', 'portfolioLinks'];
 
-  // Prepare the update object, allowing fields to be cleared
-  const updateData = {};
-  for (const key in userData) {
-    if (userData.hasOwnProperty(key)) {
-      updateData[key] = userData[key];
+  fieldsToUpdate.forEach(field => {
+    if (userData.hasOwnProperty(field)) {
+      user[field] = userData[field];
     }
-  }
+  });
 
-  const result = await db.collection("Users").findOneAndUpdate(
-    { _id: new ObjectId(userId) },
-    { $set: updateData },
-    { returnDocument: 'after', projection: { password: 0 } }
-  );
-
-  return result.value;
+  const updatedUser = await user.save();
+  return updatedUser;
 };
 
 module.exports = {
