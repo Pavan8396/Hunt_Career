@@ -12,7 +12,7 @@ import {
   toggleEmployerStatus as apiToggleEmployerStatus,
   toggleUserAdminStatus as apiToggleUserAdminStatus,
 } from '../services/api';
-import { PencilIcon, TrashIcon } from '@heroicons/react/outline';
+import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/outline';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import EditEmployerModal from '../components/common/EditEmployerModal';
 import Tooltip from '../components/common/Tooltip';
@@ -233,11 +233,11 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
-                <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
                 <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
                 <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Make Admin</th>
-                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                <th className="w-auto px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
@@ -260,16 +260,18 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
                     <ToggleSwitch enabled={user.isAdmin} onChange={() => handleToggleAdmin(user)} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Tooltip text="Edit User">
-                      <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                        <PencilIcon className="h-5 w-5" />
-                      </Link>
-                    </Tooltip>
-                    <Tooltip text="Delete User">
-                      <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4">
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </Tooltip>
+                    <div className="flex items-center space-x-4">
+                      <Tooltip text="Edit User">
+                        <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                          <PencilIcon className="h-5 w-5" />
+                        </Link>
+                      </Tooltip>
+                      <Tooltip text="Delete User">
+                        <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </Tooltip>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -389,7 +391,7 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                             <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Company Name</th>
                             <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
                             <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
-                            <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            <th className="w-auto px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
@@ -409,21 +411,23 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                                     <ToggleSwitch enabled={employer.isActive} onChange={() => handleToggleStatus(employer)} />
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <Tooltip text="Edit Employer">
-                                        <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                                            <PencilIcon className="h-5 w-5" />
-                                        </button>
-                                    </Tooltip>
-                                    <Tooltip text="Manage Jobs">
-                                        <Link to={`/admin/employer/${employer._id}/jobs`} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 ml-4">
-                                            <PencilIcon className="h-5 w-5" />
-                                        </Link>
-                                    </Tooltip>
-                                    <Tooltip text="Delete Employer">
-                                        <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4">
-                                            <TrashIcon className="h-5 w-5" />
-                                        </button>
-                                    </Tooltip>
+                                    <div className="flex items-center space-x-4">
+                                        <Tooltip text="Edit Employer">
+                                            <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                                <PencilIcon className="h-5 w-5" />
+                                            </button>
+                                        </Tooltip>
+                                        <Tooltip text="Manage Jobs">
+                                            <Link to={`/admin/employer/${employer._id}/jobs`} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                                                <EyeIcon className="h-5 w-5" />
+                                            </Link>
+                                        </Tooltip>
+                                        <Tooltip text="Delete Employer">
+                                            <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                                <TrashIcon className="h-5 w-5" />
+                                            </button>
+                                        </Tooltip>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

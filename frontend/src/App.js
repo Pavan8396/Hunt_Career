@@ -17,7 +17,7 @@ import UserProfilePage from './pages/UserProfilePage.jsx';
 import EmployerProfilePage from './pages/EmployerProfilePage';
 import ApplicantsPage from './pages/ApplicantsPage';
 import AdminDashboard from './pages/AdminDashboard.jsx';
-import AdminManageJobsPage from './pages/AdminManageJobsPage';
+import AdminManageJobsPage from './pages/AdminManageJobsPage.jsx';
 import AdminPostJobPage from './pages/AdminPostJobPage';
 import AdminEditJobPage from './pages/AdminEditJobPage';
 import Layout from './components/Layout';

@@ -61,7 +61,7 @@ const AdminManageJobsPage = () => {
               <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
               <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Job Type</th>
               <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
-              <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+              <th className="w-auto px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
@@ -83,16 +83,18 @@ const AdminManageJobsPage = () => {
                     </Tooltip>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Tooltip text="Edit Job">
-                    <Link to={`/admin/post-job/${job._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                      <PencilIcon className="h-5 w-5" />
-                    </Link>
-                  </Tooltip>
-                  <Tooltip text="Delete Job">
-                    <button onClick={() => handleDelete(job._id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4">
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
-                  </Tooltip>
+                    <div className="flex items-center space-x-4">
+                        <Tooltip text="Edit Job">
+                            <Link to={`/admin/edit-job/${job._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                <PencilIcon className="h-5 w-5" />
+                            </Link>
+                        </Tooltip>
+                        <Tooltip text="Delete Job">
+                            <button onClick={() => handleDelete(job._id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                <TrashIcon className="h-5 w-5" />
+                            </button>
+                        </Tooltip>
+                    </div>
                 </td>
               </tr>
             ))}
