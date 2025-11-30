@@ -244,14 +244,18 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
               {users.map((user) => (
                 <tr key={user._id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate overflow-visible">
-                    <Tooltip text={`${user.firstName} ${user.lastName}`}>
-                      <span>{user.firstName} {user.lastName}</span>
-                    </Tooltip>
+                    <div className="group relative">
+                      <Tooltip text={`${user.firstName} ${user.lastName}`}>
+                        <span>{user.firstName} {user.lastName}</span>
+                      </Tooltip>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate overflow-visible">
-                    <Tooltip text={user.email}>
-                      <span>{user.email}</span>
-                    </Tooltip>
+                    <div className="group relative">
+                      <Tooltip text={user.email}>
+                        <span>{user.email}</span>
+                      </Tooltip>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <ToggleSwitch enabled={user.isActive} onChange={() => handleToggleStatus(user)} />
@@ -398,14 +402,18 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                         {employers.map((employer) => (
                             <tr key={employer._id}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate overflow-visible">
-                                    <Tooltip text={employer.companyName}>
-                                        <span>{employer.companyName}</span>
-                                    </Tooltip>
+                                    <div className="group relative">
+                                        <Tooltip text={employer.companyName}>
+                                            <span>{employer.companyName}</span>
+                                        </Tooltip>
+                                    </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate overflow-visible">
-                                    <Tooltip text={employer.email}>
-                                        <span>{employer.email}</span>
-                                    </Tooltip>
+                                    <div className="group relative">
+                                        <Tooltip text={employer.email}>
+                                            <span>{employer.email}</span>
+                                        </Tooltip>
+                                    </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <ToggleSwitch enabled={employer.isActive} onChange={() => handleToggleStatus(employer)} />
