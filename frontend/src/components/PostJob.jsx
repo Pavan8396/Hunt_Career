@@ -56,11 +56,17 @@ const PostJob = ({ onJobPosted, jobData }) => {
     setIsLoading(true);
     try {
       if (jobData) {
-        await updateJob(jobData._id, formData, token);
+        const updatedJob = await updateJob(jobData._id, formData, token);
         toast.success('Job updated successfully!');
+        if (onJobPosted) {
+          onJobPosted(updatedJob);
+        }
       } else {
-        await createJob(formData, token);
+        const newJob = await createJob(formData, token);
         toast.success('Job posted successfully!');
+        if (onJobPosted) {
+          onJobPosted(newJob);
+        }
       }
       setFormData({
         title: '',
@@ -69,12 +75,6 @@ const PostJob = ({ onJobPosted, jobData }) => {
         candidate_required_location: '',
         job_type: 'Full-Time',
       });
-      if (onJobPosted) {
-        onJobPosted();
-      }
-      if (jobData) {
-        navigate('/employer/posted-jobs');
-      }
     } catch (error) {
       if (error.message.includes('A job with the same title and company already exists.')) {
         //toast.error('A job with the same title and company already exists.');

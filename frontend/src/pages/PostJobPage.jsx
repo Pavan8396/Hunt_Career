@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PostJob from '../components/PostJob';
-import { getEmployerJobs, fetchJobById } from '../services/api';
+import { fetchJobById } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 
 const PostJobPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token, user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [jobData, setJobData] = useState(null);
 
   useEffect(() => {
@@ -24,15 +24,11 @@ const PostJobPage = () => {
     }
   }, [id]);
 
-  const handleJobPosted = async () => {
-    try {
-      if (user && user.isAdmin) {
-        navigate(`/admin/employer/${jobData.employer}/jobs`);
-      } else {
-        navigate('/employer/posted-jobs');
-      }
-    } catch (error) {
-      console.error('Failed to fetch employer jobs:', error);
+  const handleJobPosted = (updatedJob) => {
+    if (user && user.isAdmin && updatedJob) {
+      navigate(`/admin/employer/${updatedJob.employer}/jobs`);
+    } else {
+      navigate('/employer/posted-jobs');
     }
   };
 
