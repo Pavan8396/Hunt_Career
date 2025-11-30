@@ -67,19 +67,19 @@ const AdminManageJobsPage = () => {
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
             {jobs.map((job) => (
               <tr key={job._id} className="relative z-0">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     <Tooltip text={job.title}>
-                        <span>{job.title}</span>
+                        <span className="truncate">{job.title}</span>
                     </Tooltip>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                     <Tooltip text={job.job_type}>
-                        <span>{job.job_type}</span>
+                        <span className="truncate">{job.job_type}</span>
                     </Tooltip>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                     <Tooltip text={job.candidate_required_location}>
-                        <span>{job.candidate_required_location}</span>
+                        <span className="truncate">{job.candidate_required_location}</span>
                     </Tooltip>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
