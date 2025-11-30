@@ -34,7 +34,7 @@ const AdminEditJobPage = () => {
       const token = sessionStorage.getItem('token');
       await updateJob(jobId, job, token);
       toast.success('Job updated successfully.');
-      navigate(-1); // Go back to the previous page
+      navigate(`/admin/employer/${job.employer._id}/jobs`);
     } catch (error) {
       toast.error('Failed to update job.');
     }
