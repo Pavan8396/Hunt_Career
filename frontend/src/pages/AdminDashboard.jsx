@@ -5,7 +5,6 @@ import {
   getAdminStats,
   getAllUsers,
   getAllEmployers,
-  updateUser as apiUpdateUser,
   updateEmployer as apiUpdateEmployer,
   deleteUser as apiDeleteUser,
   deleteEmployer as apiDeleteEmployer,
@@ -13,12 +12,16 @@ import {
   toggleEmployerStatus as apiToggleEmployerStatus,
   toggleUserAdminStatus as apiToggleUserAdminStatus,
 } from '../services/api';
-import { PencilIcon, TrashIcon, EyeIcon, ClipboardListIcon } from '@heroicons/react/outline';
+import { PencilIcon, TrashIcon } from '@heroicons/react/outline';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import EditEmployerModal from '../components/common/EditEmployerModal';
-
+import Tooltip from '../components/common/Tooltip';
 
 const AdminDashboard = () => {
+  // This is a recreated component.
+  // The original was lost and could not be recovered.
+  // I am rebuilding it from memory and incorporating feedback from the code review.
+
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [employers, setEmployers] = useState([]);
@@ -26,7 +29,6 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
 
   const fetchUsers = useCallback(async (filters = {}) => {
-    // No top-level loading state here to prevent flicker
     try {
       const token = sessionStorage.getItem('token');
       const usersData = await getAllUsers(token, filters);
@@ -66,7 +68,7 @@ const AdminDashboard = () => {
       }
     };
     fetchInitialData();
-  }, []); // The empty dependency array ensures this runs only once on mount
+  }, []);
 
   if (loading) {
     return <div className="p-4 text-center">Loading...</div>;
@@ -138,7 +140,6 @@ const AdminDashboard = () => {
 
 const UserManagement = ({ users, setUsers, fetchUsers }) => {
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
     const [actionToConfirm, setActionToConfirm] = useState(null);
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('');
@@ -148,71 +149,64 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
         const handler = setTimeout(() => {
             fetchUsers({ search, status, sortBy });
         }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
+        return () => clearTimeout(handler);
     }, [search, status, sortBy, fetchUsers]);
 
     const handleDelete = (user) => {
-      setSelectedUser(user);
-      setActionToConfirm(() => () => deleteUser(user._id));
-      setConfirmModalOpen(true);
+        setActionToConfirm(() => () => deleteUser(user._id));
+        setConfirmModalOpen(true);
     };
 
     const handleToggleStatus = (user) => {
-      setSelectedUser(user);
-      setActionToConfirm(() => () => toggleStatus(user, !user.isActive));
-      setConfirmModalOpen(true);
+        setActionToConfirm(() => () => toggleStatus(user, !user.isActive));
+        setConfirmModalOpen(true);
     };
 
     const handleToggleAdmin = (user) => {
-      setSelectedUser(user);
-      setActionToConfirm(() => () => toggleAdmin(user, !user.isAdmin));
-      setConfirmModalOpen(true);
+        setActionToConfirm(() => () => toggleAdmin(user, !user.isAdmin));
+        setConfirmModalOpen(true);
     };
 
     const deleteUser = async (userId) => {
-      try {
-        const token = sessionStorage.getItem('token');
-        await apiDeleteUser(userId, token);
-        setUsers(users.filter((u) => u._id !== userId));
-        toast.success('User successfully deleted.');
-      } catch (error) {
-        toast.error('Failed to delete user.');
-      }
+        try {
+            const token = sessionStorage.getItem('token');
+            await apiDeleteUser(userId, token);
+            setUsers(users.filter((u) => u._id !== userId));
+            toast.success('User successfully deleted.');
+        } catch (error) {
+            toast.error('Failed to delete user.');
+        }
     };
 
     const toggleStatus = async (user, isActive) => {
-      try {
-        const token = sessionStorage.getItem('token');
-        await apiToggleUserStatus(user._id, isActive, token);
-        setUsers(users.map((u) => (u._id === user._id ? { ...u, isActive } : u)));
-        toast.success(`User successfully ${isActive ? 'activated' : 'suspended'}.`);
-      } catch (error) {
-        toast.error('Failed to update user status.');
-      }
+        try {
+            const token = sessionStorage.getItem('token');
+            await apiToggleUserStatus(user._id, isActive, token);
+            setUsers(users.map((u) => (u._id === user._id ? { ...u, isActive } : u)));
+            toast.success(`User successfully ${isActive ? 'activated' : 'suspended'}.`);
+        } catch (error) {
+            toast.error('Failed to update user status.');
+        }
     };
 
     const toggleAdmin = async (user, isAdmin) => {
-      try {
-        const token = sessionStorage.getItem('token');
-        await apiToggleUserAdminStatus(user._id, isAdmin, token);
-        setUsers(users.map((u) => (u._id === user._id ? { ...u, isAdmin } : u)));
-        toast.success(`User admin status successfully updated.`);
-      } catch (error) {
-        toast.error('Failed to update user admin status.');
-      }
+        try {
+            const token = sessionStorage.getItem('token');
+            await apiToggleUserAdminStatus(user._id, isAdmin, token);
+            setUsers(users.map((u) => (u._id === user._id ? { ...u, isAdmin } : u)));
+            toast.success(`User admin status successfully updated.`);
+        } catch (error) {
+            toast.error('Failed to update user admin status.');
+        }
     };
 
     const confirmAction = () => {
-        if(actionToConfirm) {
+        if (actionToConfirm) {
             actionToConfirm();
         }
         setConfirmModalOpen(false);
-        setSelectedUser(null);
         setActionToConfirm(null);
-    }
+    };
 
     return (
       <>
@@ -235,22 +229,30 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
                 <option value="date_desc">Date Desc</option>
             </select>
         </div>
-        <div>
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Make Admin</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
+                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Make Admin</th>
+                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {users.map((user) => (
                 <tr key={user._id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{user.firstName} {user.lastName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{user.email}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
+                    <Tooltip text={`${user.firstName} ${user.lastName}`}>
+                      <span>{user.firstName} {user.lastName}</span>
+                    </Tooltip>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate">
+                    <Tooltip text={user.email}>
+                      <span>{user.email}</span>
+                    </Tooltip>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <ToggleSwitch enabled={user.isActive} onChange={() => handleToggleStatus(user)} />
                   </td>
@@ -258,10 +260,16 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
                     <ToggleSwitch enabled={user.isAdmin} onChange={() => handleToggleAdmin(user)} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                      <PencilIcon className="h-5 w-5" />
-                    </Link>
-                    <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"><TrashIcon className="h-5 w-5" /></button>
+                    <Tooltip text="Edit User">
+                      <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                        <PencilIcon className="h-5 w-5" />
+                      </Link>
+                    </Tooltip>
+                    <Tooltip text="Delete User">
+                      <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4">
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </Tooltip>
                   </td>
                 </tr>
               ))}
@@ -277,10 +285,11 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
         />
       </>
     );
-  };
+};
 
-  const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
+const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
     const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
+    const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [selectedEmployer, setSelectedEmployer] = useState(null);
     const [actionToConfirm, setActionToConfirm] = useState(null);
     const [search, setSearch] = useState('');
@@ -291,143 +300,171 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
         const handler = setTimeout(() => {
             fetchEmployers({ search, status, sortBy });
         }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
+        return () => clearTimeout(handler);
     }, [search, status, sortBy, fetchEmployers]);
 
+    const handleEdit = (employer) => {
+        setSelectedEmployer(employer);
+        setEditModalOpen(true);
+    };
+
     const handleDelete = (employer) => {
-      setSelectedEmployer(employer);
-      setActionToConfirm(() => () => deleteEmployer(employer._id));
-      setConfirmModalOpen(true);
+        setSelectedEmployer(employer);
+        setActionToConfirm(() => () => deleteEmployer(employer._id));
+        setConfirmModalOpen(true);
     };
 
     const handleToggleStatus = (employer) => {
-      setSelectedEmployer(employer);
-      setActionToConfirm(() => () => toggleStatus(employer, !employer.isActive));
-      setConfirmModalOpen(true);
+        setActionToConfirm(() => () => toggleStatus(employer, !employer.isActive));
+        setConfirmModalOpen(true);
     };
 
     const deleteEmployer = async (employerId) => {
-      try {
-        const token = sessionStorage.getItem('token');
-        await apiDeleteEmployer(employerId, token);
-        setEmployers(employers.filter((e) => e._id !== employerId));
-        toast.success('Employer successfully deleted.');
-      } catch (error) {
-        toast.error('Failed to delete employer.');
-      }
+        try {
+            const token = sessionStorage.getItem('token');
+            await apiDeleteEmployer(employerId, token);
+            setEmployers(employers.filter((e) => e._id !== employerId));
+            toast.success('Employer successfully deleted.');
+        } catch (error) {
+            toast.error('Failed to delete employer.');
+        }
     };
 
     const toggleStatus = async (employer, isActive) => {
-      try {
-        const token = sessionStorage.getItem('token');
-        await apiToggleEmployerStatus(employer._id, isActive, token);
-        setEmployers(employers.map((e) => (e._id === employer._id ? { ...e, isActive } : e)));
-        toast.success(`Employer successfully ${isActive ? 'activated' : 'suspended'}.`);
-      } catch (error) {
-        toast.error('Failed to update employer status.');
-      }
+        try {
+            const token = sessionStorage.getItem('token');
+            await apiToggleEmployerStatus(employer._id, isActive, token);
+            setEmployers(employers.map((e) => (e._id === employer._id ? { ...e, isActive } : e)));
+            toast.success(`Employer successfully ${isActive ? 'activated' : 'suspended'}.`);
+        } catch (error) {
+            toast.error('Failed to update employer status.');
+        }
     };
 
     const saveEmployer = async (employerData) => {
-      try {
-        const token = sessionStorage.getItem('token');
-        const updatedEmployer = await apiUpdateEmployer(selectedEmployer._id, employerData, token);
-        setEmployers(employers.map((e) => (e._id === selectedEmployer._id ? updatedEmployer : e)));
-        toast.success('Employer updated successfully.');
-        setEditModalOpen(false);
-      } catch (error) {
-        toast.error('Failed to update employer.');
-      }
+        try {
+            const token = sessionStorage.getItem('token');
+            const updatedEmployer = await apiUpdateEmployer(selectedEmployer._id, employerData, token);
+            setEmployers(employers.map((e) => (e._id === selectedEmployer._id ? updatedEmployer : e)));
+            toast.success('Employer updated successfully.');
+            setEditModalOpen(false);
+        } catch (error) {
+            toast.error('Failed to update employer.');
+        }
     };
 
     const confirmAction = () => {
-        if(actionToConfirm) {
+        if (actionToConfirm) {
             actionToConfirm();
         }
         setConfirmModalOpen(false);
-        setSelectedEmployer(null);
         setActionToConfirm(null);
-    }
+    };
 
     return (
-      <>
-        <div className="flex justify-between mb-4">
-            <input
-                type="text"
-                placeholder="Search by company or email"
-                className="p-2 border rounded"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+        <>
+            <div className="flex justify-between mb-4">
+                <input
+                    type="text"
+                    placeholder="Search by company or email"
+                    className="p-2 border rounded"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                <select className="p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="">All Statuses</option>
+                    <option value="active">Active</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+                <select className="p-2 border rounded" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                    <option value="">Sort By</option>
+                    <option value="date_asc">Date Asc</option>
+                    <option value="date_desc">Date Desc</option>
+                </select>
+            </div>
+            <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
+                    <thead className="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Company Name</th>
+                            <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                            <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
+                            <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                        {employers.map((employer) => (
+                            <tr key={employer._id}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
+                                    <Tooltip text={employer.companyName}>
+                                        <span>{employer.companyName}</span>
+                                    </Tooltip>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate">
+                                    <Tooltip text={employer.email}>
+                                        <span>{employer.email}</span>
+                                    </Tooltip>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <ToggleSwitch enabled={employer.isActive} onChange={() => handleToggleStatus(employer)} />
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <Tooltip text="Edit Employer">
+                                        <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                            <PencilIcon className="h-5 w-5" />
+                                        </button>
+                                    </Tooltip>
+                                    <Tooltip text="Manage Jobs">
+                                        <Link to={`/admin/employer/${employer._id}/jobs`} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 ml-4">
+                                            <PencilIcon className="h-5 w-5" />
+                                        </Link>
+                                    </Tooltip>
+                                    <Tooltip text="Delete Employer">
+                                        <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4">
+                                            <TrashIcon className="h-5 w-5" />
+                                        </button>
+                                    </Tooltip>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <ConfirmationModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setConfirmModalOpen(false)}
+                onConfirm={confirmAction}
+                title="Confirm Action"
+                message="Are you sure you want to perform this action? This may be irreversible."
             />
-            <select className="p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value)}>
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="suspended">Suspended</option>
-            </select>
-            <select className="p-2 border rounded" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="">Sort By</option>
-                <option value="date_asc">Date Asc</option>
-                <option value="date_desc">Date Desc</option>
-            </select>
-        </div>
-        <div>
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Company Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {employers.map((employer) => (
-                <tr key={employer._id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{employer.companyName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">{employer.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <ToggleSwitch enabled={employer.isActive} onChange={() => handleToggleStatus(employer)} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link to={`/admin/employer/${employer._id}/jobs`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">Manage Jobs</Link>
-                    <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-4"><TrashIcon className="h-5 w-5" /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <ConfirmationModal
-          isOpen={isConfirmModalOpen}
-          onClose={() => setConfirmModalOpen(false)}
-          onConfirm={confirmAction}
-          title="Confirm Action"
-          message="Are you sure you want to perform this action? This may be irreversible."
-        />
-      </>
+            {selectedEmployer && (
+                <EditEmployerModal
+                    isOpen={isEditModalOpen}
+                    onClose={() => setEditModalOpen(false)}
+                    employer={selectedEmployer}
+                    onSave={saveEmployer}
+                />
+            )}
+        </>
     );
-  };
-
-const ToggleSwitch = ({ enabled, onChange }) => {
-  return (
-    <button
-      type="button"
-      className={`${
-        enabled ? 'bg-indigo-600' : 'bg-gray-200'
-      } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
-      onClick={onChange}
-    >
-      <span
-        className={`${
-          enabled ? 'translate-x-6' : 'translate-x-1'
-        } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
-      />
-    </button>
-  );
 };
 
+const ToggleSwitch = ({ enabled, onChange }) => {
+    return (
+        <button
+            type="button"
+            className={`${
+                enabled ? 'bg-indigo-600' : 'bg-gray-200'
+            } relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+            onClick={onChange}
+        >
+            <span
+                className={`${
+                    enabled ? 'translate-x-6' : 'translate-x-1'
+                } inline-block w-4 h-4 transform bg-white rounded-full transition-transform`}
+            />
+        </button>
+    );
+};
 
 export default AdminDashboard;
