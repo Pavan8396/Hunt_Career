@@ -229,7 +229,7 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
                 <option value="date_desc">Date Desc</option>
             </select>
         </div>
-        <div className="overflow-x-auto">
+        <div>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
@@ -384,7 +384,7 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                     <option value="date_desc">Date Desc</option>
                 </select>
             </div>
-            <div className="overflow-x-auto">
+            <div>
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
                     <thead className="bg-gray-50 dark:bg-gray-800">
                         <tr>
