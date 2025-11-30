@@ -1,13 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { getApplicationsForJob, updateApplicationStatus, fetchJobById } from '../services/api';
 import { toast } from 'react-toastify';
+import { ChatContext } from '../context/ChatContext';
 
 const ApplicantsPage = () => {
   const [applications, setApplications] = useState([]);
   const [jobTitle, setJobTitle] = useState('');
   const [loading, setLoading] = useState(true);
   const { jobId } = useParams();
+  const { openChatForApplication } = useContext(ChatContext);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.state?.chatToOpen) {
+      const { applicationId, recipientName, jobTitle } = location.state.chatToOpen;
+      openChatForApplication(applicationId, recipientName, jobTitle);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location, navigate, openChatForApplication]);
 
   const fetchApplications = useCallback(async () => {
     try {
@@ -76,6 +88,12 @@ const ApplicantsPage = () => {
                   <option value="Offered">Offered</option>
                   <option value="Rejected">Rejected</option>
                 </select>
+                <button
+                  onClick={() => openChatForApplication(app._id, `${app.applicant.firstName} ${app.applicant.lastName}`, jobTitle)}
+                  className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Chat
+                </button>
               </div>
             </div>
           ))
