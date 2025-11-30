@@ -15,7 +15,7 @@ const Navbar = () => {
 
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const { isAuthenticated, user, userType, logout } = useContext(AuthContext);
-  const { notifications } = useContext(ChatContext);
+  const { notifications, openChatForApplication } = useContext(ChatContext);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -72,10 +72,12 @@ const Navbar = () => {
   const handleNotificationClick = (notification) => {
     const { applicationId, senderName, jobId, jobTitle } = notification;
     const path =
-      userType === 'employer' ? '/employer/posted-jobs' : '/applied';
+      userType === 'employer'
+        ? `/employer/jobs/${jobId}/applicants`
+        : '/applied';
     navigate(path, {
       state: {
-        chatToOpen: { applicationId, recipientName: senderName, jobTitle, jobId },
+        chatToOpen: { applicationId, recipientName: senderName, jobTitle },
       },
     });
     setIsNotificationOpen(false);
