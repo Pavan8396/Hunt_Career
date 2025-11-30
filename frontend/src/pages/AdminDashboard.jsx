@@ -243,12 +243,12 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {users.map((user) => (
                 <tr key={user._id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate overflow-visible">
                     <Tooltip text={`${user.firstName} ${user.lastName}`}>
                       <span>{user.firstName} {user.lastName}</span>
                     </Tooltip>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate overflow-visible">
                     <Tooltip text={user.email}>
                       <span>{user.email}</span>
                     </Tooltip>
@@ -397,12 +397,12 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                         {employers.map((employer) => (
                             <tr key={employer._id}>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate overflow-visible">
                                     <Tooltip text={employer.companyName}>
                                         <span>{employer.companyName}</span>
                                     </Tooltip>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate overflow-visible">
                                     <Tooltip text={employer.email}>
                                         <span>{employer.email}</span>
                                     </Tooltip>
