@@ -242,16 +242,20 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {users.map((user) => (
-                <tr key={user._id} className="relative z-0">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
-                    <Tooltip text={`${user.firstName} ${user.lastName}`}>
-                      <span>{user.firstName} {user.lastName}</span>
-                    </Tooltip>
+                <tr key={user._id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate overflow-visible">
+                    <div className="group relative">
+                      <Tooltip text={`${user.firstName} ${user.lastName}`}>
+                        <span>{user.firstName} {user.lastName}</span>
+                      </Tooltip>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate">
-                    <Tooltip text={user.email}>
-                      <span>{user.email}</span>
-                    </Tooltip>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate overflow-visible">
+                    <div className="group relative">
+                      <Tooltip text={user.email}>
+                        <span>{user.email}</span>
+                      </Tooltip>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <ToggleSwitch enabled={user.isActive} onChange={() => handleToggleStatus(user)} />
@@ -396,16 +400,20 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                     </thead>
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                         {employers.map((employer) => (
-                            <tr key={employer._id} className="relative z-0">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
-                                    <Tooltip text={employer.companyName}>
-                                        <span>{employer.companyName}</span>
-                                    </Tooltip>
+                            <tr key={employer._id}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate overflow-visible">
+                                    <div className="group relative">
+                                        <Tooltip text={employer.companyName}>
+                                            <span>{employer.companyName}</span>
+                                        </Tooltip>
+                                    </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate">
-                                    <Tooltip text={employer.email}>
-                                        <span>{employer.email}</span>
-                                    </Tooltip>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300 truncate overflow-visible">
+                                    <div className="group relative">
+                                        <Tooltip text={employer.email}>
+                                            <span>{employer.email}</span>
+                                        </Tooltip>
+                                    </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <ToggleSwitch enabled={employer.isActive} onChange={() => handleToggleStatus(employer)} />
