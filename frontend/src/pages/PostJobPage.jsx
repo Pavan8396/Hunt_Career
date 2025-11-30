@@ -7,7 +7,7 @@ import { AuthContext } from '../context/AuthContext';
 const PostJobPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
   const [jobData, setJobData] = useState(null);
 
   useEffect(() => {
@@ -26,8 +26,11 @@ const PostJobPage = () => {
 
   const handleJobPosted = async () => {
     try {
-      await getEmployerJobs(token);
-      navigate('/employer/posted-jobs');
+      if (user && user.isAdmin) {
+        navigate(`/admin/employer/${jobData.employer}/jobs`);
+      } else {
+        navigate('/employer/posted-jobs');
+      }
     } catch (error) {
       console.error('Failed to fetch employer jobs:', error);
     }
