@@ -77,13 +77,7 @@ const createJob = async (req, res) => {
       employer: req.user._id,
     });
     const savedJob = await newJob.save();
-    const employer = await Employer.findById(req.user._id);
-    if (!employer) {
-      await Job.findByIdAndDelete(savedJob._id);
-      return res.status(404).json({ message: 'Employer not found.' });
-    }
-    employer.postedJobs.push(savedJob._id);
-    await employer.save();
+    await Employer.findByIdAndUpdate(req.user._id, { $push: { postedJobs: savedJob._id } });
     res.status(201).json(savedJob);
   } catch (error) {
     console.error('Error creating job:', error);

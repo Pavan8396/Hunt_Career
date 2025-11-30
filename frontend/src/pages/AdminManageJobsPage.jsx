@@ -66,7 +66,7 @@ const AdminManageJobsPage = () => {
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
             {jobs.map((job) => (
-              <tr key={job._id}>
+              <tr key={job._id} className="relative z-0">
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
                     <Tooltip text={job.title}>
                         <span>{job.title}</span>

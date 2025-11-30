@@ -242,7 +242,7 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {users.map((user) => (
-                <tr key={user._id}>
+                <tr key={user._id} className="relative z-0">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
                     <Tooltip text={`${user.firstName} ${user.lastName}`}>
                       <span>{user.firstName} {user.lastName}</span>
@@ -396,7 +396,7 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                     </thead>
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                         {employers.map((employer) => (
-                            <tr key={employer._id}>
+                            <tr key={employer._id} className="relative z-0">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 truncate">
                                     <Tooltip text={employer.companyName}>
                                         <span>{employer.companyName}</span>
