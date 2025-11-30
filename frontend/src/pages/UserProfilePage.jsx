@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getUserProfile, updateUserProfile, getUserById } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
@@ -20,6 +20,7 @@ const UserProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const { updateUser } = useContext(AuthContext);
   const { userId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -109,6 +110,7 @@ const UserProfilePage = () => {
         toast.success('Profile updated successfully!');
       } else {
         toast.success('User profile updated successfully by admin!');
+        navigate('/admin/dashboard');
       }
     } catch (error) {
       console.error('Failed to update profile', error);
