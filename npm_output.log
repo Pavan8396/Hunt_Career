@@ -1,8 +1,0 @@
-
-> hunt-career-monorepo@1.0.0 start
-> concurrently "npm start --prefix frontend" "npm start --prefix backend"
-
-[1]
-[1] > hunt-career-backend@1.0.0 start
-[1] > node index.js
-[1]
