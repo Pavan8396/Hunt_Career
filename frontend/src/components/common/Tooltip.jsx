@@ -2,9 +2,9 @@ import React from 'react';
 
 const Tooltip = ({ text, children }) => {
   return (
-    <div className="relative flex items-center group">
+    <div className="relative group flex items-center">
       {children}
-      <div className="absolute bottom-full mb-2 w-max px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-50">
+      <div className="absolute left-full ml-4 w-auto min-w-max p-2 bg-gray-900 text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 scale-0 group-hover:scale-100 origin-left whitespace-nowrap">
         {text}
       </div>
     </div>

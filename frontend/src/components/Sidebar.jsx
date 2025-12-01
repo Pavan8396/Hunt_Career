@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import Tooltip from './common/Tooltip';
 import {
   HomeIcon,
   BookmarkIcon,
@@ -40,32 +41,36 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
         <ul>
           {links.map((link, index) => (
             <li key={index} className="mb-4">
-              <NavLink
-                to={link.to}
-                className={({ isActive }) =>
-                  `flex items-center p-2 rounded-md transition-colors ${
-                    isActive ? 'bg-blue-500 text-white' : 'hover:bg-gray-700'
-                  } ${isCollapsed ? 'justify-center' : ''}`
-                }
-              >
-                <div className={`${isCollapsed ? '' : 'mr-3'}`}>{link.icon}</div>
-                {!isCollapsed && <span>{link.text}</span>}
-              </NavLink>
+              <Tooltip text={link.text}>
+                <NavLink
+                  to={link.to}
+                  className={({ isActive }) =>
+                    `flex items-center p-2 rounded-md transition-colors ${
+                      isActive ? 'bg-blue-500 text-white' : 'hover:bg-gray-700'
+                    } ${isCollapsed ? 'justify-center' : ''}`
+                  }
+                >
+                  <div className={`${isCollapsed ? '' : 'mr-3'}`}>{link.icon}</div>
+                  {!isCollapsed && <span>{link.text}</span>}
+                </NavLink>
+              </Tooltip>
             </li>
           ))}
           {user && user.isAdmin && (
             <li className="mb-4">
-              <NavLink
-                to="/admin/dashboard"
-                className={({ isActive }) =>
-                  `flex items-center p-2 rounded-md transition-colors ${
-                    isActive ? 'bg-green-500 text-white' : 'hover:bg-gray-700'
-                  } ${isCollapsed ? 'justify-center' : ''}`
-                }
-              >
-                <div className={`${isCollapsed ? '' : 'mr-3'}`}><ShieldCheckIcon className="h-5 w-5" /></div>
-                {!isCollapsed && <span>Admin</span>}
-              </NavLink>
+              <Tooltip text="Admin">
+                <NavLink
+                  to="/admin/dashboard"
+                  className={({ isActive }) =>
+                    `flex items-center p-2 rounded-md transition-colors ${
+                      isActive ? 'bg-green-500 text-white' : 'hover:bg-gray-700'
+                    } ${isCollapsed ? 'justify-center' : ''}`
+                  }
+                >
+                  <div className={`${isCollapsed ? '' : 'mr-3'}`}><ShieldCheckIcon className="h-5 w-5" /></div>
+                  {!isCollapsed && <span>Admin</span>}
+                </NavLink>
+              </Tooltip>
             </li>
           )}
         </ul>

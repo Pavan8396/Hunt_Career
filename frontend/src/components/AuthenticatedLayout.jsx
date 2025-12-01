@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import Chatbox from './Chatbox';
 
 const AuthenticatedLayout = ({ children }) => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
@@ -15,7 +15,11 @@ const AuthenticatedLayout = ({ children }) => {
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} />
-        <main className="flex-1 overflow-y-auto p-8 transition-all duration-300">
+        <main
+          className={`flex-1 overflow-y-auto p-8 transition-all duration-300 ${
+            isSidebarCollapsed ? 'ml-0' : 'ml-0'
+          }`}
+        >
           {children}
         </main>
       </div>
