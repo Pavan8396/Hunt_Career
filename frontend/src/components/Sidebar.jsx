@@ -10,9 +10,11 @@ import {
   UserCircleIcon,
   OfficeBuildingIcon,
   ShieldCheckIcon,
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
 } from '@heroicons/react/outline';
 
-const Sidebar = () => {
+const Sidebar = ({ isCollapsed, toggleSidebar }) => {
   const { user } = useContext(AuthContext);
   const userType = user?.type;
 
@@ -33,7 +35,7 @@ const Sidebar = () => {
   const links = userType === 'employer' ? employerLinks : jobSeekerLinks;
 
   return (
-    <aside className="w-56 bg-gray-800 text-white min-h-screen p-4">
+    <aside className={`bg-gray-800 text-white min-h-screen p-4 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-56'}`}>
       <nav>
         <ul>
           {links.map((link, index) => (
@@ -47,7 +49,7 @@ const Sidebar = () => {
                 }
               >
                 {link.icon}
-                <span>{link.text}</span>
+                {!isCollapsed && <span>{link.text}</span>}
               </NavLink>
             </li>
           ))}
@@ -62,12 +64,17 @@ const Sidebar = () => {
                 }
               >
                 <ShieldCheckIcon className="h-5 w-5 mr-3" />
-                <span>Admin</span>
+                {!isCollapsed && <span>Admin</span>}
               </NavLink>
             </li>
           )}
         </ul>
       </nav>
+      <div className="absolute bottom-4 left-4">
+        <button onClick={toggleSidebar} className="p-2 rounded-md hover:bg-gray-700 transition-colors">
+          {isCollapsed ? <ChevronDoubleRightIcon className="h-5 w-5" /> : <ChevronDoubleLeftIcon className="h-5 w-5" />}
+        </button>
+      </div>
     </aside>
   );
 };
