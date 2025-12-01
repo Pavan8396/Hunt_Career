@@ -35,7 +35,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
   const links = userType === 'employer' ? employerLinks : jobSeekerLinks;
 
   return (
-    <aside className={`bg-gray-800 text-white min-h-screen p-4 transition-all duration-300 relative ${isCollapsed ? 'w-20' : 'w-56'}`}>
+    <aside className={`bg-gray-800 text-white min-h-screen p-4 transition-all duration-300 relative flex-shrink-0 ${isCollapsed ? 'w-20' : 'w-56'}`}>
       <nav>
         <ul>
           {links.map((link, index) => (
