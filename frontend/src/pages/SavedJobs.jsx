@@ -11,6 +11,7 @@ const SavedJobs = () => {
   const [error, setError] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [jobToRemove, setJobToRemove] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'title', direction: 'ascending' });
   const navigate = useNavigate();
 
   useEffect(() => {

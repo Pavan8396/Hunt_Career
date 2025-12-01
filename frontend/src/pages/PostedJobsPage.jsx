@@ -17,6 +17,7 @@ const PostedJobsPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmMessage, setConfirmMessage] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: 'title', direction: 'ascending' });
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
