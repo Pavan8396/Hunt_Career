@@ -121,7 +121,7 @@ export const getRecentActivity = async (token) => {
 
 export const getAppliedJobs = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/applied-jobs`, {
+    const response = await fetch(`${API_URL}/users/applied-jobs`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -181,6 +181,62 @@ export const login = async (email, password) => {
   } catch (error) {
     console.error('Login error:', error.message);
     throw new Error(error.message);
+  }
+};
+
+export const getSavedJobs = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/users/saved-jobs`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch saved jobs');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching saved jobs:', error);
+    toast.error('Could not load saved jobs.');
+    throw error;
+  }
+};
+
+export const saveJob = async (jobId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/users/saved-jobs/${jobId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save job');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error saving job:', error);
+    toast.error('Could not save job.');
+    throw error;
+  }
+};
+
+export const unsaveJob = async (jobId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/users/saved-jobs/${jobId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to unsave job');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error unsaving job:', error);
+    toast.error('Could not unsave job.');
+    throw error;
   }
 };
 
@@ -401,7 +457,7 @@ export const getReviewsForEmployer = async (employerId) => {
 
 export const getUserProfile = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/profile`, {
+    const response = await fetch(`${API_URL}/users/profile`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -419,7 +475,7 @@ export const getUserProfile = async (token) => {
 
 export const updateUserProfile = async (profileData, token, userId = null) => {
   try {
-    const url = userId ? `${API_URL}/user/profile/${userId}` : `${API_URL}/user/profile`;
+    const url = userId ? `${API_URL}/users/profile/${userId}` : `${API_URL}/users/profile`;
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -561,7 +617,7 @@ export const updateJob = async (jobId, jobData, token) => {
 
 export const getUserDetails = async (userId, token) => {
   try {
-    const response = await fetch(`${API_URL}/user/${userId}`, {
+    const response = await fetch(`${API_URL}/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -839,7 +895,7 @@ export const applyForJob = async (jobId, token) => {
 
 export const getUserApplications = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/applications`, {
+    const response = await fetch(`${API_URL}/users/applications`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
