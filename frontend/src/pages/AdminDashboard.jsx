@@ -12,7 +12,7 @@ import {
   toggleEmployerStatus as apiToggleEmployerStatus,
   toggleUserAdminStatus as apiToggleUserAdminStatus,
 } from '../services/api';
-import { PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/outline';
+import { PencilIcon, TrashIcon, EyeIcon, SearchIcon, FilterIcon, SortAscendingIcon } from '@heroicons/react/outline';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import EditEmployerModal from '../components/common/EditEmployerModal';
 import Tooltip from '../components/common/Tooltip';
@@ -210,24 +210,33 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
 
     return (
       <>
-        <div className="flex justify-between mb-4">
-            <input
-                type="text"
-                placeholder="Search by name or email"
-                className="p-2 border rounded"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-            />
-            <select className="p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value)}>
-                <option value="">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="suspended">Suspended</option>
-            </select>
-            <select className="p-2 border rounded" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="">Sort By</option>
-                <option value="date_asc">Date Asc</option>
-                <option value="date_desc">Date Desc</option>
-            </select>
+        <div className="flex justify-between mb-4 items-center">
+            <div className="relative">
+                <input
+                    type="text"
+                    placeholder="Search by name or email"
+                    className="p-2 border rounded pl-10"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            </div>
+            <div className="relative">
+                <select className="p-2 border rounded pl-10" value={status} onChange={(e) => setStatus(e.target.value)}>
+                    <option value="">All Statuses</option>
+                    <option value="active">Active</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+                <FilterIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            </div>
+            <div className="relative">
+                <select className="p-2 border rounded pl-10" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                    <option value="">Sort By</option>
+                    <option value="date_asc">Date Asc</option>
+                    <option value="date_desc">Date Desc</option>
+                </select>
+                <SortAscendingIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            </div>
         </div>
         <div>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
@@ -242,7 +251,7 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
               {users.map((user) => (
-                <tr key={user._id} className="relative z-0">
+                <tr key={user._id} className="relative z-0 hover:bg-gray-50 dark:hover:bg-gray-800">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     <Tooltip text={`${user.firstName} ${user.lastName}`}>
                       <span className="truncate">{user.firstName} {user.lastName}</span>
@@ -365,24 +374,33 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
 
     return (
         <>
-            <div className="flex justify-between mb-4">
-                <input
-                    type="text"
-                    placeholder="Search by company or email"
-                    className="p-2 border rounded"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-                <select className="p-2 border rounded" value={status} onChange={(e) => setStatus(e.target.value)}>
-                    <option value="">All Statuses</option>
-                    <option value="active">Active</option>
-                    <option value="suspended">Suspended</option>
-                </select>
-                <select className="p-2 border rounded" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                    <option value="">Sort By</option>
-                    <option value="date_asc">Date Asc</option>
-                    <option value="date_desc">Date Desc</option>
-                </select>
+            <div className="flex justify-between mb-4 items-center">
+                <div className="relative">
+                    <input
+                        type="text"
+                        placeholder="Search by company or email"
+                        className="p-2 border rounded pl-10"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                </div>
+                <div className="relative">
+                    <select className="p-2 border rounded pl-10" value={status} onChange={(e) => setStatus(e.target.value)}>
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                    <FilterIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                </div>
+                <div className="relative">
+                    <select className="p-2 border rounded pl-10" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                        <option value="">Sort By</option>
+                        <option value="date_asc">Date Asc</option>
+                        <option value="date_desc">Date Desc</option>
+                    </select>
+                    <SortAscendingIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                </div>
             </div>
             <div>
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
@@ -396,7 +414,7 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                     </thead>
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                         {employers.map((employer) => (
-                            <tr key={employer._id} className="relative z-0">
+                            <tr key={employer._id} className="relative z-0 hover:bg-gray-50 dark:hover:bg-gray-800">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                     <Tooltip text={employer.companyName}>
                                         <span className="truncate">{employer.companyName}</span>

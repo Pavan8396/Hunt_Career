@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getSavedJobs, removeJob } from '../utils/localStorageHelpers';
+import { TrashIcon, ExternalLinkIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon } from '@heroicons/react/outline';
+import { useSortableData } from '../hooks/useSortableData';
 
 const SavedJobs = () => {
   const [savedJobs, setSavedJobs] = useState([]);
@@ -33,15 +35,15 @@ const SavedJobs = () => {
     fetchSavedJobs();
   }, []);
 
-  const handleRemoveJob = (id, title) => {
-    setJobToRemove({ id, title });
+  const handleRemoveJob = (_id, title) => {
+    setJobToRemove({ _id, title });
     setShowConfirm(true);
   };
 
   const handleConfirmRemove = () => {
     if (jobToRemove) {
-      removeJob(jobToRemove.id);
-      setSavedJobs(savedJobs.filter((job) => job.id !== jobToRemove.id));
+      removeJob(jobToRemove._id);
+      setSavedJobs(savedJobs.filter((job) => job._id !== jobToRemove._id));
       toast.info(`"${jobToRemove.title}" removed from saved jobs!`);
     }
     setShowConfirm(false);
@@ -56,6 +58,8 @@ const SavedJobs = () => {
   const handleCardClick = (id) => {
     navigate(`/jobs/${id}`);
   };
+
+  const { items: sortedJobs, requestSort, sortConfig } = useSortableData(savedJobs, { key: 'title', direction: 'ascending' });
 
   if (loading) {
     return (
@@ -100,57 +104,60 @@ const SavedJobs = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {savedJobs.map((job) => (
-            <div
-              key={job.id}
-              className="border rounded p-4 shadow hover:shadow-md transition bg-white dark:bg-gray-800 dark:border-gray-700 cursor-pointer"
-              onClick={() => handleCardClick(job.id)}
-              role="button"
-              tabIndex={0}
-              aria-label={`View details for ${job.title} at ${job.company}`}
-            >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{job.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400">{job.company}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {job.job_type} • {job.candidate_required_location}
-              </p>
-              {job.description && (
-                <p className="text-sm text-gray-700 dark:text-gray-300 mt-3 line-clamp-3">
-                  {job.description}
-                </p>
-              )}
-              <div className="mt-4 flex justify-between items-center">
-                <span className="text-blue-600 dark:text-blue-400 text-sm hover:underline">
-                  View Details →
-                </span>
-                <div className="flex gap-2">
-                  {job.apply_url && (
-                    <a
-                      href={job.apply_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm px-3 py-1 bg-blue-600 text-white border border-blue-600 rounded hover:bg-blue-700 transition dark:bg-blue-700 dark:border-blue-700 dark:hover:bg-blue-800"
-                      onClick={(e) => e.stopPropagation()}
-                      aria-label={`Apply for ${job.title}`}
-                    >
-                      Apply
-                    </a>
-                  )}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveJob(job.id, job.title);
-                    }}
-                    className="text-sm px-3 py-1 bg-red-100 text-red-600 border border-red-300 rounded hover:bg-red-200 transition dark:bg-red-900 dark:text-red-300 dark:border-red-700 dark:hover:bg-red-800"
-                    aria-label={`Remove ${job.title} from saved jobs`}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <thead className="bg-gray-200 dark:bg-gray-700">
+              <tr>
+                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('title')}>
+                  Job Title {sortConfig.key === 'title' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                </th>
+                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('company')}>
+                  Company {sortConfig.key === 'company' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                </th>
+                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('job_type')}>
+                  Job Type {sortConfig.key === 'job_type' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                </th>
+                <th className="p-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedJobs.map((job) => (
+                <tr key={job._id} className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job._id)}>{job.title}</td>
+                  <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job._id)}>{job.company}</td>
+                  <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job._id)}>{job.job_type}</td>
+                  <td className="p-4 text-center">
+                    <div className="flex justify-center gap-2">
+                      {job.apply_url && (
+                        <a
+                          href={job.apply_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+                          onClick={(e) => e.stopPropagation()}
+                          aria-label={`Apply for ${job.title}`}
+                          title="Apply"
+                        >
+                          <ExternalLinkIcon className="h-5 w-5" />
+                        </a>
+                      )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveJob(job._id, job.title);
+                        }}
+                        className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition"
+                        aria-label={`Remove ${job.title} from saved jobs`}
+                        title="Remove"
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

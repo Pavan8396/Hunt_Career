@@ -5,6 +5,8 @@ import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 import { getUserApplications } from '../services/api';
 import SkeletonCard from '../components/SkeletonCard';
+import { ChatIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon } from '@heroicons/react/outline';
+import { useSortableData } from '../hooks/useSortableData';
 
 const AppliedJobs = () => {
   const [applications, setApplications] = useState([]);
@@ -59,6 +61,8 @@ const AppliedJobs = () => {
     openChatForApplication(application._id, recipientName, application.job.title);
   };
 
+  const { items: sortedApplications, requestSort, sortConfig } = useSortableData(applications, { key: 'date', direction: 'descending' });
+
   if (loading) {
     return (
       <div className="p-4 max-w-7xl mx-auto">
@@ -106,44 +110,59 @@ const AppliedJobs = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {applications
-            .filter((app) => app.job) // Filter out applications with no job
-            .map((app) => (
-              <div
-                key={app._id}
-                className="border rounded p-4 shadow hover:shadow-md transition bg-white dark:bg-gray-800 dark:border-gray-700"
-              >
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
-                  {app.job.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {app.job.company}
-                </p>
-                <div className="mt-4 flex justify-between items-center">
-                  <span
-                    className={`text-sm px-3 py-1 rounded capitalize ${
-                      {
-                        Submitted: 'bg-blue-100 text-blue-600 border border-blue-300',
-                        'In Review': 'bg-yellow-100 text-yellow-600 border border-yellow-300',
-                        Interviewing: 'bg-purple-100 text-purple-600 border border-purple-300',
-                        Offered: 'bg-green-100 text-green-600 border border-green-300',
-                        Rejected: 'bg-red-100 text-red-600 border border-red-300',
-                      }[app.status] || 'bg-gray-100 text-gray-600 border border-gray-300'
-                    }`}
-                  >
-                    {app.status}
-                  </span>
-                  <button
-                    onClick={() => openChat(app)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded text-sm"
-                    data-chat-opener="true"
-                  >
-                    Chat with Recruiter
-                  </button>
-                </div>
-              </div>
-            ))}
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
+            <thead className="bg-gray-200 dark:bg-gray-700">
+              <tr>
+                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('job.title')}>
+                  Job Title {sortConfig.key === 'job.title' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                </th>
+                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('job.company')}>
+                  Company {sortConfig.key === 'job.company' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                </th>
+                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('date')}>
+                  Applied Date {sortConfig.key === 'date' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                </th>
+                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('status')}>
+                  Status {sortConfig.key === 'status' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                </th>
+                <th className="p-4 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedApplications.map((app) => (
+                <tr key={app._id} className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <td className="p-4">{app.job.title}</td>
+                  <td className="p-4">{app.job.company}</td>
+                  <td className="p-4">{new Date(app.date).toLocaleDateString()}</td>
+                  <td className="p-4">
+                    <span
+                      className={`text-sm px-3 py-1 rounded capitalize ${
+                        {
+                          Submitted: 'bg-blue-100 text-blue-600 border border-blue-300',
+                          'In Review': 'bg-yellow-100 text-yellow-600 border border-yellow-300',
+                          Interviewing: 'bg-purple-100 text-purple-600 border border-purple-300',
+                          Offered: 'bg-green-100 text-green-600 border border-green-300',
+                          Rejected: 'bg-red-100 text-red-600 border border-red-300',
+                        }[app.status] || 'bg-gray-100 text-gray-600 border border-gray-300'
+                      }`}
+                    >
+                      {app.status}
+                    </span>
+                  </td>
+                  <td className="p-4 text-center">
+                    <button
+                      onClick={() => openChat(app)}
+                      className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+                      title="Chat with recruiter"
+                    >
+                      <ChatIcon className="h-5 w-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

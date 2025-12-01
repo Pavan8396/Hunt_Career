@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getUserProfile, updateUserProfile, getUserById } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import { PlusIcon, TrashIcon } from '@heroicons/react/outline';
+import { PlusIcon, TrashIcon, SaveIcon } from '@heroicons/react/outline';
 
 const UserProfilePage = () => {
   const [profile, setProfile] = useState({
@@ -222,8 +222,8 @@ const UserProfilePage = () => {
                   </div>
                 </div>
                 <textarea name="description" value={exp.description} onChange={(e) => handleChange(e, index, 'workExperience')} placeholder="Description" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200"></textarea>
-                <button type="button" onClick={() => removeSectionItem(index, 'workExperience')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500 flex items-center">
-                  <TrashIcon className="h-5 w-5 mr-1" /> Remove
+                <button type="button" onClick={() => removeSectionItem(index, 'workExperience')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500" title="Remove work experience">
+                  <TrashIcon className="h-5 w-5" />
                 </button>
               </div>
             ))}
@@ -252,8 +252,8 @@ const UserProfilePage = () => {
                   <input name="startDate" type="date" value={edu.startDate ? new Date(edu.startDate).toISOString().split('T')[0] : ''} onChange={(e) => handleChange(e, index, 'education')} placeholder="Start Date" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
                   <input name="endDate" type="date" value={edu.endDate ? new Date(edu.endDate).toISOString().split('T')[0] : ''} onChange={(e) => handleChange(e, index, 'education')} placeholder="End Date" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
                 </div>
-                <button type="button" onClick={() => removeSectionItem(index, 'education')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500 flex items-center">
-                  <TrashIcon className="h-5 w-5 mr-1" /> Remove
+                <button type="button" onClick={() => removeSectionItem(index, 'education')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500" title="Remove education">
+                  <TrashIcon className="h-5 w-5" />
                 </button>
               </div>
             ))}
@@ -271,7 +271,7 @@ const UserProfilePage = () => {
               {profile.skills.map((skill, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <input value={skill} onChange={(e) => handleListChange(e, index, 'skills')} placeholder="e.g., React" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
-                  <button type="button" onClick={() => removeListItem(index, 'skills')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"><TrashIcon className="h-5 w-5" /></button>
+                  <button type="button" onClick={() => removeListItem(index, 'skills')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500" title="Remove skill"><TrashIcon className="h-5 w-5" /></button>
                 </div>
               ))}
             </div>
@@ -285,7 +285,7 @@ const UserProfilePage = () => {
               {profile.portfolioLinks.map((link, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <input value={link} onChange={(e) => handleListChange(e, index, 'portfolioLinks')} placeholder="https://github.com/johndoe" className="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md sm:text-sm dark:text-gray-200" />
-                  <button type="button" onClick={() => removeListItem(index, 'portfolioLinks')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"><TrashIcon className="h-5 w-5" /></button>
+                  <button type="button" onClick={() => removeListItem(index, 'portfolioLinks')} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500" title="Remove link"><TrashIcon className="h-5 w-5" /></button>
                   {errors.portfolioLinks && errors.portfolioLinks[index] && <p className="text-red-500 text-xs mt-1">{errors.portfolioLinks[index]}</p>}
                 </div>
               ))}
@@ -297,7 +297,8 @@ const UserProfilePage = () => {
         </div>
 
         <div className="flex justify-end pt-4">
-          <button type="submit" className="px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+          <button type="submit" className="px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 flex items-center">
+            <SaveIcon className="h-5 w-5 mr-2" />
             Save Changes
           </button>
         </div>
