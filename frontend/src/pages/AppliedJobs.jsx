@@ -4,7 +4,8 @@ import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 import { getUserApplications } from '../services/api';
-import SkeletonCard from '../components/SkeletonCard';
+import { useSortableData } from '../hooks/useSortableData';
+import { FaSort, FaSortUp, FaSortDown, FaComments, FaEye } from 'react-icons/fa';
 
 const AppliedJobs = () => {
   const [applications, setApplications] = useState([]);
@@ -14,6 +15,7 @@ const AppliedJobs = () => {
   const { openChatForApplication } = useContext(ChatContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const { items, requestSort, sortConfig } = useSortableData(applications);
 
   const fetchAppliedJobs = useCallback(async () => {
     setLoading(true);
@@ -59,16 +61,24 @@ const AppliedJobs = () => {
     openChatForApplication(application._id, recipientName, application.job.title);
   };
 
+  const getSortIcon = (key) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <FaSort className="inline-block ml-1" />;
+    }
+    if (sortConfig.direction === 'ascending') {
+      return <FaSortUp className="inline-block ml-1" />;
+    }
+    return <FaSortDown className="inline-block ml-1" />;
+  };
+
   if (loading) {
     return (
-      <div className="p-4 max-w-7xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4 dark:text-gray-200">
-          Applied Jobs
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
+      <div className="p-4 max-w-4xl mx-auto">
+        <h2 className="text-2xl font-bold mb-4">Applied Jobs</h2>
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-300 rounded w-full"></div>
+          <div className="h-12 bg-gray-300 rounded w-full"></div>
+          <div className="h-12 bg-gray-300 rounded w-full"></div>
         </div>
       </div>
     );
@@ -77,73 +87,76 @@ const AppliedJobs = () => {
   if (error) {
     return (
       <div className="p-4 text-center">
-        <p className="text-red-500 dark:text-red-400">{error}</p>
-        <Link
-          to="/home"
-          className="text-blue-600 hover:underline mt-4 inline-block dark:text-blue-400"
-        >
-          ← Back to Home
-        </Link>
+        <p className="text-red-500">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="p-4 max-w-7xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 dark:text-gray-200">
-        Applied Jobs
-      </h2>
+    <div className="p-4 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Applied Jobs</h2>
       {applications.length === 0 ? (
         <div className="text-center">
-          <p className="text-gray-500 dark:text-gray-400">
-            You have not applied for any jobs yet.
-          </p>
-          <Link
-            to="/home"
-            className="text-blue-600 hover:underline mt-4 inline-block dark:text-blue-400"
-          >
+          <p>You have not applied for any jobs yet.</p>
+          <Link to="/home" className="text-blue-600 hover:underline mt-2 inline-block">
             ← Find Jobs
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {applications
-            .filter((app) => app.job) // Filter out applications with no job
-            .map((app) => (
-              <div
-                key={app._id}
-                className="border rounded p-4 shadow hover:shadow-md transition bg-white dark:bg-gray-800 dark:border-gray-700"
-              >
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
-                  {app.job.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {app.job.company}
-                </p>
-                <div className="mt-4 flex justify-between items-center">
-                  <span
-                    className={`text-sm px-3 py-1 rounded capitalize ${
-                      {
-                        Submitted: 'bg-blue-100 text-blue-600 border border-blue-300',
-                        'In Review': 'bg-yellow-100 text-yellow-600 border border-yellow-300',
-                        Interviewing: 'bg-purple-100 text-purple-600 border border-purple-300',
-                        Offered: 'bg-green-100 text-green-600 border border-green-300',
-                        Rejected: 'bg-red-100 text-red-600 border border-red-300',
-                      }[app.status] || 'bg-gray-100 text-gray-600 border border-gray-300'
-                    }`}
-                  >
-                    {app.status}
-                  </span>
-                  <button
-                    onClick={() => openChat(app)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded text-sm"
-                    data-chat-opener="true"
-                  >
-                    Chat with Recruiter
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow">
+            <thead>
+              <tr className="bg-gray-200 dark:bg-gray-700">
+                <th className="p-3 text-left">
+                  <button onClick={() => requestSort('job.title')} className="font-bold">
+                    Job Title {getSortIcon('job.title')}
                   </button>
-                </div>
-              </div>
-            ))}
+                </th>
+                <th className="p-3 text-left">
+                  <button onClick={() => requestSort('job.company')} className="font-bold">
+                    Company {getSortIcon('job.company')}
+                  </button>
+                </th>
+                <th className="p-3 text-left">
+                  <button onClick={() => requestSort('status')} className="font-bold">
+                    Status {getSortIcon('status')}
+                  </button>
+                </th>
+                <th className="p-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((app) => (
+                <tr key={app._id} className="border-b dark:border-gray-700">
+                  <td className="p-3">{app.job.title}</td>
+                  <td className="p-3">{app.job.company}</td>
+                  <td className="p-3">
+                    <span
+                      className={`px-2 py-1 text-sm rounded-full ${
+                        {
+                          Submitted: 'bg-blue-100 text-blue-800',
+                          'In Review': 'bg-yellow-100 text-yellow-800',
+                          Interviewing: 'bg-purple-100 text-purple-800',
+                          Offered: 'bg-green-100 text-green-800',
+                          Rejected: 'bg-red-100 text-red-800',
+                        }[app.status] || 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {app.status}
+                    </span>
+                  </td>
+                  <td className="p-3 flex justify-center items-center space-x-2">
+                    <Link to={`/jobs/${app.job._id}`} className="p-2 rounded-full hover:bg-gray-200" title="View Job">
+                      <FaEye />
+                    </Link>
+                    <button onClick={() => openChat(app)} className="p-2 rounded-full hover:bg-gray-200" title="Chat with Recruiter">
+                      <FaComments />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

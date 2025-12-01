@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { FaEdit, FaTrash, FaTrashAlt, FaUsers } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaTrashAlt, FaUsers, FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import {
   getEmployerJobs,
   deleteJob,
@@ -9,6 +9,7 @@ import {
   deleteMultipleJobs,
 } from '../services/api';
 import { toast } from 'react-toastify';
+import { useSortableData } from '../hooks/useSortableData';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -18,6 +19,7 @@ const PostedJobsPage = () => {
   const [confirmMessage, setConfirmMessage] = useState('');
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { items, requestSort, sortConfig } = useSortableData(jobs);
 
   const fetchJobs = useCallback(async () => {
     try {
@@ -100,16 +102,26 @@ const PostedJobsPage = () => {
   };
   
   const handleSelectAll = () => {
-    if (selectedJobs.length === jobs.length) {
+    if (selectedJobs.length === items.length) {
       setSelectedJobs([]);
     } else {
-      setSelectedJobs(jobs.map(job => job._id));
+      setSelectedJobs(items.map(job => job._id));
     }
   };
 
   const handleCancel = () => {
     setShowConfirm(false);
     setConfirmAction(null);
+  };
+
+  const getSortIcon = (key) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <FaSort className="inline-block ml-1" />;
+    }
+    if (sortConfig.direction === 'ascending') {
+      return <FaSortUp className="inline-block ml-1" />;
+    }
+    return <FaSortDown className="inline-block ml-1" />;
   };
 
   return (
@@ -147,14 +159,22 @@ const PostedJobsPage = () => {
                   checked={jobs.length > 0 && selectedJobs.length === jobs.length}
                 />
               </th>
-              <th className="p-4 text-left">Job Title</th>
-              <th className="p-4 text-left">Company</th>
+              <th className="p-4 text-left">
+                <button onClick={() => requestSort('title')} className="font-bold">
+                  Job Title {getSortIcon('title')}
+                </button>
+              </th>
+              <th className="p-4 text-left">
+                <button onClick={() => requestSort('company')} className="font-bold">
+                  Company {getSortIcon('company')}
+                </button>
+              </th>
               <th className="p-4 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {jobs.length > 0 ? (
-              jobs.map((job) => (
+            {items.length > 0 ? (
+              items.map((job) => (
                 <React.Fragment key={job._id}>
                   <tr className="border-b dark:border-gray-700">
                     <td className="p-4">
