@@ -4,9 +4,9 @@ import { ChatContext } from '../context/ChatContext';
 import { AuthContext } from '../context/AuthContext';
 import {
   saveJob,
-  removeJob,
-  isJobSaved,
-} from '../utils/localStorageHelpers';
+  unsaveJob,
+  getSavedJobs,
+} from '../services/api';
 import { fetchJobById, applyForJob, getApplicationForJob, submitReview } from '../services/api';
 import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
@@ -28,7 +28,6 @@ const JobDetails = () => {
   const { token, user, isAuthenticated } = useContext(AuthContext);
   const [hasApplied, setHasApplied] = useState(false);
 
-  // ✅ Effect for fetching job details (with cleanup)
   useEffect(() => {
     let isMounted = true;
 
@@ -40,7 +39,8 @@ const JobDetails = () => {
         if (!isMounted) return;
         setJob(foundJob);
         if (isAuthenticated) {
-          setSaved(isJobSaved(foundJob._id));
+          const savedJobs = await getSavedJobs(token);
+          setSaved(savedJobs.some((job) => job._id === foundJob._id));
         }
       } catch (err) {
         if (isMounted) {
@@ -57,9 +57,8 @@ const JobDetails = () => {
     return () => {
       isMounted = false;
     };
-  }, [id, isAuthenticated]);
+  }, [id, isAuthenticated, token]);
 
-  // ✅ Effect for checking application status (with cleanup)
   useEffect(() => {
     let isMounted = true;
 
@@ -80,7 +79,6 @@ const JobDetails = () => {
     };
   }, [id, user, job, token]);
 
-  // ✅ Effect to auto-clear notifications safely
   useEffect(() => {
     let timer;
     if (notification.message) {
@@ -131,23 +129,31 @@ const JobDetails = () => {
     setShowConfirm(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (confirmAction === 'save') {
-      saveJob(job);
-      setSaved(true);
-      setNotification({
-        message: `Job "${job.title}" saved!`,
-        type: 'success',
-      });
-      toast.success(`Job "${job.title}" saved!`);
+      try {
+        await saveJob(job._id, token);
+        setSaved(true);
+        setNotification({
+          message: `Job "${job.title}" saved!`,
+          type: 'success',
+        });
+        toast.success(`Job "${job.title}" saved!`);
+      } catch (error) {
+        toast.error('Failed to save job.');
+      }
     } else if (confirmAction === 'unsave') {
-      removeJob(job._id);
-      setSaved(false);
-      setNotification({
-        message: `Job "${job.title}" unsaved!`,
-        type: 'info',
-      });
-      toast.info(`Job "${job.title}" unsaved!`);
+      try {
+        await unsaveJob(job._id, token);
+        setSaved(false);
+        setNotification({
+          message: `Job "${job.title}" unsaved!`,
+          type: 'info',
+        });
+        toast.info(`Job "${job.title}" unsaved!`);
+      } catch (error) {
+        toast.error('Failed to unsave job.');
+      }
     }
     setShowConfirm(false);
     setConfirmAction(null);
@@ -161,14 +167,10 @@ const JobDetails = () => {
   const handleReviewSubmitted = async (reviewData) => {
     try {
       await submitReview(job.employer, reviewData, token);
-      // We can optionally refresh reviews here if they were displayed on this page
     } catch (error) {
-      // The ReviewForm already shows a toast on failure, but re-throw for parent if needed
       throw error;
     }
   };
-
-  // ----------------- Render Section -----------------
 
   if (loading) {
     return (
