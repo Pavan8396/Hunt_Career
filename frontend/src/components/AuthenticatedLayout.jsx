@@ -15,7 +15,7 @@ const AuthenticatedLayout = ({ children }) => {
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} />
-        <main className={`flex-1 overflow-y-auto p-8 transition-all duration-300 ${isSidebarCollapsed ? 'ml-20' : 'ml-56'}`}>
+        <main className="flex-1 overflow-y-auto p-8 transition-all duration-300">
           {children}
         </main>
       </div>
