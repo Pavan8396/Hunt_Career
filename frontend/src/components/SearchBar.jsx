@@ -1,4 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useState } from 'react';
+import { SearchIcon, XIcon } from '@heroicons/react/outline';
 
 const SearchBar = forwardRef(({ onSearch, initialValue = '' }, ref) => {
   const [inputValue, setInputValue] = useState(initialValue);
@@ -33,10 +34,11 @@ const SearchBar = forwardRef(({ onSearch, initialValue = '' }, ref) => {
   return (
     <div className="flex items-center mb-6">
       <div className="relative flex-1">
+        <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
         <input
           type="text"
           placeholder="Search jobs by title, company, or keyword..."
-          className="w-full px-4 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:placeholder-gray-400"
+          className="w-full px-10 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:placeholder-gray-400"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -49,7 +51,7 @@ const SearchBar = forwardRef(({ onSearch, initialValue = '' }, ref) => {
             className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             aria-label="Clear search"
           >
-            ×
+            <XIcon className="h-5 w-5" />
           </button>
         )}
       </div>
@@ -63,7 +65,7 @@ const SearchBar = forwardRef(({ onSearch, initialValue = '' }, ref) => {
         }`}
         aria-label="Search"
       >
-        {isSearching ? 'Searching...' : 'Search'}
+        {isSearching ? 'Searching...' : <SearchIcon className="h-5 w-5" />}
       </button>
     </div>
   );
