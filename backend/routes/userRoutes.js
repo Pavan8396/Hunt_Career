@@ -24,9 +24,9 @@ router.get('/applications', authenticateToken, ensureDb, getUserApplications);
 router.get('/applied-jobs', authenticateToken, ensureDb, getAppliedJobs);
 
 // Saved Jobs
-router.get('/saved-jobs', authenticateToken, ensureDb, isJobSeeker, getSavedJobs);
-router.post('/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, saveJob);
-router.delete('/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, unsaveJob);
+router.get('/profile/saved-jobs', authenticateToken, ensureDb, isJobSeeker, getSavedJobs);
+router.post('/profile/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, saveJob);
+router.delete('/profile/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, unsaveJob);
 
 router.get('/:id', authenticateToken, ensureDb, getUserById);
 

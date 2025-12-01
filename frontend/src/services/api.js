@@ -186,7 +186,7 @@ export const login = async (email, password) => {
 
 export const getSavedJobs = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/saved-jobs`, {
+    const response = await fetch(`${API_URL}/user/profile/saved-jobs`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -204,7 +204,7 @@ export const getSavedJobs = async (token) => {
 
 export const saveJob = async (jobId, token) => {
   try {
-    const response = await fetch(`${API_URL}/user/saved-jobs/${jobId}`, {
+    const response = await fetch(`${API_URL}/user/profile/saved-jobs/${jobId}`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -223,7 +223,7 @@ export const saveJob = async (jobId, token) => {
 
 export const unsaveJob = async (jobId, token) => {
   try {
-    const response = await fetch(`${API_URL}/user/saved-jobs/${jobId}`, {
+    const response = await fetch(`${API_URL}/user/profile/saved-jobs/${jobId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
