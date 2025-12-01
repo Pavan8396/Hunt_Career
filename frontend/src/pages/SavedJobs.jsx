@@ -13,11 +13,11 @@ const SavedJobs = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [jobToRemove, setJobToRemove] = useState(null);
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchSavedJobs = async () => {
-      if (!user) {
+      if (!token) {
         toast.error('You must be logged in to view saved jobs.');
         navigate('/login');
         return;
@@ -25,7 +25,7 @@ const SavedJobs = () => {
       try {
         setLoading(true);
         setError(null);
-        const jobs = await getSavedJobs(user.token);
+        const jobs = await getSavedJobs(token);
         setSavedJobs(jobs);
       } catch (err) {
         setError('Failed to load saved jobs. Please try again.');
@@ -45,7 +45,7 @@ const SavedJobs = () => {
   const handleConfirmRemove = async () => {
     if (jobToRemove) {
       try {
-        await unsaveJob(jobToRemove._id, user.token);
+        await unsaveJob(jobToRemove._id, token);
         setSavedJobs(savedJobs.filter((job) => job._id !== jobToRemove._id));
         toast.info(`"${jobToRemove.title}" removed from saved jobs!`);
       } catch (error) {
