@@ -11,6 +11,7 @@ const AppliedJobs = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'descending' });
   const { user, token } = useContext(AuthContext);
   const { openChatForApplication } = useContext(ChatContext);
   const navigate = useNavigate();

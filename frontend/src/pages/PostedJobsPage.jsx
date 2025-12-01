@@ -17,6 +17,7 @@ const PostedJobsPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmMessage, setConfirmMessage] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: 'title', direction: 'ascending' });
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const { items, requestSort, sortConfig } = useSortableData(jobs);
@@ -36,6 +37,8 @@ const PostedJobsPage = () => {
       fetchJobs();
     }
   }, [token, fetchJobs]);
+
+  const { items: sortedJobs, requestSort, sortConfig } = useSortableData(jobs, { key: 'title', direction: 'ascending' });
 
   const handleDeleteJob = (jobId) => {
     setConfirmMessage('Are you sure you want to delete this job?');
@@ -134,7 +137,7 @@ const PostedJobsPage = () => {
             className="p-2 bg-red-600 text-white rounded flex items-center space-x-2"
             title="Delete All Jobs"
           >
-            <FaTrashAlt />
+            <TrashIcon className="h-5 w-5" />
             <span>Delete All</span>
           </button>
           <button
@@ -143,15 +146,15 @@ const PostedJobsPage = () => {
             disabled={selectedJobs.length === 0}
             title="Delete Selected Jobs"
           >
-            <FaTrash />
+            <TrashIcon className="h-5 w-5" />
             <span>Delete Selected</span>
           </button>
         </div>
       )}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
-          <thead>
-            <tr className="bg-gray-200 dark:bg-gray-700">
+          <thead className="bg-gray-200 dark:bg-gray-700">
+            <tr>
               <th className="p-4 text-left">
                 <input
                   type="checkbox"
@@ -176,7 +179,7 @@ const PostedJobsPage = () => {
             {items.length > 0 ? (
               items.map((job) => (
                 <React.Fragment key={job._id}>
-                  <tr className="border-b dark:border-gray-700">
+                  <tr className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                     <td className="p-4">
                       <input
                         type="checkbox"
@@ -189,24 +192,24 @@ const PostedJobsPage = () => {
                     <td className="p-4 flex justify-center space-x-2">
                       <Link
                         to={`/employer/jobs/${job._id}/applicants`}
-                        className="p-2 bg-blue-600 text-white rounded"
+                        className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
                         title="View Applicants"
                       >
-                        <FaUsers />
+                        <UsersIcon className="h-5 w-5" />
                       </Link>
                       <button
                         onClick={() => navigate(`/employer/post-job/${job._id}`)}
-                        className="p-2 bg-yellow-600 text-white rounded"
+                        className="p-2 bg-yellow-600 text-white rounded-full hover:bg-yellow-700 transition"
                         title="Edit Job"
                       >
-                        <FaEdit />
+                        <PencilIcon className="h-5 w-5" />
                       </button>
                       <button
                         onClick={() => handleDeleteJob(job._id)}
-                        className="p-2 bg-red-600 text-white rounded"
+                        className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition"
                         title="Delete Job"
                       >
-                        <FaTrash />
+                        <TrashIcon className="h-5 w-5" />
                       </button>
                     </td>
                   </tr>
