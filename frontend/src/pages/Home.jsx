@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { LocationMarkerIcon, BriefcaseIcon, SortAscendingIcon, ChevronDownIcon, ChevronUpIcon, TrashIcon } from '@heroicons/react/outline';
 
+const JOBS_PER_PAGE = 6;
 const jobTypes = ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'];
 
 const Home = () => {
@@ -18,6 +19,7 @@ const Home = () => {
   const [location, setLocation] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [jobType, setJobType] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [locationsList, setLocationsList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -152,8 +154,16 @@ const Home = () => {
   }, [jobs, sortOption]);
 
   const currentJobs = useMemo(() => {
-    return sortedJobs.slice(0, 6);
-  }, [sortedJobs]);
+    const indexOfLast = currentPage * JOBS_PER_PAGE;
+    const indexOfFirst = indexOfLast - JOBS_PER_PAGE;
+    return sortedJobs.slice(indexOfFirst, indexOfLast);
+  }, [sortedJobs, currentPage]);
+
+  const totalPages = Math.ceil(sortedJobs.length / JOBS_PER_PAGE);
+
+  const changePage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
 
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
@@ -161,7 +171,7 @@ const Home = () => {
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto overflow-hidden h-screen">
+    <div className="p-4 max-w-6xl mx-auto">
       {error && <p className="text-red-500 text-center mb-4 dark:text-red-400">{error}</p>}
 
       <SearchBar ref={searchBarRef} onSearch={handleSearchSubmit} initialValue={searchTerm} />
@@ -403,6 +413,52 @@ const Home = () => {
             {notification.message}
           </p>
         </div>
+      )}
+
+      {!isLoading && totalPages > 1 && (
+        <>
+          <p className="text-center mb-2 dark:text-gray-100">Page {currentPage} of {totalPages}</p>
+          <div className="flex justify-center mt-6 gap-2">
+            <button
+              onClick={() => changePage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white transition dark:bg-gray-700 dark:border-gray-500 dark:hover:bg-blue-700 dark:text-white"
+              aria-label="Previous page"
+            >
+              ◀ Prev
+            </button>
+            {(() => {
+              const maxPages = 5;
+              let start = Math.max(1, currentPage - Math.floor(maxPages / 2));
+              let end = start + maxPages - 1;
+              if (end > totalPages) {
+                end = totalPages;
+                start = Math.max(1, end - maxPages + 1);
+              }
+              return Array.from({ length: end - start + 1 }, (_, i) => start + i).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => changePage(page)}
+                    className={`px-3 py-1 border rounded ${currentPage === page ? 'bg-blue-600 text-white' : ''
+                      } hover:bg-blue-100 transition dark:bg-gray-700 dark:border-gray-500 dark:hover:bg-blue-700 dark:text-white ${currentPage === page ? 'dark:bg-blue-700' : ''}`}
+                    aria-label={`Go to page ${page}`}
+                  >
+                    {page}
+                  </button>
+                )
+              );
+            })()}
+            <button
+              onClick={() => changePage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-blue-600 hover:text-white transition dark:bg-gray-700 dark:border-gray-500 dark:hover:bg-blue-700 dark:text-white"
+              aria-label="Next page"
+            >
+              Next ▶
+            </button>
+          </div>
+        </>
       )}
     </div>
   );

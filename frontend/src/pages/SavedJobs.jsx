@@ -35,7 +35,7 @@ const SavedJobs = () => {
       }
     };
     fetchSavedJobs();
-  }, [user, navigate]);
+  }, [navigate]);
 
   const handleRemoveJob = (_id, title) => {
     setJobToRemove({ _id, title });
