@@ -23,11 +23,12 @@ router.put('/profile', authenticateToken, ensureDb, isJobSeeker, updateUserProfi
 router.get('/applications', authenticateToken, ensureDb, getUserApplications);
 router.get('/applied-jobs', authenticateToken, ensureDb, getAppliedJobs);
 
-// Saved Jobs
-router.get('/profile/saved-jobs', authenticateToken, ensureDb, isJobSeeker, getSavedJobs);
-router.post('/profile/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, saveJob);
-router.delete('/profile/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, unsaveJob);
+// Saved Jobs - Placed before the dynamic /:id route to ensure correct matching
+router.get('/saved-jobs', authenticateToken, ensureDb, isJobSeeker, getSavedJobs);
+router.post('/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, saveJob);
+router.delete('/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, unsaveJob);
 
+// Dynamic route for fetching a user by ID should be last to avoid conflicts
 router.get('/:id', authenticateToken, ensureDb, getUserById);
 
 module.exports = router;
