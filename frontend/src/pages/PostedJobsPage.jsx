@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { FaEdit, FaTrash, FaTrashAlt, FaUsers } from 'react-icons/fa';
+import { PencilIcon, TrashIcon, UsersIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon } from '@heroicons/react/outline';
 import {
   getEmployerJobs,
   deleteJob,
@@ -16,6 +16,7 @@ const PostedJobsPage = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmMessage, setConfirmMessage] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: 'title', direction: 'ascending' });
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -34,6 +35,30 @@ const PostedJobsPage = () => {
       fetchJobs();
     }
   }, [token, fetchJobs]);
+
+  const sortedJobs = React.useMemo(() => {
+    let sortableJobs = [...jobs];
+    if (sortConfig !== null) {
+      sortableJobs.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableJobs;
+  }, [jobs, sortConfig]);
+
+  const requestSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
 
   const handleDeleteJob = (jobId) => {
     setConfirmMessage('Are you sure you want to delete this job?');
@@ -122,7 +147,7 @@ const PostedJobsPage = () => {
             className="p-2 bg-red-600 text-white rounded flex items-center space-x-2"
             title="Delete All Jobs"
           >
-            <FaTrashAlt />
+            <TrashIcon className="h-5 w-5" />
             <span>Delete All</span>
           </button>
           <button
@@ -131,15 +156,15 @@ const PostedJobsPage = () => {
             disabled={selectedJobs.length === 0}
             title="Delete Selected Jobs"
           >
-            <FaTrash />
+            <TrashIcon className="h-5 w-5" />
             <span>Delete Selected</span>
           </button>
         </div>
       )}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
-          <thead>
-            <tr className="bg-gray-200 dark:bg-gray-700">
+          <thead className="bg-gray-200 dark:bg-gray-700">
+            <tr>
               <th className="p-4 text-left">
                 <input
                   type="checkbox"
@@ -147,16 +172,20 @@ const PostedJobsPage = () => {
                   checked={jobs.length > 0 && selectedJobs.length === jobs.length}
                 />
               </th>
-              <th className="p-4 text-left">Job Title</th>
-              <th className="p-4 text-left">Company</th>
+              <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('title')}>
+                Job Title {sortConfig.key === 'title' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+              </th>
+              <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('company')}>
+                Company {sortConfig.key === 'company' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+              </th>
               <th className="p-4 text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {jobs.length > 0 ? (
-              jobs.map((job) => (
+            {sortedJobs.length > 0 ? (
+              sortedJobs.map((job) => (
                 <React.Fragment key={job._id}>
-                  <tr className="border-b dark:border-gray-700">
+                  <tr className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                     <td className="p-4">
                       <input
                         type="checkbox"
@@ -169,24 +198,24 @@ const PostedJobsPage = () => {
                     <td className="p-4 flex justify-center space-x-2">
                       <Link
                         to={`/employer/jobs/${job._id}/applicants`}
-                        className="p-2 bg-blue-600 text-white rounded"
+                        className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
                         title="View Applicants"
                       >
-                        <FaUsers />
+                        <UsersIcon className="h-5 w-5" />
                       </Link>
                       <button
                         onClick={() => navigate(`/employer/post-job/${job._id}`)}
-                        className="p-2 bg-yellow-600 text-white rounded"
+                        className="p-2 bg-yellow-600 text-white rounded-full hover:bg-yellow-700 transition"
                         title="Edit Job"
                       >
-                        <FaEdit />
+                        <PencilIcon className="h-5 w-5" />
                       </button>
                       <button
                         onClick={() => handleDeleteJob(job._id)}
-                        className="p-2 bg-red-600 text-white rounded"
+                        className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition"
                         title="Delete Job"
                       >
-                        <FaTrash />
+                        <TrashIcon className="h-5 w-5" />
                       </button>
                     </td>
                   </tr>
