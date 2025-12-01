@@ -171,7 +171,7 @@ const Home = () => {
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto overflow-hidden h-screen">
+    <div className="p-4 max-w-6xl mx-auto">
       {error && <p className="text-red-500 text-center mb-4 dark:text-red-400">{error}</p>}
 
       <SearchBar ref={searchBarRef} onSearch={handleSearchSubmit} initialValue={searchTerm} />
