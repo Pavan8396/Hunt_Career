@@ -39,8 +39,23 @@ export const AuthProvider = ({ children }) => {
     setUser(userWithType);
   };
 
+  const employerLogin = (newToken, employerData) => {
+    if (!employerData) {
+      console.error("Login function called with undefined employerData.");
+      return;
+    }
+    const employerWithType = { ...employerData, type: 'employer' };
+    sessionStorage.setItem('token', newToken);
+    sessionStorage.setItem('user', JSON.stringify(employerWithType));
+    sessionStorage.setItem('userType', 'employer');
+    setToken(newToken);
+    setIsAuthenticated(true);
+    setUser(employerWithType);
+    setUserType('employer');
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, token, userType, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, userType, login, logout, updateUser, employerLogin }}>
       {children}
     </AuthContext.Provider>
   );
