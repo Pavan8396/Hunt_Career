@@ -130,7 +130,9 @@ const AppliedJobs = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedApplications.map((app) => (
+              {sortedApplications
+                .filter((app) => app.job) // Add this line to filter out null jobs
+                .map((app) => (
                 <tr key={app._id} className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                   <td className="p-4">{app.job.title}</td>
                   <td className="p-4">{app.job.company}</td>

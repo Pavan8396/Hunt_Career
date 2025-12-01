@@ -13,7 +13,7 @@ const EmployerLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { email, password } = formData;
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { employerLogin: login } = useContext(AuthContext);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });

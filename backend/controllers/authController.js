@@ -31,7 +31,6 @@ const registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const name = `${firstName} ${lastName}`;
 
     const userData = {
       firstName,
@@ -39,7 +38,6 @@ const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       phoneNumber,
-      name,
     };
 
     const insertedUser = await userService.createUser(userData);
@@ -49,7 +47,7 @@ const registerUser = async (req, res) => {
 
     // The missingFields check might still be relevant if the service doesn't guarantee all fields
     // For now, assuming createUser returns the full user or handles its own errors for missing fields post-insert.
-    const requiredFields = ['firstName', 'lastName', 'email', 'password', 'phoneNumber', 'name'];
+    const requiredFields = ['firstName', 'lastName', 'email', 'password', 'phoneNumber'];
     const missingFields = requiredFields.filter(field => !(field in insertedUser));
     if (missingFields.length > 0) {
       // This scenario might indicate a discrepancy between what createUser promises and what it delivers

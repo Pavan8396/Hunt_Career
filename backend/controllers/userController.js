@@ -1,6 +1,55 @@
 const User = require('../models/userModel');
 const userService = require('../services/userService');
 const Application = require('../models/applicationModel');
+const Job = require('../models/jobModel');
+
+const getSavedJobs = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate('savedJobs');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user.savedJobs);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch saved jobs' });
+  }
+};
+
+const saveJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ message: 'Job not found' });
+    }
+    if (!user.savedJobs.includes(jobId)) {
+      user.savedJobs.push(jobId);
+      await user.save();
+    }
+    res.status(200).json({ message: 'Job saved successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to save job' });
+  }
+};
+
+const unsaveJob = async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.savedJobs.pull(jobId);
+    await user.save();
+    res.status(200).json({ message: 'Job unsaved successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to unsave job' });
+  }
+};
 
 const getUserProfile = async (req, res) => {
   try {
@@ -100,4 +149,7 @@ module.exports = {
   getUserById,
   getUserProfile,
   updateUserProfile,
+  getSavedJobs,
+  saveJob,
+  unsaveJob,
 };
