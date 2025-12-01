@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getSavedJobs, removeJob } from '../utils/localStorageHelpers';
+import { getSavedJobs, unsaveJob } from '../services/api';
 import { TrashIcon, ExternalLinkIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon } from '@heroicons/react/outline';
 import { useSortableData } from '../hooks/useSortableData';
+import { AuthContext } from '../context/AuthContext';
 
 const SavedJobs = () => {
   const [savedJobs, setSavedJobs] = useState([]);
@@ -12,20 +13,21 @@ const SavedJobs = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [jobToRemove, setJobToRemove] = useState(null);
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    const fetchSavedJobs = () => {
-      setLoading(true);
-      setError(null);
+    const fetchSavedJobs = async () => {
+      if (!user) {
+        toast.error('You must be logged in to view saved jobs.');
+        navigate('/login');
+        return;
+      }
       try {
-        const jobs = getSavedJobs();
-        console.log('Fetched saved jobs:', jobs); // Debug logging
-        if (!Array.isArray(jobs)) {
-          throw new Error('Saved jobs data is not an array');
-        }
+        setLoading(true);
+        setError(null);
+        const jobs = await getSavedJobs(user.token);
         setSavedJobs(jobs);
       } catch (err) {
-        console.error('Error loading saved jobs:', err.message);
         setError('Failed to load saved jobs. Please try again.');
         toast.error('Failed to load saved jobs. Please try again.');
       } finally {
@@ -33,18 +35,22 @@ const SavedJobs = () => {
       }
     };
     fetchSavedJobs();
-  }, []);
+  }, [user, navigate]);
 
   const handleRemoveJob = (_id, title) => {
     setJobToRemove({ _id, title });
     setShowConfirm(true);
   };
 
-  const handleConfirmRemove = () => {
+  const handleConfirmRemove = async () => {
     if (jobToRemove) {
-      removeJob(jobToRemove._id);
-      setSavedJobs(savedJobs.filter((job) => job._id !== jobToRemove._id));
-      toast.info(`"${jobToRemove.title}" removed from saved jobs!`);
+      try {
+        await unsaveJob(jobToRemove._id, user.token);
+        setSavedJobs(savedJobs.filter((job) => job._id !== jobToRemove._id));
+        toast.info(`"${jobToRemove.title}" removed from saved jobs!`);
+      } catch (error) {
+        toast.error('Failed to remove job.');
+      }
     }
     setShowConfirm(false);
     setJobToRemove(null);

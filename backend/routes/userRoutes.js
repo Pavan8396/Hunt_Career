@@ -6,6 +6,9 @@ const {
   getUserById,
   updateUserProfile,
   getUserProfile,
+  getSavedJobs,
+  saveJob,
+  unsaveJob,
 } = require('../controllers/userController');
 const { authenticateToken, isJobSeeker } = require('../middleware/authMiddleware');
 const { ensureDb } = require('../middleware/dbMiddleware');
@@ -20,5 +23,10 @@ router.put('/profile', authenticateToken, ensureDb, isJobSeeker, updateUserProfi
 router.get('/applications', authenticateToken, ensureDb, getUserApplications);
 router.get('/applied-jobs', authenticateToken, ensureDb, getAppliedJobs);
 router.get('/:id', authenticateToken, ensureDb, getUserById);
+
+// Saved Jobs
+router.get('/saved-jobs', authenticateToken, ensureDb, isJobSeeker, getSavedJobs);
+router.post('/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, saveJob);
+router.delete('/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, unsaveJob);
 
 module.exports = router;

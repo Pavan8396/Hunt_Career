@@ -184,6 +184,62 @@ export const login = async (email, password) => {
   }
 };
 
+export const getSavedJobs = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/saved-jobs`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch saved jobs');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching saved jobs:', error);
+    toast.error('Could not load saved jobs.');
+    throw error;
+  }
+};
+
+export const saveJob = async (jobId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/saved-jobs/${jobId}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save job');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error saving job:', error);
+    toast.error('Could not save job.');
+    throw error;
+  }
+};
+
+export const unsaveJob = async (jobId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/user/saved-jobs/${jobId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to unsave job');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error unsaving job:', error);
+    toast.error('Could not unsave job.');
+    throw error;
+  }
+};
+
 // Admin API calls
 export const getAdminStats = async (token) => {
   try {
