@@ -19,23 +19,23 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
   const userType = user?.type;
 
   const jobSeekerLinks = [
-    { to: '/home', icon: <HomeIcon className="h-5 w-5 mr-3" />, text: 'Home' },
-    { to: '/saved', icon: <BookmarkIcon className="h-5 w-5 mr-3" />, text: 'Saved Jobs' },
-    { to: '/applied', icon: <ClipboardListIcon className="h-5 w-5 mr-3" />, text: 'Applied Jobs' },
-    { to: '/profile', icon: <UserCircleIcon className="h-5 w-5 mr-3" />, text: 'Profile' },
+    { to: '/home', icon: <HomeIcon className="h-5 w-5" />, text: 'Home' },
+    { to: '/saved', icon: <BookmarkIcon className="h-5 w-5" />, text: 'Saved Jobs' },
+    { to: '/applied', icon: <ClipboardListIcon className="h-5 w-5" />, text: 'Applied Jobs' },
+    { to: '/profile', icon: <UserCircleIcon className="h-5 w-5" />, text: 'Profile' },
   ];
 
   const employerLinks = [
-    { to: '/employer/dashboard', icon: <HomeIcon className="h-5 w-5 mr-3" />, text: 'Dashboard' },
-    { to: '/employer/post-job', icon: <PlusCircleIcon className="h-5 w-5 mr-3" />, text: 'Post a Job' },
-    { to: '/employer/posted-jobs', icon: <CollectionIcon className="h-5 w-5 mr-3" />, text: 'Posted Jobs' },
-    { to: '/employer/profile', icon: <OfficeBuildingIcon className="h-5 w-5 mr-3" />, text: 'Company Profile' },
+    { to: '/employer/dashboard', icon: <HomeIcon className="h-5 w-5" />, text: 'Dashboard' },
+    { to: '/employer/post-job', icon: <PlusCircleIcon className="h-5 w-5" />, text: 'Post a Job' },
+    { to: '/employer/posted-jobs', icon: <CollectionIcon className="h-5 w-5" />, text: 'Posted Jobs' },
+    { to: '/employer/profile', icon: <OfficeBuildingIcon className="h-5 w-5" />, text: 'Company Profile' },
   ];
 
   const links = userType === 'employer' ? employerLinks : jobSeekerLinks;
 
   return (
-    <aside className={`bg-gray-800 text-white min-h-screen p-4 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-56'}`}>
+    <aside className={`bg-gray-800 text-white min-h-screen p-4 transition-all duration-300 relative ${isCollapsed ? 'w-20' : 'w-56'}`}>
       <nav>
         <ul>
           {links.map((link, index) => (
@@ -45,10 +45,10 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                 className={({ isActive }) =>
                   `flex items-center p-2 rounded-md transition-colors ${
                     isActive ? 'bg-blue-500 text-white' : 'hover:bg-gray-700'
-                  }`
+                  } ${isCollapsed ? 'justify-center' : ''}`
                 }
               >
-                {link.icon}
+                <div className={`${isCollapsed ? '' : 'mr-3'}`}>{link.icon}</div>
                 {!isCollapsed && <span>{link.text}</span>}
               </NavLink>
             </li>
@@ -60,17 +60,17 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                 className={({ isActive }) =>
                   `flex items-center p-2 rounded-md transition-colors ${
                     isActive ? 'bg-green-500 text-white' : 'hover:bg-gray-700'
-                  }`
+                  } ${isCollapsed ? 'justify-center' : ''}`
                 }
               >
-                <ShieldCheckIcon className="h-5 w-5 mr-3" />
+                <div className={`${isCollapsed ? '' : 'mr-3'}`}><ShieldCheckIcon className="h-5 w-5" /></div>
                 {!isCollapsed && <span>Admin</span>}
               </NavLink>
             </li>
           )}
         </ul>
       </nav>
-      <div className="absolute bottom-4 left-4">
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
         <button onClick={toggleSidebar} className="p-2 rounded-md hover:bg-gray-700 transition-colors">
           {isCollapsed ? <ChevronDoubleRightIcon className="h-5 w-5" /> : <ChevronDoubleLeftIcon className="h-5 w-5" />}
         </button>
