@@ -6,6 +6,7 @@ import { fetchJobs } from '../services/api';
 import SearchBar from '../components/SearchBar';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
+import { LocationMarkerIcon, BriefcaseIcon, SortAscendingIcon, ChevronDownIcon, ChevronUpIcon, TrashIcon } from '@heroicons/react/outline';
 
 const JOBS_PER_PAGE = 6;
 const jobTypes = ['Full-Time', 'Part-Time', 'Contract', 'Internship', 'Freelance'];
@@ -170,7 +171,7 @@ const Home = () => {
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto">
+    <div className="p-4 max-w-6xl mx-auto overflow-hidden h-screen">
       {error && <p className="text-red-500 text-center mb-4 dark:text-red-400">{error}</p>}
 
       <SearchBar ref={searchBarRef} onSearch={handleSearchSubmit} initialValue={searchTerm} />
@@ -183,8 +184,9 @@ const Home = () => {
               className="px-4 py-2 border rounded flex items-center gap-2 hover:bg-gray-100 transition dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-200"
               aria-label="Toggle location filter dropdown"
             >
+              <LocationMarkerIcon className="h-5 w-5" />
               Location
-              <span>{showLocationDropdown ? '▲' : '▼'}</span>
+              {showLocationDropdown ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
             </button>
             {showLocationDropdown && (
               <div className="absolute bg-white shadow-md border rounded mt-2 w-56 z-10 dark:bg-gray-800 dark:border-gray-700">
@@ -227,9 +229,10 @@ const Home = () => {
                 <div className="p-2 border-t text-right dark:border-gray-700">
                   <button
                     onClick={() => setLocation([])}
-                    className="text-sm text-red-600 hover:underline dark:text-red-400"
+                    className="text-sm text-red-600 hover:underline dark:text-red-400 flex items-center"
                     aria-label="Clear all location filters"
                   >
+                    <TrashIcon className="h-4 w-4 mr-1" />
                     Clear All
                   </button>
                 </div>
@@ -243,8 +246,9 @@ const Home = () => {
               className="px-4 py-2 border rounded flex items-center gap-2 hover:bg-gray-100 transition dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-200"
               aria-label="Toggle job type filter dropdown"
             >
+              <BriefcaseIcon className="h-5 w-5" />
               Job Type
-              <span>{showJobTypeDropdown ? '▲' : '▼'}</span>
+              {showJobTypeDropdown ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
             </button>
             {showJobTypeDropdown && (
               <div className="absolute bg-white shadow-md border rounded mt-2 w-56 z-10 dark:bg-gray-800 dark:border-gray-700">
@@ -283,9 +287,10 @@ const Home = () => {
                 <div className="p-2 border-t text-right dark:border-gray-700">
                   <button
                     onClick={() => setJobType([])}
-                    className="text-sm text-red-600 hover:underline dark:text-red-400"
+                    className="text-sm text-red-600 hover:underline dark:text-red-400 flex items-center"
                     aria-label="Clear all job type filters"
                   >
+                    <TrashIcon className="h-4 w-4 mr-1" />
                     Clear All
                   </button>
                 </div>
@@ -294,10 +299,11 @@ const Home = () => {
           </div>
 
           <div className="relative">
+            <SortAscendingIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="px-4 py-2 border rounded hover:bg-gray-100 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600"
+              className="pl-10 pr-4 py-2 border rounded hover:bg-gray-100 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600"
               aria-label="Sort jobs"
             >
               <option value="default">Sort By: Default</option>

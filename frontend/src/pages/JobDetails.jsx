@@ -12,7 +12,7 @@ import ReviewForm from '../components/ReviewForm';
 import ReviewList from '../components/ReviewList';
 import ReactMarkdown from 'react-markdown';
 import { toast } from 'react-toastify';
-import { FaBriefcase, FaMapMarkerAlt } from 'react-icons/fa';
+import { BriefcaseIcon, LocationMarkerIcon, BookmarkIcon, ArrowCircleRightIcon, ChatIcon } from '@heroicons/react/outline';
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -232,10 +232,10 @@ const JobDetails = () => {
           <p className="text-gray-200 mt-2">{job.company}</p>
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-200">
             <span className="flex items-center gap-1">
-              <FaBriefcase className="text-gray-200" /> {job.job_type}
+              <BriefcaseIcon className="h-5 w-5" /> {job.job_type}
             </span>
             <span className="flex items-center gap-1">
-              <FaMapMarkerAlt className="text-gray-200" />{' '}
+              <LocationMarkerIcon className="h-5 w-5" />{' '}
               {job.candidate_required_location}
             </span>
           </div>
@@ -245,33 +245,36 @@ const JobDetails = () => {
           <button
             type="button"
             onClick={toggleSave}
-            className={`text-sm px-3 py-1 border rounded transition ${
+            className={`p-2 rounded-full transition ${
               saved
-                ? 'bg-red-100 text-red-600 border-red-300 hover:bg-red-200 dark:bg-red-800 dark:text-white dark:border-gray-500 dark:hover:bg-red-700'
-                : 'bg-green-100 text-green-600 border-green-300 hover:bg-green-200 dark:bg-green-800 dark:text-white dark:border-gray-500 dark:hover:bg-green-700'
+                ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                : 'bg-green-100 text-green-600 hover:bg-green-200'
             }`}
             aria-label={saved ? 'Unsave job' : 'Save job'}
+            title={saved ? 'Unsave job' : 'Save job'}
           >
-            {saved ? 'Unsave' : 'Save'}
+            <BookmarkIcon className="h-5 w-5" />
           </button>
 
           {hasApplied ? (
             <button
               type="button"
               onClick={handleMessageRecruiter}
-              className="inline-block text-sm text-center px-4 py-2 bg-green-600 text-white border border-green-600 rounded hover:bg-green-700 transition dark:bg-green-800 dark:border-gray-500 dark:hover:bg-green-700 dark:text-white"
+              className="p-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
               data-chat-opener="true"
+              title="Message Recruiter"
             >
-              Message Recruiter
+              <ChatIcon className="h-5 w-5" />
             </button>
           ) : (
             <button
               type="button"
               onClick={handleApply}
-              className="inline-block text-sm text-center px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded hover:bg-blue-700 transition dark:bg-blue-800 dark:border-gray-500 dark:hover:bg-blue-700 dark:text-white"
+              className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
               aria-label="Apply for this job"
+              title="Apply"
             >
-              Apply
+              <ArrowCircleRightIcon className="h-5 w-5" />
             </button>
           )}
         </div>
