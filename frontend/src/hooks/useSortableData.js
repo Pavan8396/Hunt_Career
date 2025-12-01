@@ -7,12 +7,10 @@ export const useSortableData = (items, config = null) => {
     let sortableItems = [...items];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const aValue = sortConfig.key.split('.').reduce((o, i) => o[i], a);
-        const bValue = sortConfig.key.split('.').reduce((o, i) => o[i], b);
-        if (aValue < bValue) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sort_Config.direction === 'ascending' ? -1 : 1;
         }
-        if (aValue > bValue) {
+        if (a[sortConfig.key] > b[sortConfig.key]) {
           return sortConfig.direction === 'ascending' ? 1 : -1;
         }
         return 0;
