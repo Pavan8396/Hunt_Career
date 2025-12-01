@@ -22,11 +22,12 @@ router.put('/profile/:id', authenticateToken, ensureDb, updateUserProfile);
 router.put('/profile', authenticateToken, ensureDb, isJobSeeker, updateUserProfile);
 router.get('/applications', authenticateToken, ensureDb, getUserApplications);
 router.get('/applied-jobs', authenticateToken, ensureDb, getAppliedJobs);
-router.get('/:id', authenticateToken, ensureDb, getUserById);
 
 // Saved Jobs
 router.get('/saved-jobs', authenticateToken, ensureDb, isJobSeeker, getSavedJobs);
 router.post('/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, saveJob);
 router.delete('/saved-jobs/:jobId', authenticateToken, ensureDb, isJobSeeker, unsaveJob);
+
+router.get('/:id', authenticateToken, ensureDb, getUserById);
 
 module.exports = router;
