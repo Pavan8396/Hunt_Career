@@ -121,7 +121,7 @@ export const getRecentActivity = async (token) => {
 
 export const getAppliedJobs = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/applied-jobs`, {
+    const response = await fetch(`${API_URL}/users/applied-jobs`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -186,7 +186,7 @@ export const login = async (email, password) => {
 
 export const getSavedJobs = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/profile/saved-jobs`, {
+    const response = await fetch(`${API_URL}/users/profile/saved-jobs`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -204,7 +204,7 @@ export const getSavedJobs = async (token) => {
 
 export const saveJob = async (jobId, token) => {
   try {
-    const response = await fetch(`${API_URL}/user/profile/saved-jobs/${jobId}`, {
+    const response = await fetch(`${API_URL}/users/profile/saved-jobs/${jobId}`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -223,7 +223,7 @@ export const saveJob = async (jobId, token) => {
 
 export const unsaveJob = async (jobId, token) => {
   try {
-    const response = await fetch(`${API_URL}/user/profile/saved-jobs/${jobId}`, {
+    const response = await fetch(`${API_URL}/users/profile/saved-jobs/${jobId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -457,7 +457,7 @@ export const getReviewsForEmployer = async (employerId) => {
 
 export const getUserProfile = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/profile`, {
+    const response = await fetch(`${API_URL}/users/profile`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -475,7 +475,7 @@ export const getUserProfile = async (token) => {
 
 export const updateUserProfile = async (profileData, token, userId = null) => {
   try {
-    const url = userId ? `${API_URL}/user/profile/${userId}` : `${API_URL}/user/profile`;
+    const url = userId ? `${API_URL}/users/profile/${userId}` : `${API_URL}/users/profile`;
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -617,7 +617,7 @@ export const updateJob = async (jobId, jobData, token) => {
 
 export const getUserDetails = async (userId, token) => {
   try {
-    const response = await fetch(`${API_URL}/user/${userId}`, {
+    const response = await fetch(`${API_URL}/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -895,7 +895,7 @@ export const applyForJob = async (jobId, token) => {
 
 export const getUserApplications = async (token) => {
   try {
-    const response = await fetch(`${API_URL}/user/applications`, {
+    const response = await fetch(`${API_URL}/users/applications`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

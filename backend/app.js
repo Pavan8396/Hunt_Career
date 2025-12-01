@@ -45,7 +45,7 @@ app.use(express.json());
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
-app.use('/api/user', userRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/employers', employerRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/admin', adminRoutes);
