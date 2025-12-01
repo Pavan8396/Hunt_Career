@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
-import { saveJob, removeJob, isJobSaved } from '../utils/localStorageHelpers';
+import { saveJob, unsaveJob } from '../services/api';
+import { AuthContext } from '../context/AuthContext';
+import { getSavedJobs } from '../services/api';
 
 const JobCard = ({
   _id,
@@ -17,39 +19,51 @@ const JobCard = ({
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
 
   useEffect(() => {
-    setSaved(isJobSaved(_id));
-  }, [_id]);
+    const checkSaved = async () => {
+      if (token) {
+        const savedJobs = await getSavedJobs(token);
+        setSaved(savedJobs.some((job) => job._id === _id));
+      }
+    };
+    checkSaved();
+  }, [_id, token]);
 
   const handleSaveClick = (e) => {
     e.stopPropagation();
+    if (!token) {
+      toast.error('You must be logged in to save jobs.');
+      navigate('/login');
+      return;
+    }
     setConfirmAction(saved ? 'unsave' : 'save');
     setShowConfirm(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (confirmAction === 'save') {
-      saveJob({
-        _id,
-        title,
-        company,
-        job_type,
-        candidate_required_location,
-        description,
-      });
-      setSaved(true);
-      setNotification({ message: `Job "${title}" saved!`, type: 'success' });
-      toast.success(`Job "${title}" saved!`);
+      try {
+        await saveJob(_id, token);
+        setSaved(true);
+        setNotification({ message: `Job "${title}" saved!`, type: 'success' });
+        toast.success(`Job "${title}" saved!`);
+      } catch (error) {
+        toast.error('Failed to save job.');
+      }
     } else if (confirmAction === 'unsave') {
-      removeJob(_id);
-      setSaved(false);
-      setNotification({ message: `Job "${title}" unsaved!`, type: 'info' });
-      toast.info(`Job "${title}" unsaved!`);
+      try {
+        await unsaveJob(_id, token);
+        setSaved(false);
+        setNotification({ message: `Job "${title}" unsaved!`, type: 'info' });
+        toast.info(`Job "${title}" unsaved!`);
+      } catch (error) {
+        toast.error('Failed to unsave job.');
+      }
     }
     setShowConfirm(false);
     setConfirmAction(null);
-    // Auto-hide notification after 3 seconds
     setTimeout(() => setNotification({ message: '', type: '' }), 3000);
   };
 
@@ -117,7 +131,6 @@ const JobCard = ({
         </div>
       </div>
 
-      {/* Notification below the job card */}
       {notification.message && (
         <div className="mt-2 text-center">
           <p
@@ -132,7 +145,6 @@ const JobCard = ({
         </div>
       )}
 
-      {/* Custom Confirmation Dialog */}
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
