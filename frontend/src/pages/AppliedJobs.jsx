@@ -65,10 +65,12 @@ const AppliedJobs = () => {
     let sortableApplications = [...applications];
     if (sortConfig !== null) {
       sortableApplications.sort((a, b) => {
-        if (a.job[sortConfig.key] < b.job[sortConfig.key]) {
+        const aValue = sortConfig.key === 'date' || sortConfig.key === 'status' ? a[sortConfig.key] : a.job[sortConfig.key];
+        const bValue = sortConfig.key === 'date' || sortConfig.key === 'status' ? b[sortConfig.key] : b.job[sortConfig.key];
+        if (aValue < bValue) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
-        if (a.job[sortConfig.key] > b.job[sortConfig.key]) {
+        if (aValue > bValue) {
           return sortConfig.direction === 'ascending' ? 1 : -1;
         }
         return 0;

@@ -1,8 +1,8 @@
 export const saveJob = (job) => {
   const savedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
-  if (!savedJobs.some((savedJob) => savedJob.id === job.id)) {
+  if (!savedJobs.some((savedJob) => savedJob._id === job._id)) {
     savedJobs.push({
-      id: job.id,
+      _id: job._id,
       title: job.title,
       company: job.company,
       job_type: job.job_type,
@@ -15,7 +15,7 @@ export const saveJob = (job) => {
 
 export const removeJob = (jobId) => {
   const savedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
-  const updatedJobs = savedJobs.filter((job) => job.id !== jobId);
+  const updatedJobs = savedJobs.filter((job) => job._id !== jobId);
   localStorage.setItem('savedJobs', JSON.stringify(updatedJobs));
 };
 
@@ -25,5 +25,5 @@ export const getSavedJobs = () => {
 
 export const isJobSaved = (jobId) => {
   const savedJobs = JSON.parse(localStorage.getItem('savedJobs')) || [];
-  return savedJobs.some((job) => job.id === jobId);
+  return savedJobs.some((job) => job._id === jobId);
 };

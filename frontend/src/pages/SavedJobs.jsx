@@ -35,15 +35,15 @@ const SavedJobs = () => {
     fetchSavedJobs();
   }, []);
 
-  const handleRemoveJob = (id, title) => {
-    setJobToRemove({ id, title });
+  const handleRemoveJob = (_id, title) => {
+    setJobToRemove({ _id, title });
     setShowConfirm(true);
   };
 
   const handleConfirmRemove = () => {
     if (jobToRemove) {
-      removeJob(jobToRemove.id);
-      setSavedJobs(savedJobs.filter((job) => job.id !== jobToRemove.id));
+      removeJob(jobToRemove._id);
+      setSavedJobs(savedJobs.filter((job) => job._id !== jobToRemove._id));
       toast.info(`"${jobToRemove.title}" removed from saved jobs!`);
     }
     setShowConfirm(false);
@@ -144,10 +144,10 @@ const SavedJobs = () => {
             </thead>
             <tbody>
               {sortedJobs.map((job) => (
-                <tr key={job.id} className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
-                  <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job.id)}>{job.title}</td>
-                  <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job.id)}>{job.company}</td>
-                  <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job.id)}>{job.job_type}</td>
+                <tr key={job._id} className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job._id)}>{job.title}</td>
+                  <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job._id)}>{job.company}</td>
+                  <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job._id)}>{job.job_type}</td>
                   <td className="p-4 text-center">
                     <div className="flex justify-center gap-2">
                       {job.apply_url && (
@@ -166,7 +166,7 @@ const SavedJobs = () => {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleRemoveJob(job.id, job.title);
+                          handleRemoveJob(job._id, job.title);
                         }}
                         className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition"
                         aria-label={`Remove ${job.title} from saved jobs`}
