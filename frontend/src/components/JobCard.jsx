@@ -19,21 +19,21 @@ const JobCard = ({
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
 
   useEffect(() => {
     const checkSaved = async () => {
-      if (user) {
-        const savedJobs = await getSavedJobs(user.token);
+      if (token) {
+        const savedJobs = await getSavedJobs(token);
         setSaved(savedJobs.some((job) => job._id === _id));
       }
     };
     checkSaved();
-  }, [_id, user]);
+  }, [_id, token]);
 
   const handleSaveClick = (e) => {
     e.stopPropagation();
-    if (!user) {
+    if (!token) {
       toast.error('You must be logged in to save jobs.');
       navigate('/login');
       return;
@@ -45,7 +45,7 @@ const JobCard = ({
   const handleConfirm = async () => {
     if (confirmAction === 'save') {
       try {
-        await saveJob(_id, user.token);
+        await saveJob(_id, token);
         setSaved(true);
         setNotification({ message: `Job "${title}" saved!`, type: 'success' });
         toast.success(`Job "${title}" saved!`);
@@ -54,7 +54,7 @@ const JobCard = ({
       }
     } else if (confirmAction === 'unsave') {
       try {
-        await unsaveJob(_id, user.token);
+        await unsaveJob(_id, token);
         setSaved(false);
         setNotification({ message: `Job "${title}" unsaved!`, type: 'info' });
         toast.info(`Job "${title}" unsaved!`);
