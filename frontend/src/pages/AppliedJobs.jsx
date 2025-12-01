@@ -6,6 +6,7 @@ import { ChatContext } from '../context/ChatContext';
 import { getUserApplications } from '../services/api';
 import SkeletonCard from '../components/SkeletonCard';
 import { ChatIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon } from '@heroicons/react/outline';
+import { useSortableData } from '../hooks/useSortableData';
 
 const AppliedJobs = () => {
   const [applications, setApplications] = useState([]);
@@ -61,31 +62,7 @@ const AppliedJobs = () => {
     openChatForApplication(application._id, recipientName, application.job.title);
   };
 
-  const sortedApplications = React.useMemo(() => {
-    let sortableApplications = [...applications];
-    if (sortConfig !== null) {
-      sortableApplications.sort((a, b) => {
-        const aValue = sortConfig.key === 'date' || sortConfig.key === 'status' ? a[sortConfig.key] : a.job[sortConfig.key];
-        const bValue = sortConfig.key === 'date' || sortConfig.key === 'status' ? b[sortConfig.key] : b.job[sortConfig.key];
-        if (aValue < bValue) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableApplications;
-  }, [applications, sortConfig]);
-
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
+  const { items: sortedApplications, requestSort, sortConfig } = useSortableData(applications, { key: 'date', direction: 'descending' });
 
   if (loading) {
     return (
@@ -138,11 +115,11 @@ const AppliedJobs = () => {
           <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
             <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
-                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('title')}>
-                  Job Title {sortConfig.key === 'title' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('job.title')}>
+                  Job Title {sortConfig.key === 'job.title' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
                 </th>
-                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('company')}>
-                  Company {sortConfig.key === 'company' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('job.company')}>
+                  Company {sortConfig.key === 'job.company' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
                 </th>
                 <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('date')}>
                   Applied Date {sortConfig.key === 'date' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}

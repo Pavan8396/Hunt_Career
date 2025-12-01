@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getSavedJobs, removeJob } from '../utils/localStorageHelpers';
 import { TrashIcon, ExternalLinkIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon } from '@heroicons/react/outline';
+import { useSortableData } from '../hooks/useSortableData';
 
 const SavedJobs = () => {
   const [savedJobs, setSavedJobs] = useState([]);
@@ -59,29 +60,7 @@ const SavedJobs = () => {
     navigate(`/jobs/${id}`);
   };
 
-  const sortedJobs = React.useMemo(() => {
-    let sortableJobs = [...savedJobs];
-    if (sortConfig !== null) {
-      sortableJobs.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableJobs;
-  }, [savedJobs, sortConfig]);
-
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
+  const { items: sortedJobs, requestSort, sortConfig } = useSortableData(savedJobs, { key: 'title', direction: 'ascending' });
 
   if (loading) {
     return (

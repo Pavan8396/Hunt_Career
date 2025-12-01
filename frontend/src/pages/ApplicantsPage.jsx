@@ -4,6 +4,7 @@ import { getApplicationsForJob, updateApplicationStatus, fetchJobById } from '..
 import { toast } from 'react-toastify';
 import { ChatContext } from '../context/ChatContext';
 import { SortAscendingIcon, SortDescendingIcon, SelectorIcon, FilterIcon, SearchIcon, ChatIcon } from '@heroicons/react/outline';
+import { useSortableData } from '../hooks/useSortableData';
 
 const ApplicantsPage = () => {
   const [applications, setApplications] = useState([]);
@@ -11,7 +12,6 @@ const ApplicantsPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'descending' });
   const { jobId } = useParams();
   const { openChatForApplication } = useContext(ChatContext);
   const location = useLocation();
@@ -52,45 +52,17 @@ const ApplicantsPage = () => {
     fetchApplications();
   }, [fetchApplications, jobId]);
 
+  const { items: sortedApplications, requestSort, sortConfig } = useSortableData(applications, { key: 'date', direction: 'descending' });
+
   const sortedAndFilteredApplications = React.useMemo(() => {
-    let filteredApps = applications.filter(app => {
+    return sortedApplications.filter(app => {
       const applicantName = `${app.applicant.firstName} ${app.applicant.lastName}`.toLowerCase();
       return (
         (applicantName.includes(search.toLowerCase())) &&
         (statusFilter === '' || app.status === statusFilter)
       );
     });
-
-    if (sortConfig.key !== null) {
-      filteredApps.sort((a, b) => {
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
-
-        if (sortConfig.key === 'name') {
-          aValue = `${a.applicant.firstName} ${a.applicant.lastName}`;
-          bValue = `${b.applicant.firstName} ${b.applicant.lastName}`;
-        }
-
-        if (aValue < bValue) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-
-    return filteredApps;
-  }, [applications, search, statusFilter, sortConfig]);
-
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
+  }, [sortedApplications, search, statusFilter]);
 
   const handleStatusChange = async (applicationId, newStatus) => {
     try {
@@ -143,8 +115,8 @@ const ApplicantsPage = () => {
         <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
           <thead className="bg-gray-200 dark:bg-gray-700">
             <tr>
-              <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('name')}>
-                Applicant Name {sortConfig.key === 'name' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+              <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('applicant.firstName')}>
+                Applicant Name {sortConfig.key === 'applicant.firstName' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
               </th>
               <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('date')}>
                 Applied Date {sortConfig.key === 'date' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}

@@ -9,6 +9,7 @@ import {
   deleteMultipleJobs,
 } from '../services/api';
 import { toast } from 'react-toastify';
+import { useSortableData } from '../hooks/useSortableData';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -36,29 +37,7 @@ const PostedJobsPage = () => {
     }
   }, [token, fetchJobs]);
 
-  const sortedJobs = React.useMemo(() => {
-    let sortableJobs = [...jobs];
-    if (sortConfig !== null) {
-      sortableJobs.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableJobs;
-  }, [jobs, sortConfig]);
-
-  const requestSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
+  const { items: sortedJobs, requestSort, sortConfig } = useSortableData(jobs, { key: 'title', direction: 'ascending' });
 
   const handleDeleteJob = (jobId) => {
     setConfirmMessage('Are you sure you want to delete this job?');
