@@ -6,6 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 import { toast } from 'react-toastify';
 import Dropdown from './common/Dropdown';
+import logo from '../assets/logo.svg';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -88,7 +89,7 @@ const Navbar = () => {
       <div className="relative" ref={notificationRef}>
         <button
           onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-          className="relative text-white hover:text-gray-200 focus:outline-none"
+          className="relative text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none"
           aria-label="Notifications"
         >
           <BellIcon className="h-6 w-6" />
@@ -129,8 +130,8 @@ const Navbar = () => {
       </div>
       <Dropdown
         trigger={
-          <button className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 p-2 rounded-full focus:outline-none transition">
-            <span className="w-8 h-8 bg-blue-200 text-blue-800 flex items-center justify-center rounded-full">
+          <button className="flex items-center space-x-2 focus:outline-none">
+            <span className="w-10 h-10 bg-blue-200 text-blue-800 flex items-center justify-center rounded-full font-bold">
               {userInitials}
             </span>
           </button>
@@ -254,20 +255,23 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="bg-blue-600 text-white p-4 shadow-md dark:bg-gray-800">
-      <div className="container mx-auto flex justify-between items-center">
+    <nav className="bg-white dark:bg-gray-800 shadow-md">
+      <div className="container mx-auto flex justify-between items-center p-4">
         <Link
           to={
             isAuthenticated && userType === 'employer'
               ? '/employer/dashboard'
               : '/'
           }
-          className="text-xl font-bold hover:text-gray-200 transition"
+          className="flex items-center space-x-2"
         >
-          Hunt-Career
+          <img src={logo} alt="Hunt-Career-Logo" className="h-8 w-8" />
+          <span className="text-xl font-bold text-gray-800 dark:text-white">
+            Hunt-Career
+          </span>
         </Link>
         <button
-          className="md:hidden text-white focus:outline-none"
+          className="md:hidden text-gray-800 dark:text-white focus:outline-none"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
         >
@@ -283,10 +287,10 @@ const Navbar = () => {
           ) : (
             !hideAuthLinksPaths.includes(location.pathname) && (
               <>
-                <Link to="/login" className="hover:text-gray-200 transition">
+                <Link to="/login" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
                   Login
                 </Link>
-                <Link to="/signup" className="hover:text-gray-200 transition">
+                <Link to="/signup" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
                   Signup
                 </Link>
               </>
