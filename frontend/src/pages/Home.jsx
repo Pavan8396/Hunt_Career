@@ -171,30 +171,31 @@ const Home = () => {
   };
 
   return (
-    <div className="p-4 max-w-6xl mx-auto">
+    <div className="p-4 max-w-7xl mx-auto">
       {error && <p className="text-red-500 text-center mb-4 dark:text-red-400">{error}</p>}
 
-      <SearchBar ref={searchBarRef} onSearch={handleSearchSubmit} initialValue={searchTerm} />
-
-      <div className="flex items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-4">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-6">
+        <SearchBar ref={searchBarRef} onSearch={handleSearchSubmit} initialValue={searchTerm} />
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative" ref={locationRef}>
             <button
               onClick={() => setShowLocationDropdown((prev) => !prev)}
-              className="px-4 py-2 border rounded flex items-center gap-2 hover:bg-gray-100 transition dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-200"
+              className="w-full px-4 py-2 border rounded-md flex items-center justify-between gap-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 transition dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-200"
               aria-label="Toggle location filter dropdown"
             >
-              <LocationMarkerIcon className="h-5 w-5" />
-              Location
+              <span className="flex items-center">
+                <LocationMarkerIcon className="h-5 w-5 mr-2" />
+                Location
+              </span>
               {showLocationDropdown ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
             </button>
             {showLocationDropdown && (
-              <div className="absolute bg-white shadow-md border rounded mt-2 w-56 z-10 dark:bg-gray-800 dark:border-gray-700">
+              <div className="absolute bg-white shadow-lg border rounded-md mt-2 w-full z-10 dark:bg-gray-800 dark:border-gray-700">
                 <div className="p-2 border-b dark:border-gray-700">
                   <input
                     type="text"
                     placeholder="Search location..."
-                    className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                    className="w-full px-2 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:ring-2 focus:ring-blue-500"
                     value={locationSearch}
                     onChange={(e) => setLocationSearch(e.target.value)}
                     aria-label="Search locations"
@@ -202,10 +203,10 @@ const Home = () => {
                 </div>
                 <div className="p-2 max-h-60 overflow-y-auto">
                   {filteredLocations.length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400">No locations found</p>
+                    <p className="text-center text-gray-500 dark:text-gray-400 p-4">No locations found</p>
                   ) : (
                     filteredLocations.map((loc) => (
-                      <label key={loc} className="block text-gray-900 dark:text-gray-200">
+                      <label key={loc} className="flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 cursor-pointer">
                         <input
                           type="checkbox"
                           value={loc}
@@ -218,7 +219,7 @@ const Home = () => {
                                 : [...prev, value]
                             );
                           }}
-                          className="mr-2"
+                          className="mr-3 h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
                           aria-label={`Select location ${loc}`}
                         />
                         {loc}
@@ -226,14 +227,14 @@ const Home = () => {
                     ))
                   )}
                 </div>
-                <div className="p-2 border-t text-right dark:border-gray-700">
+                <div className="p-2 border-t flex justify-end dark:border-gray-700">
                   <button
                     onClick={() => setLocation([])}
-                    className="text-sm text-red-600 hover:underline dark:text-red-400 flex items-center"
+                    className="text-sm text-red-600 hover:underline dark:text-red-400 flex items-center transition-colors"
                     aria-label="Clear all location filters"
                   >
                     <TrashIcon className="h-4 w-4 mr-1" />
-                    Clear All
+                    Clear
                   </button>
                 </div>
               </div>
@@ -243,20 +244,22 @@ const Home = () => {
           <div className="relative" ref={jobTypeRef}>
             <button
               onClick={() => setShowJobTypeDropdown((prev) => !prev)}
-              className="px-4 py-2 border rounded flex items-center gap-2 hover:bg-gray-100 transition dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-200"
+              className="w-full px-4 py-2 border rounded-md flex items-center justify-between gap-2 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 transition dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-200"
               aria-label="Toggle job type filter dropdown"
             >
-              <BriefcaseIcon className="h-5 w-5" />
-              Job Type
+              <span className="flex items-center">
+                <BriefcaseIcon className="h-5 w-5 mr-2" />
+                Job Type
+              </span>
               {showJobTypeDropdown ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
             </button>
             {showJobTypeDropdown && (
-              <div className="absolute bg-white shadow-md border rounded mt-2 w-56 z-10 dark:bg-gray-800 dark:border-gray-700">
+              <div className="absolute bg-white shadow-lg border rounded-md mt-2 w-full z-10 dark:bg-gray-800 dark:border-gray-700">
                 <div className="p-2 border-b dark:border-gray-700">
                   <input
                     type="text"
                     placeholder="Search job type..."
-                    className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+                    className="w-full px-2 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 focus:ring-2 focus:ring-blue-500"
                     value={jobTypeSearch}
                     onChange={(e) => setJobTypeSearch(e.target.value)}
                     aria-label="Search job types"
@@ -264,7 +267,7 @@ const Home = () => {
                 </div>
                 <div className="p-2 max-h-60 overflow-y-auto">
                   {filteredJobTypes.map((type) => (
-                    <label key={type} className="block text-gray-900 dark:text-gray-200">
+                    <label key={type} className="flex items-center p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-gray-200 cursor-pointer">
                       <input
                         type="checkbox"
                         value={type}
@@ -277,21 +280,21 @@ const Home = () => {
                               : [...prev, value]
                           );
                         }}
-                        className="mr-2"
+                        className="mr-3 h-4 w-4 rounded text-blue-600 focus:ring-blue-500"
                         aria-label={`Select job type ${type}`}
                       />
                       {type}
                     </label>
                   ))}
                 </div>
-                <div className="p-2 border-t text-right dark:border-gray-700">
+                <div className="p-2 border-t flex justify-end dark:border-gray-700">
                   <button
                     onClick={() => setJobType([])}
-                    className="text-sm text-red-600 hover:underline dark:text-red-400 flex items-center"
+                    className="text-sm text-red-600 hover:underline dark:text-red-400 flex items-center transition-colors"
                     aria-label="Clear all job type filters"
                   >
                     <TrashIcon className="h-4 w-4 mr-1" />
-                    Clear All
+                    Clear
                   </button>
                 </div>
               </div>
@@ -299,11 +302,11 @@ const Home = () => {
           </div>
 
           <div className="relative">
-            <SortAscendingIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <SortAscendingIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="pl-10 pr-4 py-2 border rounded hover:bg-gray-100 transition dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600"
+              className="w-full pl-10 pr-4 py-2 border rounded-md appearance-none bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 transition dark:hover:bg-gray-600 dark:border-gray-600 dark:text-gray-200 focus:ring-2 focus:ring-blue-500"
               aria-label="Sort jobs"
             >
               <option value="default">Sort By: Default</option>
@@ -316,10 +319,11 @@ const Home = () => {
       </div>
 
       {(searchTerm || location.length > 0 || jobType.length > 0) && (
-        <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          <span className="text-gray-600 dark:text-gray-400 font-semibold">Active Filters:</span>
           {searchTerm && (
-            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full flex items-center gap-2 dark:bg-blue-900 dark:text-blue-300">
-              🔍 {searchTerm}
+            <span className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full flex items-center gap-2 dark:bg-gray-700 dark:text-gray-300">
+              {searchTerm}
               <button
                 onClick={() => {
                   setSearchTerm('');
@@ -331,45 +335,45 @@ const Home = () => {
                 className="font-bold hover:text-red-500 dark:hover:text-red-400"
                 aria-label="Clear search term filter"
               >
-                ×
+                &times;
               </button>
             </span>
           )}
-          {location.length > 0 && (
-            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full flex items-center gap-2 dark:bg-green-900 dark:text-green-300">
-              📍 {getDisplayText(location)}
+          {location.map(loc => (
+            <span key={loc} className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full flex items-center gap-2 dark:bg-gray-700 dark:text-gray-300">
+              {loc}
               <button
-                onClick={() => setLocation([])}
+                onClick={() => setLocation(prev => prev.filter(item => item !== loc))}
                 className="font-bold hover:text-red-500 dark:hover:text-red-400"
-                aria-label="Clear all location filters"
+                aria-label={`Remove location filter: ${loc}`}
               >
-                ×
+                &times;
               </button>
             </span>
-          )}
-          {jobType.length > 0 && (
-            <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full flex items-center gap-2 dark:bg-purple-900 dark:text-purple-300">
-              🧾 {getDisplayText(jobType)}
+          ))}
+          {jobType.map(type => (
+            <span key={type} className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full flex items-center gap-2 dark:bg-gray-700 dark:text-gray-300">
+              {type}
               <button
-                onClick={() => setJobType([])}
+                onClick={() => setJobType(prev => prev.filter(item => item !== type))}
                 className="font-bold hover:text-red-500 dark:hover:text-red-400"
-                aria-label="Clear all job type filters"
+                aria-label={`Remove job type filter: ${type}`}
               >
-                ×
+                &times;
               </button>
             </span>
-          )}
+          ))}
           <button
             onClick={clearFilters}
-            className="text-sm text-red-600 border border-red-600 px-3 py-1 rounded hover:bg-red-600 hover:text-white transition dark:border-red-500 dark:text-red-500 dark:hover:bg-red-600 dark:hover:text-white"
+            className="text-sm text-red-600 hover:underline dark:text-red-400 transition-colors"
             aria-label="Clear all filters"
           >
-            Clear All Filters
+            Clear All
           </button>
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading && (
           <>
             {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
