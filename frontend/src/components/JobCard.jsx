@@ -99,7 +99,7 @@ const JobCard = ({
               <BriefcaseIcon className="w-6 h-6 text-gray-500 dark:text-gray-400" />
             </div>
           </div>
-          <div className="ml-4 flex-1">
+          <div className="ml-4 flex-1 pr-8">
             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-200 line-clamp-2">
               {title}
             </h3>
