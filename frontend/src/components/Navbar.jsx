@@ -89,7 +89,7 @@ const Navbar = () => {
       <div className="relative" ref={notificationRef}>
         <button
           onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-          className="relative text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none"
+          className="relative text-white hover:text-gray-200 focus:outline-none"
           aria-label="Notifications"
         >
           <BellIcon className="h-6 w-6" />
@@ -255,23 +255,21 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md">
-      <div className="container mx-auto flex justify-between items-center p-4">
+    <nav className="bg-blue-600 text-white p-4 shadow-md dark:bg-gray-800">
+      <div className="container mx-auto flex justify-between items-center">
         <Link
           to={
             isAuthenticated && userType === 'employer'
               ? '/employer/dashboard'
               : '/'
           }
-          className="flex items-center space-x-2"
+          className="flex items-center space-x-2 text-xl font-bold hover:text-gray-200 transition"
         >
           <img src={logo} alt="Hunt-Career-Logo" className="h-8 w-8" />
-          <span className="text-xl font-bold text-gray-800 dark:text-white">
-            Hunt-Career
-          </span>
+          <span>Hunt-Career</span>
         </Link>
         <button
-          className="md:hidden text-gray-800 dark:text-white focus:outline-none"
+          className="md:hidden text-white focus:outline-none"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
         >
@@ -287,10 +285,10 @@ const Navbar = () => {
           ) : (
             !hideAuthLinksPaths.includes(location.pathname) && (
               <>
-                <Link to="/login" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
+                <Link to="/login" className="hover:text-gray-200 transition">
                   Login
                 </Link>
-                <Link to="/signup" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                <Link to="/signup" className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100 transition">
                   Signup
                 </Link>
               </>
