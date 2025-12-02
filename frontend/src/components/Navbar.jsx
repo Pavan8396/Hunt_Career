@@ -6,6 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 import { toast } from 'react-toastify';
 import Dropdown from './common/Dropdown';
+import logo from '../assets/logo.svg';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -129,8 +130,8 @@ const Navbar = () => {
       </div>
       <Dropdown
         trigger={
-          <button className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 p-2 rounded-full focus:outline-none transition">
-            <span className="w-8 h-8 bg-blue-200 text-blue-800 flex items-center justify-center rounded-full">
+          <button className="flex items-center space-x-2 focus:outline-none">
+            <span className="w-10 h-10 bg-blue-200 text-blue-800 flex items-center justify-center rounded-full font-bold">
               {userInitials}
             </span>
           </button>
@@ -262,9 +263,10 @@ const Navbar = () => {
               ? '/employer/dashboard'
               : '/'
           }
-          className="text-xl font-bold hover:text-gray-200 transition"
+          className="flex items-center space-x-2 text-xl font-bold hover:text-gray-200 transition"
         >
-          Hunt-Career
+          <img src={logo} alt="Hunt-Career-Logo" className="h-8 w-8" />
+          <span>Hunt-Career</span>
         </Link>
         <button
           className="md:hidden text-white focus:outline-none"
@@ -286,7 +288,7 @@ const Navbar = () => {
                 <Link to="/login" className="hover:text-gray-200 transition">
                   Login
                 </Link>
-                <Link to="/signup" className="hover:text-gray-200 transition">
+                <Link to="/signup" className="bg-white text-blue-600 px-4 py-2 rounded hover:bg-gray-100 transition">
                   Signup
                 </Link>
               </>

@@ -59,18 +59,87 @@ const EmployerDashboard = () => {
   );
 
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-3xl font-bold mb-6">Welcome, {user?.name || 'Employer'}!</h1>
+    <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">Dashboard</h1>
+            <p className="text-lg text-gray-600 dark:text-gray-400 mt-1">Welcome back, {user?.name || 'Employer'}!</p>
+        </div>
 
-      {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StatCard icon={<BriefcaseIcon className="h-8 w-8" />} title="Total Jobs Posted" value={jobs.length} color="bg-blue-500" />
-        <StatCard icon={<DocumentTextIcon className="h-8 w-8" />} title="Total Applications" value={totalApplications} color="bg-indigo-500" />
-        <StatCard icon={<HashtagIcon className="h-8 w-8" />} title="Avg. Apps per Job" value={avgApplicationsPerJob} color="bg-pink-500" />
+        {/* Key Metrics Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <StatCard icon={<BriefcaseIcon className="h-8 w-8" />} title="Active Listings" value={jobs.length} color="bg-blue-500" />
+            <StatCard icon={<DocumentTextIcon className="h-8 w-8" />} title="Total Applications" value={totalApplications} color="bg-green-500" />
+            <StatCard icon={<HashtagIcon className="h-8 w-8" />} title="Avg. Apps/Job" value={avgApplicationsPerJob} color="bg-purple-500" />
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <div className="lg:col-span-3 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Application Trends</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={applicationsOverTime} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                        <defs>
+                            <linearGradient id="colorApplications" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                                <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                            </linearGradient>
+                        </defs>
+                        <XAxis dataKey="date" stroke="grey" />
+                        <YAxis stroke="grey" />
+                        <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
+                        <Tooltip />
+                        <Area type="monotone" dataKey="count" stroke="#10B981" fillOpacity={1} fill="url(#colorApplications)" />
+                    </AreaChart>
+                </ResponsiveContainer>
+            </div>
+            <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Job Postings by Type</h3>
+                <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                        <Pie
+                            data={jobPostingsSummary}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="count"
+                        >
+                            {jobPostingsSummary.map((entry, index) => <Cell key={`cell-${index}`} fill={['#3B82F6', '#10B981', '#F59E0B', '#EF4444'][index % 4]} />)}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                    </PieChart>
+                </ResponsiveContainer>
+            </div>
+        </div>
+
+        {/* Recent Activity Section */}
+        <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">Recent Activity</h3>
+            <div className="space-y-4">
+                {recentActivity.map((activity) => (
+                    <div key={activity._id} className="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-200 dark:bg-blue-900 flex items-center justify-center font-bold text-blue-700 dark:text-blue-300">
+                            {activity.applicant.firstName.charAt(0)}
+                        </div>
+                        <div className="ml-4">
+                            <p className="text-sm text-gray-800 dark:text-gray-200">
+                                <span className="font-bold">{activity.applicant.firstName} {activity.applicant.lastName}</span> applied for <span className="font-semibold text-blue-600 dark:text-blue-400">{activity.job.title}</span>
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {new Date(activity.date).toLocaleString()}
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
       </div>
-
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    </div>
+  );
+};
         {/* Area Chart */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
           <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Applications Over Time</h3>

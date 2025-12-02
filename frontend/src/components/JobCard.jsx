@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
-import { saveJob, unsaveJob } from '../services/api';
+import { saveJob, unsaveJob, getSavedJobs } from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import { getSavedJobs } from '../services/api';
+import { BriefcaseIcon, LocationMarkerIcon, BookmarkIcon } from '@heroicons/react/outline';
 
 const JobCard = ({
   _id,
@@ -84,55 +84,61 @@ const JobCard = ({
   };
 
   return (
-    <div className="relative flex flex-col justify-between border rounded p-4 shadow hover:shadow-md transition bg-white dark:bg-gray-800 dark:border-gray-700 cursor-pointer h-full">
-      <div
-        onClick={handleCardClick}
-        onKeyDown={handleKeyDown}
-        role="button"
-        tabIndex={0}
-        aria-label={`View details for ${title} at ${company}`}
-      >
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{title}</h3>
-        <p className="text-gray-600 dark:text-gray-400">{company}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {job_type} • {candidate_required_location}
-        </p>
+    <div
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-label={`View details for ${title} at ${company}`}
+      className="relative flex flex-col justify-between border rounded-lg p-4 shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-800 dark:border-gray-700 cursor-pointer h-full"
+    >
+      <div>
+        <div className="flex items-start">
+          <div className="flex-shrink-0">
+            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center">
+              <BriefcaseIcon className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+            </div>
+          </div>
+          <div className="ml-4 flex-1 pr-8">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-200 line-clamp-2">
+              {title}
+            </h3>
+            <p className="text-md text-gray-600 dark:text-gray-400">{company}</p>
+          </div>
+        </div>
+
+        <div className="mt-3 space-y-2">
+          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+            <BriefcaseIcon className="w-4 h-4 mr-2" />
+            <span>{job_type}</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+            <LocationMarkerIcon className="w-4 h-4 mr-2" />
+            <span>{candidate_required_location}</span>
+          </div>
+        </div>
 
         {description && (
-          <p className="text-sm text-gray-700 dark:text-gray-300 mt-3 line-clamp-3">
+          <p className="text-sm text-gray-700 dark:text-gray-300 mt-4 line-clamp-3 leading-relaxed">
             {description}
           </p>
         )}
       </div>
 
-      <div className="mt-4 flex justify-between items-center">
-        <span
-          onClick={handleCardClick}
-          className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
-          role="button"
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          aria-label={`View details for ${title}`}
-        >
-          View Details →
-        </span>
-        <div className="flex gap-2">
-          <button
-            onClick={handleSaveClick}
-            className={`text-sm w-20 text-center px-3 py-1 rounded ${
-              saved
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'bg-blue-600 text-white hover:bg-blue-700'
-            } transition`}
-            aria-label={saved ? `Unsave ${title}` : `Save ${title}`}
-          >
-            {saved ? 'Unsave' : 'Save'}
-          </button>
-        </div>
-      </div>
+      <button
+        onClick={handleSaveClick}
+        className={`absolute top-4 right-4 p-2 rounded-full transition-colors duration-200 ${
+          saved
+            ? 'bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-400 dark:hover:bg-red-800'
+            : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600'
+        }`}
+        aria-label={saved ? `Unsave ${title}` : `Save ${title}`}
+      >
+        <BookmarkIcon className="w-5 h-5" />
+      </button>
 
       {notification.message && (
-        <div className="mt-2 text-center">
+        <div className="absolute bottom-4 right-4 text-center">
           <p
             className={`px-4 py-1 rounded text-sm ${
               notification.type === 'success'
