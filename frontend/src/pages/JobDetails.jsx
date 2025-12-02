@@ -219,75 +219,73 @@ const JobDetails = () => {
   }
 
   return (
-    <div className="p-4 max-w-3xl mx-auto relative">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg dark:shadow-gray-800/50">
+    <div className="p-4 max-w-4xl mx-auto relative">
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
         <Link
-          to="/home"
-          className="text-blue-600 hover:underline text-sm dark:text-blue-200 dark:hover:text-blue-100 mb-4 inline-block"
+          to="/"
+          className="text-blue-600 hover:underline text-sm dark:text-blue-400 mb-6 inline-block"
           aria-label="Back to home"
         >
-          ← Back to Home
+          &larr; Back to Listings
         </Link>
 
-        <div className="bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-700 dark:to-blue-900 p-6 rounded-lg mb-6">
-          <h1 className="text-3xl font-bold text-white">{job.title}</h1>
-          <p className="text-gray-200 mt-2">{job.company}</p>
-          <div className="flex items-center gap-4 mt-2 text-sm text-gray-200">
-            <span className="flex items-center gap-1">
-              <BriefcaseIcon className="h-5 w-5" /> {job.job_type}
-            </span>
-            <span className="flex items-center gap-1">
-              <LocationMarkerIcon className="h-5 w-5" />{' '}
-              {job.candidate_required_location}
-            </span>
-          </div>
+        <div className="flex items-center justify-between mb-4">
+            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">{job.title}</h1>
+            <button
+                type="button"
+                onClick={toggleSave}
+                className={`p-2 rounded-full transition-colors duration-200 ${
+                saved
+                    ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                aria-label={saved ? 'Unsave job' : 'Save job'}
+                title={saved ? 'Unsave job' : 'Save job'}
+            >
+                <BookmarkIcon className="h-6 w-6" />
+            </button>
         </div>
 
-        <div className="flex justify-between items-center my-6">
-          <button
-            type="button"
-            onClick={toggleSave}
-            className={`p-2 rounded-full transition ${
-              saved
-                ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                : 'bg-green-100 text-green-600 hover:bg-green-200'
-            }`}
-            aria-label={saved ? 'Unsave job' : 'Save job'}
-            title={saved ? 'Unsave job' : 'Save job'}
-          >
-            <BookmarkIcon className="h-5 w-5" />
-          </button>
+        <p className="text-xl text-gray-600 dark:text-gray-400 mb-6">{job.company}</p>
 
-          {hasApplied ? (
+        <div className="flex flex-wrap items-center gap-4 mb-8">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                <BriefcaseIcon className="h-5 w-5 mr-2" /> {job.job_type}
+            </span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                <LocationMarkerIcon className="h-5 w-5 mr-2" /> {job.candidate_required_location}
+            </span>
+        </div>
+
+        {hasApplied ? (
             <button
               type="button"
               onClick={handleMessageRecruiter}
-              className="p-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition"
+              className="w-full flex items-center justify-center py-3 px-6 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all duration-300 shadow-md mb-8"
               data-chat-opener="true"
               title="Message Recruiter"
             >
-              <ChatIcon className="h-5 w-5" />
+              <ChatIcon className="h-6 w-6 mr-2" />
+              Message Recruiter
             </button>
           ) : (
             <button
               type="button"
               onClick={handleApply}
-              className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+              className="w-full flex items-center justify-center py-3 px-6 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-md mb-8"
               aria-label="Apply for this job"
               title="Apply"
             >
-              <ArrowCircleRightIcon className="h-5 w-5" />
+              <ArrowCircleRightIcon className="h-6 w-6 mr-2" />
+              Apply Now
             </button>
           )}
-        </div>
 
-        <div className="border-t dark:border-gray-700 my-6"></div>
-
-        <div className="prose max-w-none dark:prose-invert prose-p:text-gray-700 dark:text-white prose-h3:text-gray-900 dark:prose-h3:text-gray-100 prose-h4:text-gray-900 dark:prose-h4:text-gray-100 prose-ul:text-gray-700 dark:text-white prose-ol:text-gray-700 dark:text-white">
-          <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">
-            Job Description
-          </h2>
-          <ReactMarkdown>{job.description}</ReactMarkdown>
+        <div className="border-t dark:border-gray-700 pt-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Job Description</h2>
+            <div className="prose max-w-none dark:prose-invert text-gray-700 dark:text-gray-300">
+                <ReactMarkdown>{job.description}</ReactMarkdown>
+            </div>
         </div>
 
         {job && job.employer && (
