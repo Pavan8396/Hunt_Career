@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { MoonIcon, MenuIcon, XIcon, BellIcon } from '@heroicons/react/outline';
+import { MoonIcon, MenuIcon, XIcon, BellIcon, UserCircleIcon, LogoutIcon } from '@heroicons/react/outline';
 import { ThemeContext } from '../context/ThemeContext';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 import { toast } from 'react-toastify';
+import Dropdown from './common/Dropdown';
 
 const Navbar = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -42,7 +42,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target))
-        setIsDropdownOpen(false);
+        //setIsDropdownOpen(false);
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target))
         setIsMobileMenuOpen(false);
       if (
@@ -60,7 +60,7 @@ const Navbar = () => {
   const handleConfirmLogout = () => {
     const type = userType;
     logout();
-    setIsDropdownOpen(false);
+    //setIsDropdownOpen(false);
     setIsMobileMenuOpen(false);
     setShowConfirm(false);
     toast.success('Logged out successfully!');
@@ -127,57 +127,61 @@ const Navbar = () => {
           </div>
         )}
       </div>
-      <div className="relative" ref={dropdownRef}>
-        <button
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 p-2 rounded-full focus:outline-none transition"
+      <Dropdown
+        trigger={
+          <button className="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 p-2 rounded-full focus:outline-none transition">
+            <span className="w-8 h-8 bg-blue-200 text-blue-800 flex items-center justify-center rounded-full">
+              {userInitials}
+            </span>
+          </button>
+        }
+      >
+        <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-600">
+          Signed in as <br />
+          <span className="font-semibold">{user.name || user.companyName}</span>
+        </div>
+        <Link
+          to={userType === 'employer' ? '/employer/profile' : '/profile'}
+          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
         >
-          <span className="w-8 h-8 bg-blue-200 text-blue-800 flex items-center justify-center rounded-full">
-            {userInitials}
-          </span>
+          <UserCircleIcon className="h-5 w-5 mr-2" />
+          My Profile
+        </Link>
+        <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
+        <Link
+          to="/about"
+          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+        >
+          About
+        </Link>
+        <Link
+          to="/contact"
+          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+        >
+          Contact
+        </Link>
+        <Link
+          to="/privacy"
+          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+        >
+          Privacy Policy
+        </Link>
+        <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
+        <button
+          onClick={toggleDarkMode}
+          className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+        >
+          <MoonIcon className="h-5 w-5 mr-2" />
+          {isDarkMode ? 'Light Mode' : 'Dark Mode'}
         </button>
-        {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-            <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
-              Welcome, {user.name || user.companyName}
-            </div>
-            <Link
-              to="/about"
-              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              Contact
-            </Link>
-            <Link
-              to="/privacy"
-              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              Privacy Policy
-            </Link>
-            <button
-              onClick={toggleDarkMode}
-              className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
-            >
-              <MoonIcon className="h-5 w-5 mr-2" />
-              {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-            </button>
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 hover:text-red-700"
-            >
-              Logout
-            </button>
-          </div>
-        )}
-      </div>
+        <button
+          onClick={handleLogout}
+          className="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-gray-600"
+        >
+          <LogoutIcon className="h-5 w-5 mr-2" />
+          Logout
+        </button>
+      </Dropdown>
     </>
   );
 

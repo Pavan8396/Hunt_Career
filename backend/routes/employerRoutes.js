@@ -10,6 +10,7 @@ const {
   getEmployerById,
   getEmployerProfile,
   updateEmployerProfile,
+  updateEmployerTheme,
 } = require('../controllers/employerController');
 const { ensureDb } = require('../middleware/dbMiddleware');
 const { authenticateToken, isEmployer } = require('../middleware/authMiddleware');
@@ -46,6 +47,7 @@ router.put(
   upload.single('companyLogo'),
   updateEmployerProfile
 );
+router.put('/theme', ensureDb, authenticateToken, isEmployer, updateEmployerTheme);
 router.get('/applications', ensureDb, authenticateToken, isEmployer, getEmployerApplications);
 router.get('/stats/applications-over-time', ensureDb, authenticateToken, isEmployer, getApplicationsOverTime);
 router.get('/stats/job-postings-summary', ensureDb, authenticateToken, isEmployer, getJobPostingsSummary);

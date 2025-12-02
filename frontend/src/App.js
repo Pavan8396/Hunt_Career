@@ -48,8 +48,8 @@ const GuestOrAuthenticatedRoute = ({ children }) => {
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
         <ChatProvider>
           <Router>
             <Routes>
@@ -127,8 +127,8 @@ function App() {
             />
           </Router>
         </ChatProvider>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

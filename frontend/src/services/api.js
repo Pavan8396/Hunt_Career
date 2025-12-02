@@ -184,6 +184,48 @@ export const login = async (email, password) => {
   }
 };
 
+export const updateUserTheme = async (theme, token) => {
+  try {
+    const response = await fetch(`${API_URL}/users/theme`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ theme }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update theme');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating user theme:', error);
+    toast.error('Could not update theme.');
+    throw error;
+  }
+};
+
+export const updateEmployerTheme = async (theme, token) => {
+  try {
+    const response = await fetch(`${API_URL}/employers/theme`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ theme }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update theme');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating employer theme:', error);
+    toast.error('Could not update theme.');
+    throw error;
+  }
+};
+
 export const getSavedJobs = async (token) => {
   try {
     const response = await fetch(`${API_URL}/users/saved-jobs`, {

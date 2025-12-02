@@ -55,6 +55,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  theme: {
+    type: String,
+    enum: ['light', 'dark'],
+    default: 'light',
+  },
   savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
 });
 

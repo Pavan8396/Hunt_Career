@@ -5,8 +5,9 @@ import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 import { getUserApplications } from '../services/api';
 import SkeletonCard from '../components/SkeletonCard';
-import { ChatIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon } from '@heroicons/react/outline';
+import { ChatIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon, DocumentTextIcon } from '@heroicons/react/outline';
 import { useSortableData } from '../hooks/useSortableData';
+import EmptyState from '../components/common/EmptyState';
 
 const AppliedJobs = () => {
   const [applications, setApplications] = useState([]);
@@ -98,17 +99,13 @@ const AppliedJobs = () => {
         Applied Jobs
       </h2>
       {applications.length === 0 ? (
-        <div className="text-center">
-          <p className="text-gray-500 dark:text-gray-400">
-            You have not applied for any jobs yet.
-          </p>
-          <Link
-            to="/home"
-            className="text-blue-600 hover:underline mt-4 inline-block dark:text-blue-400"
-          >
-            ← Find Jobs
-          </Link>
-        </div>
+        <EmptyState
+          icon={DocumentTextIcon}
+          title="No Applied Jobs"
+          message="You haven't applied for any jobs yet. Your applications will appear here once you apply."
+          buttonText="Find Jobs"
+          buttonLink="/"
+        />
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">

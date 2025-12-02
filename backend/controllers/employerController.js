@@ -51,6 +51,7 @@ const updateEmployerProfile = async (req, res) => {
         companyDescription: updatedEmployer.companyDescription,
         website: updatedEmployer.website,
         companyLogo: updatedEmployer.companyLogo,
+        theme: updatedEmployer.theme,
       });
     } else {
       res.status(404).json({ message: 'Employer not found' });
@@ -118,7 +119,7 @@ const loginEmployer = async (req, res) => {
       const token = jwt.sign({ _id: employer._id, email: employer.email, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
-        employer: { _id: employer._id, name: employer.companyName, email: employer.email }
+        employer: { _id: employer._id, name: employer.companyName, email: employer.email, theme: employer.theme }
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });
@@ -201,6 +202,24 @@ const getEmployerById = async (req, res) => {
   }
 };
 
+const updateEmployerTheme = async (req, res) => {
+  try {
+    const { theme } = req.body;
+    if (!['light', 'dark'].includes(theme)) {
+      return res.status(400).json({ message: 'Invalid theme' });
+    }
+    const employer = await Employer.findById(req.user._id);
+    if (!employer) {
+      return res.status(404).json({ message: 'Employer not found' });
+    }
+    employer.theme = theme;
+    await employer.save();
+    res.status(200).json({ message: 'Theme updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update theme' });
+  }
+};
+
 module.exports = {
   registerEmployer,
   loginEmployer,
@@ -211,4 +230,5 @@ module.exports = {
   getEmployerById,
   getEmployerProfile,
   updateEmployerProfile,
+  updateEmployerTheme,
 };

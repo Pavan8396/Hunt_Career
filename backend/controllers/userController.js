@@ -142,6 +142,24 @@ const getUserById = async (req, res) => {
   }
 };
 
+const updateUserTheme = async (req, res) => {
+  try {
+    const { theme } = req.body;
+    if (!['light', 'dark'].includes(theme)) {
+      return res.status(400).json({ message: 'Invalid theme' });
+    }
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.theme = theme;
+    await user.save();
+    res.status(200).json({ message: 'Theme updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update theme' });
+  }
+};
+
 module.exports = {
   getUserDetails,
   getUserApplications,
@@ -152,4 +170,5 @@ module.exports = {
   getSavedJobs,
   saveJob,
   unsaveJob,
+  updateUserTheme,
 };

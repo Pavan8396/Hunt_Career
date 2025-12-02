@@ -34,6 +34,11 @@ const employerSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  theme: {
+    type: String,
+    enum: ['light', 'dark'],
+    default: 'light',
+  },
 }, {
   timestamps: true,
 });

@@ -9,6 +9,7 @@ const {
   getSavedJobs,
   saveJob,
   unsaveJob,
+  updateUserTheme,
 } = require('../controllers/userController');
 const { authenticateToken, isJobSeeker } = require('../middleware/authMiddleware');
 const { ensureDb } = require('../middleware/dbMiddleware');
@@ -20,6 +21,7 @@ router.get('/profile', authenticateToken, ensureDb, isJobSeeker, getUserProfile)
 router.put('/profile/:id', authenticateToken, ensureDb, updateUserProfile);
 // Route for a user to update their own profile
 router.put('/profile', authenticateToken, ensureDb, isJobSeeker, updateUserProfile);
+router.put('/theme', authenticateToken, ensureDb, isJobSeeker, updateUserTheme);
 router.get('/applications', authenticateToken, ensureDb, getUserApplications);
 router.get('/applied-jobs', authenticateToken, ensureDb, getAppliedJobs);
 

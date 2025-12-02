@@ -2,9 +2,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getSavedJobs, unsaveJob } from '../services/api';
-import { TrashIcon, ExternalLinkIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon } from '@heroicons/react/outline';
+import { TrashIcon, ExternalLinkIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon, BookmarkIcon } from '@heroicons/react/outline';
 import { useSortableData } from '../hooks/useSortableData';
 import { AuthContext } from '../context/AuthContext';
+import EmptyState from '../components/common/EmptyState';
 
 const SavedJobs = () => {
   const [savedJobs, setSavedJobs] = useState([]);
@@ -99,16 +100,13 @@ const SavedJobs = () => {
     <div className="p-4 relative">
       <h2 className="text-2xl font-bold mb-4 dark:text-gray-200">Saved Jobs</h2>
       {savedJobs.length === 0 ? (
-        <div className="text-center">
-          <p className="text-gray-500 dark:text-gray-400">No saved jobs found.</p>
-          <Link
-            to="/"
-            className="text-blue-600 hover:underline text-sm mt-4 inline-block dark:text-blue-400"
-            aria-label="Back to home"
-          >
-            ← Back to Home
-          </Link>
-        </div>
+        <EmptyState
+          icon={BookmarkIcon}
+          title="No Saved Jobs"
+          message="You haven't saved any jobs yet. Start browsing and save jobs to view them here."
+          buttonText="Find Jobs"
+          buttonLink="/"
+        />
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">

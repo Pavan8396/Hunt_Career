@@ -119,10 +119,10 @@ const JobCard = ({
         <div className="flex gap-2">
           <button
             onClick={handleSaveClick}
-            className={`text-sm w-20 text-center px-3 py-1 border rounded ${
+            className={`text-sm w-20 text-center px-3 py-1 rounded ${
               saved
-                ? 'bg-red-100 text-red-600 border-red-300 hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:border-red-700 dark:hover:bg-red-800'
-                : 'bg-green-100 text-green-600 border-green-300 hover:bg-green-200 dark:bg-green-900 dark:text-green-300 dark:border-green-700 dark:hover:bg-green-800'
+                ? 'bg-red-600 text-white hover:bg-red-700'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
             } transition`}
             aria-label={saved ? `Unsave ${title}` : `Save ${title}`}
           >

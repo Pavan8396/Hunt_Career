@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import Tooltip from './common/Tooltip';
 import {
   HomeIcon,
   BookmarkIcon,
@@ -35,46 +36,56 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
   const links = userType === 'employer' ? employerLinks : jobSeekerLinks;
 
   return (
-    <aside className={`bg-gray-800 text-white min-h-screen p-4 transition-all duration-300 relative flex-shrink-0 ${isCollapsed ? 'w-20' : 'w-56'}`}>
-      <nav>
+    <aside className={`bg-gray-800 text-white min-h-screen transition-all duration-300 ease-in-out relative flex-shrink-0 ${isCollapsed ? 'w-20' : 'w-56'}`}>
+      <div className="flex items-center justify-between p-4">
+        {!isCollapsed && <h1 className="text-xl font-bold">Dashboard</h1>}
+        <button
+          onClick={toggleSidebar}
+          className="p-2 rounded-md hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!isCollapsed}
+        >
+          {isCollapsed ? <ChevronDoubleRightIcon className="h-5 w-5" /> : <ChevronDoubleLeftIcon className="h-5 w-5" />}
+        </button>
+      </div>
+      <nav className="px-4">
         <ul>
           {links.map((link, index) => (
             <li key={index} className="mb-4">
-              <NavLink
-                to={link.to}
-                className={({ isActive }) =>
-                  `flex items-center p-2 rounded-md transition-colors ${
-                    isActive ? 'bg-blue-500 text-white' : 'hover:bg-gray-700'
-                  } ${isCollapsed ? 'justify-center' : ''}`
-                }
-              >
-                <div className={`${isCollapsed ? '' : 'mr-3'}`}>{link.icon}</div>
-                {!isCollapsed && <span>{link.text}</span>}
-              </NavLink>
+              <Tooltip text={link.text}>
+                <NavLink
+                  to={link.to}
+                  className={({ isActive }) =>
+                    `flex items-center p-2 rounded-md transition-colors duration-200 ${
+                      isActive ? 'bg-blue-600 text-white' : 'hover:bg-gray-700'
+                    } ${isCollapsed ? 'justify-center' : ''}`
+                  }
+                >
+                  <div className={`${isCollapsed ? '' : 'mr-3'}`}>{link.icon}</div>
+                  {!isCollapsed && <span>{link.text}</span>}
+                </NavLink>
+              </Tooltip>
             </li>
           ))}
           {user && user.isAdmin && (
             <li className="mb-4">
-              <NavLink
-                to="/admin/dashboard"
-                className={({ isActive }) =>
-                  `flex items-center p-2 rounded-md transition-colors ${
-                    isActive ? 'bg-green-500 text-white' : 'hover:bg-gray-700'
-                  } ${isCollapsed ? 'justify-center' : ''}`
-                }
-              >
-                <div className={`${isCollapsed ? '' : 'mr-3'}`}><ShieldCheckIcon className="h-5 w-5" /></div>
-                {!isCollapsed && <span>Admin</span>}
-              </NavLink>
+              <Tooltip text="Admin">
+                <NavLink
+                  to="/admin/dashboard"
+                  className={({ isActive }) =>
+                    `flex items-center p-2 rounded-md transition-colors duration-200 ${
+                      isActive ? 'bg-green-600 text-white' : 'hover:bg-gray-700'
+                    } ${isCollapsed ? 'justify-center' : ''}`
+                  }
+                >
+                  <div className={`${isCollapsed ? '' : 'mr-3'}`}><ShieldCheckIcon className="h-5 w-5" /></div>
+                  {!isCollapsed && <span>Admin</span>}
+                </NavLink>
+              </Tooltip>
             </li>
           )}
         </ul>
       </nav>
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-        <button onClick={toggleSidebar} className="p-2 rounded-md hover:bg-gray-700 transition-colors">
-          {isCollapsed ? <ChevronDoubleRightIcon className="h-5 w-5" /> : <ChevronDoubleLeftIcon className="h-5 w-5" />}
-        </button>
-      </div>
     </aside>
   );
 };

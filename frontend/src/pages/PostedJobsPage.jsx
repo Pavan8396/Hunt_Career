@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { PencilIcon, TrashIcon, UsersIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon } from '@heroicons/react/outline';
+import { PencilIcon, TrashIcon, UsersIcon, SortAscendingIcon, SortDescendingIcon, SelectorIcon, BriefcaseIcon } from '@heroicons/react/outline';
 import {
   getEmployerJobs,
   deleteJob,
@@ -10,6 +10,7 @@ import {
 } from '../services/api';
 import { toast } from 'react-toastify';
 import { useSortableData } from '../hooks/useSortableData';
+import EmptyState from '../components/common/EmptyState';
 
 const PostedJobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -118,97 +119,99 @@ const PostedJobsPage = () => {
   return (
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Your Posted Jobs</h1>
-      {jobs.length > 0 && (
-        <div className="flex space-x-2 mb-4">
-          <button
-            onClick={handleDeleteAllJobs}
-            className="p-2 bg-red-600 text-white rounded flex items-center space-x-2"
-            title="Delete All Jobs"
-          >
-            <TrashIcon className="h-5 w-5" />
-            <span>Delete All</span>
-          </button>
-          <button
-            onClick={handleDeleteMultipleJobs}
-            className="p-2 bg-red-600 text-white rounded flex items-center space-x-2"
-            disabled={selectedJobs.length === 0}
-            title="Delete Selected Jobs"
-          >
-            <TrashIcon className="h-5 w-5" />
-            <span>Delete Selected</span>
-          </button>
-        </div>
+      {jobs.length === 0 ? (
+        <EmptyState
+          icon={BriefcaseIcon}
+          title="No Posted Jobs"
+          message="You haven't posted any jobs yet. Click the button below to post your first job."
+          buttonText="Post a Job"
+          buttonLink="/employer/post-job"
+        />
+      ) : (
+        <>
+          <div className="flex space-x-2 mb-4">
+            <button
+              onClick={handleDeleteAllJobs}
+              className="p-2 bg-red-600 text-white rounded flex items-center space-x-2"
+              title="Delete All Jobs"
+            >
+              <TrashIcon className="h-5 w-5" />
+              <span>Delete All</span>
+            </button>
+            <button
+              onClick={handleDeleteMultipleJobs}
+              className="p-2 bg-red-600 text-white rounded flex items-center space-x-2"
+              disabled={selectedJobs.length === 0}
+              title="Delete Selected Jobs"
+            >
+              <TrashIcon className="h-5 w-5" />
+              <span>Delete Selected</span>
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
+              <thead className="bg-gray-200 dark:bg-gray-700">
+                <tr>
+                  <th className="p-4 text-left">
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAll}
+                      checked={jobs.length > 0 && selectedJobs.length === jobs.length}
+                    />
+                  </th>
+                  <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('title')}>
+                    Job Title {sortConfig.key === 'title' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                  </th>
+                  <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('company')}>
+                    Company {sortConfig.key === 'company' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                  </th>
+                  <th className="p-4 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedJobs.map((job) => (
+                  <React.Fragment key={job._id}>
+                    <tr className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <td className="p-4">
+                        <input
+                          type="checkbox"
+                          onChange={() => handleCheckboxChange(job._id)}
+                          checked={selectedJobs.includes(job._id)}
+                        />
+                      </td>
+                      <td className="p-4">{job.title}</td>
+                      <td className="p-4">{job.company}</td>
+                      <td className="p-4 flex justify-center space-x-2">
+                        <Link
+                          to={`/employer/jobs/${job._id}/applicants`}
+                          className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+                          title="View Applicants"
+                        >
+                          <UsersIcon className="h-5 w-5" />
+                        </Link>
+                        <button
+                          onClick={() => navigate(`/employer/post-job/${job._id}`)}
+                          className="p-2 bg-yellow-600 text-white rounded-full hover:bg-yellow-700 transition"
+                          title="Edit Job"
+                        >
+                          <PencilIcon className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteJob(job._id)}
+                          className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition"
+                          title="Delete Job"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
-          <thead className="bg-gray-200 dark:bg-gray-700">
-            <tr>
-              <th className="p-4 text-left">
-                <input
-                  type="checkbox"
-                  onChange={handleSelectAll}
-                  checked={jobs.length > 0 && selectedJobs.length === jobs.length}
-                />
-              </th>
-              <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('title')}>
-                Job Title {sortConfig.key === 'title' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
-              </th>
-              <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('company')}>
-                Company {sortConfig.key === 'company' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
-              </th>
-              <th className="p-4 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedJobs.length > 0 ? (
-              sortedJobs.map((job) => (
-                <React.Fragment key={job._id}>
-                  <tr className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <td className="p-4">
-                      <input
-                        type="checkbox"
-                        onChange={() => handleCheckboxChange(job._id)}
-                        checked={selectedJobs.includes(job._id)}
-                      />
-                    </td>
-                    <td className="p-4">{job.title}</td>
-                    <td className="p-4">{job.company}</td>
-                    <td className="p-4 flex justify-center space-x-2">
-                      <Link
-                        to={`/employer/jobs/${job._id}/applicants`}
-                        className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
-                        title="View Applicants"
-                      >
-                        <UsersIcon className="h-5 w-5" />
-                      </Link>
-                      <button
-                        onClick={() => navigate(`/employer/post-job/${job._id}`)}
-                        className="p-2 bg-yellow-600 text-white rounded-full hover:bg-yellow-700 transition"
-                        title="Edit Job"
-                      >
-                        <PencilIcon className="h-5 w-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteJob(job._id)}
-                        className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition"
-                        title="Delete Job"
-                      >
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </td>
-                  </tr>
-                </React.Fragment>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="p-4 text-center">
-                  You haven't posted any jobs yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
