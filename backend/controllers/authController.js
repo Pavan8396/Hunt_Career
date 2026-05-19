@@ -75,7 +75,13 @@ const loginUser = async (req, res) => {
       const token = jwt.sign({ _id: user._id, email: user.email, type: 'user', isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
-        user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin, theme: user.theme },
+        user: {
+          _id: user._id,
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          isAdmin: user.isAdmin,
+          theme: user.theme
+        },
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });

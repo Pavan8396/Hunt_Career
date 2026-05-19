@@ -55,7 +55,9 @@ const getUserProfile = async (req, res) => {
   try {
     const user = await userService.getUserProfile(req.user.email);
     if (user) {
-      res.json(user);
+      const userObj = user.toObject();
+      userObj.name = `${user.firstName} ${user.lastName}`;
+      res.json(userObj);
     } else {
       res.status(404).json({ message: 'User not found' });
     }
@@ -75,7 +77,9 @@ const updateUserProfile = async (req, res) => {
 
     const updatedUser = await userService.updateUserProfile(targetUserId, req.body);
     if (updatedUser) {
-      res.json(updatedUser);
+      const userObj = updatedUser.toObject();
+      userObj.name = `${updatedUser.firstName} ${updatedUser.lastName}`;
+      res.json(userObj);
     } else {
       res.status(404).json({ message: 'User not found' });
     }
@@ -90,7 +94,9 @@ const getUserDetails = async (req, res) => {
   try {
     const user = await userService.getUserProfile(req.user.email);
     if (user) {
-      res.json(user);
+      const userObj = user.toObject();
+      userObj.name = `${user.firstName} ${user.lastName}`;
+      res.json(userObj);
     } else {
       res.status(404).json({ message: "User not found" });
     }
@@ -133,7 +139,9 @@ const getUserById = async (req, res) => {
   try {
     const user = await userService.getUserById(req.params.id);
     if (user) {
-      res.json(user);
+      const userObj = user.toObject();
+      userObj.name = `${user.firstName} ${user.lastName}`;
+      res.json(userObj);
     } else {
       res.status(404).json({ message: "User not found" });
     }
