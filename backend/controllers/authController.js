@@ -1,4 +1,3 @@
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require('../config/env');
 const userService = require('../services/userService');
@@ -30,13 +29,11 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const userData = {
       firstName,
       lastName,
       email,
-      password: hashedPassword,
+      password,
       phoneNumber,
     };
 
@@ -71,7 +68,7 @@ const loginUser = async (req, res) => {
 
   try {
     const user = await userService.findUserForLogin(email);
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user && (await user.matchPassword(password))) {
       if (!user.isActive) {
         return res.status(403).json({ message: "Your account has been suspended. Please contact support." });
       }
