@@ -61,6 +61,13 @@ const userSchema = new mongoose.Schema({
     default: 'light',
   },
   savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+userSchema.virtual('name').get(function() {
+  return `${this.firstName} ${this.lastName}`;
 });
 
 userSchema.pre('save', async function (next) {
