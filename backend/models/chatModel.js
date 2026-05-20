@@ -1,46 +1,79 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const messageSchema = new Schema({
-  sender: {
-    type: Schema.Types.ObjectId,
-    required: true,
+const Chat = sequelize.define('Chat', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
+  applicationId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'Applications',
+      key: 'id',
+    },
+  },
+  jobId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'Jobs',
+      key: 'id',
+    },
+  },
+  participants: {
+    type: DataTypes.JSON, // Stores array of UUIDs
+    allowNull: false,
+    defaultValue: [],
+  },
+}, {
+  tableName: 'Chats',
+  timestamps: true,
+});
+
+const Message = sequelize.define('Message', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
+  chatId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'Chats',
+      key: 'id',
+    },
+  },
+  senderId: {
+    type: DataTypes.UUID,
+    allowNull: false,
   },
   text: {
-    type: String,
-    required: true,
+    type: DataTypes.TEXT,
+    allowNull: false,
   },
   timestamp: {
-    type: Date,
-    default: Date.now,
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
   },
   read: {
-    type: Boolean,
-    default: false,
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
+}, {
+  tableName: 'Messages',
+  timestamps: false,
 });
 
-const chatSchema = new Schema({
-  application: {
-    type: Schema.Types.ObjectId,
-    ref: 'Application',
-    required: true,
-    index: true,
-  },
-  job: {
-    type: Schema.Types.ObjectId,
-    ref: 'Job',
-    required: true,
-    index: true,
-  },
-  participants: [
-    {
-      type: Schema.Types.ObjectId,
-      required: true,
-      index: true,
-    },
-  ],
-  messages: [messageSchema],
-});
+const Application = require('./applicationModel');
+const Job = require('./jobModel');
 
-module.exports = mongoose.model('Chat', chatSchema);
+Chat.belongsTo(Application, { foreignKey: 'applicationId', as: 'application' });
+Chat.belongsTo(Job, { foreignKey: 'jobId', as: 'job' });
+Chat.hasMany(Message, { foreignKey: 'chatId', as: 'messages' });
+Message.belongsTo(Chat, { foreignKey: 'chatId', as: 'chat' });
+
+module.exports = { Chat, Message };

@@ -1,47 +1,48 @@
-const Chat = require('../models/chatModel');
+const { Chat, Message } = require('../models/chatModel');
 const notificationService = require('../services/notificationService');
-const mongoose = require('mongoose');
-
 const User = require('../models/userModel');
 const Employer = require('../models/employerModel');
+const { Op } = require('sequelize');
 
 exports.getChatHistory = async (req, res) => {
   const { applicationId } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(applicationId)) {
-    return res.status(400).json({ message: 'Invalid application ID' });
-  }
 
   try {
-    const chat = await Chat.findOne({ application: applicationId }).lean();
+    const chat = await Chat.findOne({
+        where: { applicationId },
+        include: [{ model: Message, as: 'messages' }]
+    });
+
     if (!chat) {
       return res.json([]);
     }
 
-    const senderIds = [
-      ...new Set(chat.messages.map((m) => m.sender.toString())),
-    ].map((id) => new mongoose.Types.ObjectId(id));
+    const messages = chat.messages || [];
+    const senderIds = [...new Set(messages.map((m) => m.senderId))];
 
-    const users = await User.find({ _id: { $in: senderIds } })
-      .select('firstName lastName')
-      .lean();
-    const employers = await Employer.find({ _id: { $in: senderIds } })
-      .select('companyName')
-      .lean();
+    const users = await User.findAll({
+      where: { id: { [Op.in]: senderIds } },
+      attributes: ['id', 'firstName', 'lastName'],
+    });
+    const employers = await Employer.findAll({
+      where: { id: { [Op.in]: senderIds } },
+      attributes: ['id', 'companyName'],
+    });
 
     const senderMap = new Map();
     users.forEach((u) =>
-      senderMap.set(u._id.toString(), {
-        _id: u._id,
+      senderMap.set(u.id, {
+        id: u.id,
         name: `${u.firstName} ${u.lastName}`,
       })
     );
     employers.forEach((e) =>
-      senderMap.set(e._id.toString(), { _id: e._id, name: e.companyName })
+      senderMap.set(e.id, { id: e.id, name: e.companyName })
     );
 
-    const populatedMessages = chat.messages.map((message) => ({
-      ...message,
-      sender: senderMap.get(message.sender.toString()),
+    const populatedMessages = messages.map((message) => ({
+      ...message.get({ plain: true }),
+      sender: senderMap.get(message.senderId),
     }));
 
     res.json(populatedMessages);
@@ -53,11 +54,13 @@ exports.getChatHistory = async (req, res) => {
 
 exports.deleteChatHistory = async (req, res) => {
   const { applicationId } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(applicationId)) {
-    return res.status(400).json({ message: 'Invalid application ID' });
-  }
   try {
-    await Chat.findOneAndDelete({ application: applicationId });
+    const chat = await Chat.findOne({ where: { applicationId } });
+    if (chat) {
+        // Delete messages first if not handled by cascade
+        await Message.destroy({ where: { chatId: chat.id } });
+        await chat.destroy();
+    }
     res.status(200).json({ message: 'Chat history deleted successfully' });
   } catch (error) {
     console.error('Error deleting chat history:', error);
@@ -68,7 +71,7 @@ exports.deleteChatHistory = async (req, res) => {
 exports.getNotifications = async (req, res) => {
   try {
     const notifications = await notificationService.getNotificationsForUser(
-      req.user._id
+      req.user.id
     );
     res.json(notifications);
   } catch (error) {

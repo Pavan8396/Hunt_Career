@@ -1,10 +1,10 @@
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('./config/env');
-const Chat = require('./models/chatModel');
+const { Chat, Message } = require('./models/chatModel');
 const Application = require('./models/applicationModel');
 const notificationService = require('./services/notificationService');
-const mongoose = require('mongoose');
+const { Op } = require('sequelize');
 
 const initSocket = (server) => {
   const io = new Server(server, {
@@ -35,7 +35,7 @@ const initSocket = (server) => {
   };
 
   io.on('connection', (socket) => {
-    const userId = socket.user._id;
+    const userId = socket.user.id;
     userSockets.set(userId.toString(), socket);
 
     sendNotifications(userId);
@@ -48,32 +48,37 @@ const initSocket = (server) => {
       'sendMessage',
       async ({ applicationId, senderId, text }) => {
         try {
-          const application = await Application.findById(applicationId).populate('job');
+          const application = await Application.findByPk(applicationId, {
+              include: ['job']
+          });
           if (!application) return;
 
           const recipientId =
-            userId.toString() === application.applicant.toString()
-              ? application.job.employer
-              : application.applicant;
+            userId.toString() === application.applicantId.toString()
+              ? application.job.employerId
+              : application.applicantId;
 
-          let chat = await Chat.findOne({ application: applicationId });
+          let chat = await Chat.findOne({ where: { applicationId } });
           if (!chat) {
-            chat = new Chat({
-              application: applicationId,
-              job: application.job._id,
+            chat = await Chat.create({
+              applicationId,
+              jobId: application.jobId,
               participants: [senderId, recipientId],
-              messages: [],
             });
           }
 
-          const newMessage = { sender: senderId, text, timestamp: new Date(), read: false };
-          chat.messages.push(newMessage);
-          await chat.save();
+          const newMessage = await Message.create({
+              chatId: chat.id,
+              senderId,
+              text,
+              timestamp: new Date(),
+              read: false
+          });
 
           socket.to(applicationId).emit('receiveMessage', {
-            ...newMessage,
+            ...newMessage.get({ plain: true }),
             applicationId,
-            sender: { _id: senderId, name: socket.user.name },
+            sender: { id: senderId, name: socket.user.name },
           });
 
           sendNotifications(recipientId.toString());
@@ -85,15 +90,19 @@ const initSocket = (server) => {
 
     socket.on('markAsRead', async ({ applicationId }) => {
       try {
-        await Chat.updateOne(
-          { application: applicationId },
-          { $set: { 'messages.$[elem].read': true } },
-          {
-            arrayFilters: [
-              { 'elem.sender': { $ne: new mongoose.Types.ObjectId(userId) }, 'elem.read': false },
-            ],
-          }
-        );
+        const chat = await Chat.findOne({ where: { applicationId } });
+        if (chat) {
+            await Message.update(
+                { read: true },
+                {
+                    where: {
+                        chatId: chat.id,
+                        senderId: { [Op.ne]: userId },
+                        read: false
+                    }
+                }
+            );
+        }
         sendNotifications(userId);
       } catch (error) {
         console.error('Error marking messages as read:', error);

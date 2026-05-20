@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require('../config/env');
 const Employer = require('../models/employerModel');
 const Job = require('../models/jobModel');
+const Application = require('../models/applicationModel');
+const User = require('../models/userModel');
 const { Op } = require('sequelize');
 
 const getEmployerProfile = async (req, res) => {
@@ -126,11 +128,39 @@ const loginEmployer = async (req, res) => {
 };
 
 const getEmployerApplications = async (req, res) => {
-    res.status(501).json({ message: "Not implemented yet" });
+  try {
+    const applications = await Application.findAll({
+      include: [{
+        model: Job,
+        as: 'job',
+        where: { employerId: req.user.id }
+      }]
+    });
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 const getApplicationsOverTime = async (req, res) => {
-    res.status(501).json({ message: "Not implemented yet" });
+  try {
+    const applications = await Application.findAll({
+      include: [{
+        model: Job,
+        as: 'job',
+        where: { employerId: req.user.id }
+      }]
+    });
+    const data = applications.reduce((acc, app) => {
+      const date = new Date(app.date).toISOString().split('T')[0];
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    }, {});
+    const formattedData = Object.keys(data).map(date => ({ date, count: data[date] }));
+    res.json(formattedData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 const getJobPostingsSummary = async (req, res) => {
@@ -150,7 +180,28 @@ const getJobPostingsSummary = async (req, res) => {
 };
 
 const getRecentActivity = async (req, res) => {
-    res.status(501).json({ message: "Not implemented yet" });
+  try {
+    const applications = await Application.findAll({
+      limit: 5,
+      order: [['date', 'DESC']],
+      include: [
+        {
+          model: Job,
+          as: 'job',
+          where: { employerId: req.user.id },
+          attributes: ['title']
+        },
+        {
+          model: User,
+          as: 'applicant',
+          attributes: ['firstName', 'lastName']
+        }
+      ]
+    });
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 const getEmployerById = async (req, res) => {

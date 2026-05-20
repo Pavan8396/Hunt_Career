@@ -1,31 +1,51 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const reviewSchema = new mongoose.Schema({
-  employer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Employer',
-    required: true,
+const Review = sequelize.define('Review', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
   },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
+  employerId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'Employers',
+      key: 'id',
+    },
+  },
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id',
+    },
   },
   rating: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5,
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      min: 1,
+      max: 5,
+    },
   },
   comment: {
-    type: String,
-    required: true,
-    trim: true,
+    type: DataTypes.TEXT,
+    allowNull: false,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  tableName: 'Reviews',
+  timestamps: true,
 });
 
-module.exports = mongoose.model('Review', reviewSchema);
+const Employer = require('./employerModel');
+const User = require('./userModel');
+
+Review.belongsTo(Employer, { foreignKey: 'employerId', as: 'employer' });
+Review.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+Employer.hasMany(Review, { foreignKey: 'employerId', as: 'reviews' });
+User.hasMany(Review, { foreignKey: 'userId', as: 'reviews' });
+
+module.exports = Review;

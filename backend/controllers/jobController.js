@@ -1,6 +1,6 @@
 const Job = require('../models/jobModel');
 const Employer = require('../models/employerModel');
-// const Application = require('../models/applicationModel');
+const Application = require('../models/applicationModel');
 const { Op } = require('sequelize');
 
 const getJobs = async (req, res) => {
@@ -134,8 +134,18 @@ const deleteJobs = async (req, res) => {
 };
 
 const getApplicationForJob = async (req, res) => {
-  // Application model not yet migrated
-  res.status(501).json({ message: "Not implemented yet" });
+  try {
+    const application = await Application.findOne({
+      where: {
+        jobId: req.params.id,
+        applicantId: req.user.id,
+      }
+    });
+    res.json(application);
+  } catch (error) {
+    console.error('[getApplicationForJob] Error fetching application for job:', error);
+    res.status(500).json({ message: 'Failed to fetch application status' });
+  }
 };
 
 const updateJob = async (req, res) => {

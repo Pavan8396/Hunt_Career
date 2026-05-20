@@ -1,5 +1,6 @@
 const Review = require('../models/reviewModel');
 const Employer = require('../models/employerModel');
+const User = require('../models/userModel');
 
 // @desc    Create a new review
 // @route   POST /api/employers/:employerId/reviews
@@ -8,27 +9,27 @@ exports.createReview = async (req, res) => {
   try {
     const { rating, comment } = req.body;
     const employerId = req.params.employerId;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
-    const employer = await Employer.findById(employerId);
+    const employer = await Employer.findByPk(employerId);
     if (!employer) {
       return res.status(404).json({ message: 'Employer not found' });
     }
 
-    // Optional: Check if the user has already reviewed this company
-    const existingReview = await Review.findOne({ employer: employerId, user: userId });
+    const existingReview = await Review.findOne({
+        where: { employerId, userId }
+    });
     if (existingReview) {
       return res.status(400).json({ message: 'You have already reviewed this company' });
     }
 
-    const review = new Review({
-      employer: employerId,
-      user: userId,
+    const review = await Review.create({
+      employerId,
+      userId,
       rating,
       comment,
     });
 
-    await review.save();
     res.status(201).json({ message: 'Review submitted successfully', review });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -41,11 +42,14 @@ exports.createReview = async (req, res) => {
 exports.getReviewsForEmployer = async (req, res) => {
   try {
     const employerId = req.params.employerId;
-    const reviews = await Review.find({ employer: employerId }).populate('user', 'firstName lastName');
-
-    if (!reviews) {
-      return res.status(404).json({ message: 'No reviews found for this employer' });
-    }
+    const reviews = await Review.findAll({
+      where: { employerId },
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['firstName', 'lastName'],
+      }]
+    });
 
     res.json(reviews);
   } catch (error) {
