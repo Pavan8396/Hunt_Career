@@ -1,48 +1,61 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
+const bcrypt = require('bcryptjs');
 
-const employerSchema = new mongoose.Schema({
+const Employer = sequelize.define('Employer', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
   companyName: {
-    type: String,
-    required: true,
-    trim: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   email: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true,
-    trim: true,
-    lowercase: true,
+    validate: {
+      isEmail: true,
+    },
   },
   password: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
-  postedJobs: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Job',
-  }],
   companyLogo: {
-    type: String,
+    type: DataTypes.STRING,
   },
   companyDescription: {
-    type: String,
+    type: DataTypes.TEXT,
   },
   website: {
-    type: String,
+    type: DataTypes.STRING,
   },
   isActive: {
-    type: Boolean,
-    default: true,
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
   },
   theme: {
-    type: String,
-    enum: ['light', 'dark'],
-    default: 'light',
+    type: DataTypes.ENUM('light', 'dark'),
+    defaultValue: 'light',
   },
 }, {
+  hooks: {
+    beforeSave: async (employer) => {
+      if (employer.changed('password')) {
+        const salt = await bcrypt.genSalt(10);
+        employer.password = await bcrypt.hash(employer.password, salt);
+      }
+    },
+  },
+  tableName: 'Employers',
   timestamps: true,
 });
 
-const Employer = mongoose.model('Employer', employerSchema);
+Employer.prototype.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 module.exports = Employer;

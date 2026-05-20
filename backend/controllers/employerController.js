@@ -2,10 +2,14 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require('../config/env');
 const Employer = require('../models/employerModel');
+const Job = require('../models/jobModel');
+const { Op } = require('sequelize');
 
 const getEmployerProfile = async (req, res) => {
   try {
-    const employer = await Employer.findById(req.user._id).select('-password');
+    const employer = await Employer.findByPk(req.user.id, {
+        attributes: { exclude: ['password'] }
+    });
     if (employer) {
       res.json(employer);
     } else {
@@ -18,7 +22,7 @@ const getEmployerProfile = async (req, res) => {
 
 const updateEmployerProfile = async (req, res) => {
   try {
-    const employer = await Employer.findById(req.user._id);
+    const employer = await Employer.findByPk(req.user.id);
 
     if (employer) {
       // Prevent email updates
@@ -26,8 +30,6 @@ const updateEmployerProfile = async (req, res) => {
         return res.status(400).json({ message: 'Email address cannot be changed.' });
       }
 
-      // Update fields if they are present in the request. The `in` operator is used
-      // for safety as req.body from multer may not have hasOwnProperty.
       if ('companyName' in req.body) {
         employer.companyName = req.body.companyName;
       }
@@ -42,16 +44,16 @@ const updateEmployerProfile = async (req, res) => {
         employer.companyLogo = req.file.path;
       }
 
-      const updatedEmployer = await employer.save();
+      await employer.save();
 
       res.json({
-        _id: updatedEmployer._id,
-        companyName: updatedEmployer.companyName,
-        email: updatedEmployer.email,
-        companyDescription: updatedEmployer.companyDescription,
-        website: updatedEmployer.website,
-        companyLogo: updatedEmployer.companyLogo,
-        theme: updatedEmployer.theme,
+        id: employer.id,
+        companyName: employer.companyName,
+        email: employer.email,
+        companyDescription: employer.companyDescription,
+        website: employer.website,
+        companyLogo: employer.companyLogo,
+        theme: employer.theme,
       });
     } else {
       res.status(404).json({ message: 'Employer not found' });
@@ -79,20 +81,16 @@ const registerEmployer = async (req, res) => {
   }
 
   try {
-    const existingEmployer = await Employer.findOne({ email });
+    const existingEmployer = await Employer.findOne({ where: { email } });
     if (existingEmployer) {
       return res.status(400).json({ message: "Employer already exists" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const employer = new Employer({
+    const employer = await Employer.create({
       companyName,
       email,
-      password: hashedPassword,
+      password, // Hashing handled by model hook
     });
-
-    await employer.save();
 
     res.status(201).json({ message: "Employer registered successfully" });
   } catch (err) {
@@ -101,9 +99,6 @@ const registerEmployer = async (req, res) => {
   }
 };
 
-const Job = require('../models/jobModel');
-const Application = require('../models/applicationModel');
-
 const loginEmployer = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -111,15 +106,15 @@ const loginEmployer = async (req, res) => {
   }
 
   try {
-    const employer = await Employer.findOne({ email });
-    if (employer && await bcrypt.compare(password, employer.password)) {
+    const employer = await Employer.findOne({ where: { email } });
+    if (employer && await employer.matchPassword(password)) {
       if (!employer.isActive) {
         return res.status(403).json({ message: "Your account has been suspended. Please contact support." });
       }
-      const token = jwt.sign({ _id: employer._id, email: employer.email, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({ id: employer.id, email: employer.email, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
-        employer: { _id: employer._id, name: employer.companyName, email: employer.email, theme: employer.theme }
+        employer: { id: employer.id, name: employer.companyName, email: employer.email, theme: employer.theme }
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });
@@ -131,36 +126,16 @@ const loginEmployer = async (req, res) => {
 };
 
 const getEmployerApplications = async (req, res) => {
-  try {
-    const jobs = await Job.find({ employer: req.user._id });
-    const jobIds = jobs.map(job => job._id);
-    const applications = await Application.find({ job: { $in: jobIds } });
-    res.json(applications);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    res.status(501).json({ message: "Not implemented yet" });
 };
 
 const getApplicationsOverTime = async (req, res) => {
-  try {
-    const jobs = await Job.find({ employer: req.user._id });
-    const jobIds = jobs.map(job => job._id);
-    const applications = await Application.find({ job: { $in: jobIds } });
-    const data = applications.reduce((acc, app) => {
-      const date = new Date(app.date).toISOString().split('T')[0];
-      acc[date] = (acc[date] || 0) + 1;
-      return acc;
-    }, {});
-    const formattedData = Object.keys(data).map(date => ({ date, count: data[date] }));
-    res.json(formattedData);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    res.status(501).json({ message: "Not implemented yet" });
 };
 
 const getJobPostingsSummary = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.user._id });
+    const jobs = await Job.findAll({ where: { employerId: req.user.id } });
     const data = jobs.reduce((acc, job) => {
       if (job.job_type) {
         acc[job.job_type] = (acc[job.job_type] || 0) + 1;
@@ -175,23 +150,12 @@ const getJobPostingsSummary = async (req, res) => {
 };
 
 const getRecentActivity = async (req, res) => {
-  try {
-    const jobs = await Job.find({ employer: req.user._id });
-    const jobIds = jobs.map(job => job._id);
-    const applications = await Application.find({ job: { $in: jobIds } })
-      .sort({ date: -1 })
-      .limit(5)
-      .populate('applicant', 'firstName lastName')
-      .populate('job', 'title');
-    res.json(applications);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    res.status(501).json({ message: "Not implemented yet" });
 };
 
 const getEmployerById = async (req, res) => {
   try {
-    const employer = await Employer.findById(req.params.id);
+    const employer = await Employer.findByPk(req.params.id);
     if (employer) {
       res.json({ name: employer.companyName });
     } else {
@@ -208,7 +172,7 @@ const updateEmployerTheme = async (req, res) => {
     if (!['light', 'dark'].includes(theme)) {
       return res.status(400).json({ message: 'Invalid theme' });
     }
-    const employer = await Employer.findById(req.user._id);
+    const employer = await Employer.findByPk(req.user.id);
     if (!employer) {
       return res.status(404).json({ message: 'Employer not found' });
     }

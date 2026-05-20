@@ -3,8 +3,8 @@ const cors = require("cors");
 
 // Pre-load all models
 require('./models/userModel');
-// require('./models/employerModel');
-// require('./models/jobModel');
+require('./models/employerModel');
+require('./models/jobModel');
 // require('./models/applicationModel');
 // require('./models/chatModel');
 
