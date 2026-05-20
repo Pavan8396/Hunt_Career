@@ -1,18 +1,25 @@
-const mongoose = require('mongoose');
+const { Sequelize } = require('sequelize');
+const path = require('path');
 require('dotenv').config();
 
-const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/hcdb";
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: path.join(__dirname, '../database.sqlite'),
+  logging: false, // Set to console.log to see SQL queries
+});
 
-const connectToMongo = async () => {
+const connectDB = async () => {
   try {
-    await mongoose.connect(mongoUri);
-    //console.log("Connected to MongoDB");
-  } catch (err) {
-    console.error("MongoDB connection error:", err.message);
-    throw err;
+    await sequelize.authenticate();
+    // console.log('SQLite connection has been established successfully.');
+
+    // Sync models
+    // In production, you might want to use migrations
+    await sequelize.sync({ force: false });
+  } catch (error) {
+    console.error('Unable to connect to the SQLite database:', error);
+    throw error;
   }
 };
 
-const getDb = () => mongoose.connection;
-
-module.exports = { connectToMongo, getDb };
+module.exports = { sequelize, connectDB };

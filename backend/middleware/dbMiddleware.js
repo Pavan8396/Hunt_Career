@@ -1,7 +1,7 @@
-const { getDb } = require('../config/db');
+const { sequelize } = require('../config/db');
 
 const ensureDb = (req, res, next) => {
-  if (!getDb()) {
+  if (!sequelize) {
     return res.status(503).json({ message: "Database connection unavailable" });
   }
   next();

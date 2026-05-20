@@ -1,86 +1,91 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 const bcrypt = require('bcryptjs');
 
-const userSchema = new mongoose.Schema({
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
   firstName: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   lastName: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   email: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true,
+    validate: {
+      isEmail: true,
+    },
   },
   password: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   phoneNumber: {
-    type: String,
+    type: DataTypes.STRING,
   },
-  workExperience: [
-    {
-      title: { type: String },
-      company: { type: String },
-      location: { type: String },
-      startDate: { type: Date },
-      endDate: { type: Date },
-      description: { type: String },
-    },
-  ],
-  education: [
-    {
-      school: { type: String },
-      degree: { type: String },
-      fieldOfStudy: { type: String },
-      startDate: { type: Date },
-      endDate: { type: Date },
-    },
-  ],
+  workExperience: {
+    type: DataTypes.JSON, // SQLite stores this as TEXT
+    defaultValue: [],
+  },
+  education: {
+    type: DataTypes.JSON,
+    defaultValue: [],
+  },
   skills: {
-    type: [String],
+    type: DataTypes.JSON,
+    defaultValue: [],
   },
   portfolioLinks: {
-    type: [String],
+    type: DataTypes.JSON,
+    defaultValue: [],
   },
   isAdmin: {
-    type: Boolean,
-    default: false,
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   isActive: {
-    type: Boolean,
-    default: true,
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
   },
   theme: {
-    type: String,
-    enum: ['light', 'dark'],
-    default: 'light',
+    type: DataTypes.ENUM('light', 'dark'),
+    defaultValue: 'light',
   },
-  savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
-}, {
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
-
-userSchema.virtual('name').get(function() {
-  return `${this.firstName} ${this.lastName}`;
-});
-
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();
+  savedJobs: {
+    type: DataTypes.JSON,
+    defaultValue: [],
+  },
+  name: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return `${this.firstName} ${this.lastName}`;
+    },
+    set(value) {
+      throw new Error('Do not try to set the `name` value!');
+    }
   }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+}, {
+  hooks: {
+    beforeSave: async (user) => {
+      if (user.changed('password')) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+      }
+    },
+  },
+  tableName: 'Users',
 });
 
-userSchema.methods.matchPassword = async function (enteredPassword) {
+User.prototype.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', userSchema, 'Users');
+module.exports = User;

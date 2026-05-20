@@ -1,12 +1,12 @@
 const express = require("express");
 const cors = require("cors");
 
-// Pre-load all Mongoose models
+// Pre-load all models
 require('./models/userModel');
-require('./models/employerModel');
-require('./models/jobModel');
-require('./models/applicationModel');
-require('./models/chatModel');
+// require('./models/employerModel');
+// require('./models/jobModel');
+// require('./models/applicationModel');
+// require('./models/chatModel');
 
 const jwt = require("jsonwebtoken"); // Still needed for JWT operations if any are left, but authController handles its own
 const bcrypt = require("bcryptjs"); // Still needed for bcrypt operations if any are left, but authController handles its own
