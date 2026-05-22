@@ -69,11 +69,11 @@ const EmployerDashboard = () => {
   const COLORS = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
 
   const StatCard = ({ icon, title, value, color }) => (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex items-center hover:shadow-md transition-shadow">
-      <div className={`p-2 rounded-lg ${color} text-white`}>{React.cloneElement(icon, { className: 'h-6 w-6' })}</div>
-      <div className="ml-3">
-        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</h3>
-        <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+    <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex items-center hover:shadow-md transition-shadow">
+      <div className={`p-2 rounded-lg ${color} text-white shrink-0`}>{React.cloneElement(icon, { className: 'h-5 w-5' })}</div>
+      <div className="ml-2 min-w-0">
+        <h3 className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-tight truncate">{title}</h3>
+        <p className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-none">{value}</p>
       </div>
     </div>
   );
@@ -102,7 +102,7 @@ const EmployerDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Area Chart */}
         <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
-          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Applications Over Time</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Applications Over Time</h3>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={applicationsOverTime} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <defs>
@@ -125,7 +125,7 @@ const EmployerDashboard = () => {
 
         {/* Candidate Stage Pie Chart */}
         <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
-          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Candidate Stage Summary</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Candidate Stage Summary</h3>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
@@ -161,7 +161,7 @@ const EmployerDashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Job Postings by Type Bar Chart */}
         <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
-          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Jobs by Type</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Jobs by Type</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={jobPostingsSummary}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -175,7 +175,7 @@ const EmployerDashboard = () => {
 
         {/* Hiring Funnel (Simplified) */}
         <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
-          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Hiring Funnel</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Hiring Funnel</h3>
           <div className="space-y-3">
             {[
               { label: 'Total Applications', value: metrics.totalApplications, color: 'bg-indigo-500' },
@@ -200,7 +200,7 @@ const EmployerDashboard = () => {
 
         {/* Recent Activity Section (Inside the grid now for better space utilization) */}
         <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-        <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Recent Activity</h3>
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Recent Activity</h3>
         <div className="space-y-3">
           {recentActivity.map((activity) => (
             <div key={activity._id} className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -224,7 +224,6 @@ const EmployerDashboard = () => {
         </div>
       </div>
     </div>
-  </div>
   );
 };
 
