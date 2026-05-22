@@ -12,12 +12,13 @@ const getJobs = async (req, res) => {
     if (search) {
       const searchLower = search.toLowerCase().trim();
       const escapedSearch = escapeRegex(searchLower);
+      const searchRegex = new RegExp(escapedSearch, 'i');
       query.$or = [
-        { title: { $regex: escapedSearch, $options: 'i' } },
-        { company: { $regex: escapedSearch, $options: 'i' } },
-        { description: { $regex: escapedSearch, $options: 'i' } },
-        { candidate_required_location: { $regex: escapedSearch, $options: 'i' } },
-        { job_type: { $regex: escapedSearch, $options: 'i' } },
+        { title: searchRegex },
+        { company: searchRegex },
+        { description: searchRegex },
+        { candidate_required_location: searchRegex },
+        { job_type: searchRegex },
       ];
     }
     if (locations) {
@@ -63,8 +64,8 @@ const createJob = async (req, res) => {
     const escapedCompany = escapeRegex(company);
 
     const existingJob = await Job.findOne({
-      title: { $regex: `^${escapedTitle}$`, $options: 'i' },
-      company: { $regex: `^${escapedCompany}$`, $options: 'i' },
+      title: new RegExp(`^${escapedTitle}$`, 'i'),
+      company: new RegExp(`^${escapedCompany}$`, 'i'),
       employer: req.user._id,
     });
 
@@ -191,8 +192,8 @@ const updateJob = async (req, res) => {
     const escapedTitle = escapeRegex(title);
     const escapedCompany = escapeRegex(company);
     const existingJob = await Job.findOne({
-      title: { $regex: `^${escapedTitle}$`, $options: 'i' },
-      company: { $regex: `^${escapedCompany}$`, $options: 'i' },
+      title: new RegExp(`^${escapedTitle}$`, 'i'),
+      company: new RegExp(`^${escapedCompany}$`, 'i'),
       employer: req.user._id,
       _id: { $ne: id },
     });
