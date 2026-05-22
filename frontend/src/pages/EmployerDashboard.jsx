@@ -224,6 +224,7 @@ const EmployerDashboard = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
 
