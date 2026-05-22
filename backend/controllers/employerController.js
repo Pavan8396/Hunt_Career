@@ -156,7 +156,7 @@ const loginEmployer = async (req, res) => {
 const getEmployerApplications = async (req, res) => {
   try {
     const employer = await Employer.findById(req.user._id);
-    const jobs = await Job.find({ company: employer.company });
+    const jobs = await Job.find({ companyId: employer.company });
     const jobIds = jobs.map(job => job._id);
     const applications = await Application.find({ job: { $in: jobIds } });
     res.json(applications);
@@ -168,7 +168,7 @@ const getEmployerApplications = async (req, res) => {
 const getApplicationsOverTime = async (req, res) => {
   try {
     const employer = await Employer.findById(req.user._id);
-    const jobs = await Job.find({ company: employer.company });
+    const jobs = await Job.find({ companyId: employer.company });
     const jobIds = jobs.map(job => job._id);
     const applications = await Application.find({ job: { $in: jobIds } });
     const data = applications.reduce((acc, app) => {
@@ -186,7 +186,7 @@ const getApplicationsOverTime = async (req, res) => {
 const getJobPostingsSummary = async (req, res) => {
   try {
     const employer = await Employer.findById(req.user._id);
-    const jobs = await Job.find({ company: employer.company });
+    const jobs = await Job.find({ companyId: employer.company });
     const data = jobs.reduce((acc, job) => {
       if (job.job_type) {
         acc[job.job_type] = (acc[job.job_type] || 0) + 1;
@@ -203,7 +203,7 @@ const getJobPostingsSummary = async (req, res) => {
 const getRecentActivity = async (req, res) => {
   try {
     const employer = await Employer.findById(req.user._id);
-    const jobs = await Job.find({ company: employer.company });
+    const jobs = await Job.find({ companyId: employer.company });
     const jobIds = jobs.map(job => job._id);
     const applications = await Application.find({ job: { $in: jobIds } })
       .sort({ date: -1 })
@@ -253,7 +253,7 @@ const getEmployerDashboardMetrics = async (req, res) => {
     const companyId = employer.company;
 
     const metrics = await Job.aggregate([
-      { $match: { company: companyId } },
+      { $match: { companyId: companyId } },
       {
         $lookup: {
           from: 'applications',
@@ -310,7 +310,7 @@ const getEmployerDashboardMetrics = async (req, res) => {
     // Fallback for case-sensitive collections if standard ones are empty
     if (metrics[0].jobMetrics.length === 0) {
        const altMetrics = await mongoose.connection.db.collection('Jobs').aggregate([
-        { $match: { company: companyId } },
+        { $match: { companyId: companyId } },
         {
           $lookup: {
             from: 'Applications',

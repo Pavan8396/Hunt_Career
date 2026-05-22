@@ -8,7 +8,7 @@ const jobSchema = new mongoose.Schema({
   job_type: { type: String, required: true },
   status: { type: String, enum: ['Open', 'Closed', 'Draft', 'Archived'], default: 'Open' },
   employer: { type: mongoose.Schema.Types.ObjectId, ref: 'Employer', required: true },
-  company: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' },
+  companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' },
 }, {
   timestamps: true,
 });
