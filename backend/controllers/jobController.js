@@ -98,8 +98,8 @@ const getEmployerJobs = async (req, res) => {
       return res.status(404).json({ message: "Employer not found." });
     }
 
-    // Find all jobs for the company, not just the individual recruiter
-    const jobs = await Job.find({ companyId: employer.company, status: { $ne: 'Archived' } });
+    // Find only jobs posted by this specific recruiter
+    const jobs = await Job.find({ employer: req.user._id, status: { $ne: 'Archived' } });
     res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
