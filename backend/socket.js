@@ -79,7 +79,7 @@ const initSocket = (server) => {
           await newMessage.save();
 
           socket.to(applicationId).emit('receiveMessage', {
-            ...newMessage,
+            ...newMessage.toObject(),
             applicationId,
             sender: { _id: senderId, name: socket.user.name },
           });
