@@ -103,6 +103,7 @@ const registerEmployer = async (req, res) => {
 
 const Job = require('../models/jobModel');
 const Application = require('../models/applicationModel');
+const Interview = require('../models/interviewModel');
 
 const loginEmployer = async (req, res) => {
   const { email, password } = req.body;
@@ -220,6 +221,59 @@ const updateEmployerTheme = async (req, res) => {
   }
 };
 
+const getEmployerDashboardMetrics = async (req, res) => {
+  try {
+    const employerId = req.user._id;
+    const jobs = await Job.find({ employer: employerId });
+    const jobIds = jobs.map(job => job._id);
+
+    const applications = await Application.find({ job: { $in: jobIds } });
+    const applicationIds = applications.map(app => app._id);
+
+    const interviews = await Interview.find({ application: { $in: applicationIds } });
+
+    // Active Candidates (Not rejected or dropped)
+    const activeCandidatesCount = applications.filter(app =>
+      !['Rejected', 'Dropped'].includes(app.status)
+    ).length;
+
+    // Active Requests (Open jobs)
+    const activeRequestsCount = jobs.filter(job => job.status === 'Open').length;
+
+    // Interview Metrics
+    const interviewScheduled = interviews.filter(i => i.status === 'Scheduled').length;
+    const interviewCompleted = interviews.filter(i => i.status === 'Completed').length;
+    const feedbackGiven = interviews.filter(i => i.status === 'Completed' && i.feedback).length;
+    const feedbackPending = interviews.filter(i => i.status === 'Completed' && !i.feedback).length;
+
+    // Candidate Stage Summary
+    const stageSummary = applications.reduce((acc, app) => {
+      acc[app.status] = (acc[app.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    const formattedStageSummary = Object.keys(stageSummary).map(stage => ({
+      name: stage,
+      value: stageSummary[stage]
+    }));
+
+    res.json({
+      totalJobs: jobs.length,
+      totalApplications: applications.length,
+      activeCandidates: activeCandidatesCount,
+      activeRequests: activeRequestsCount,
+      interviewScheduled,
+      interviewCompleted,
+      feedbackGiven,
+      feedbackPending,
+      stageSummary: formattedStageSummary
+    });
+  } catch (error) {
+    console.error('Failed to fetch employer dashboard metrics', error);
+    res.status(500).json({ message: 'Failed to fetch dashboard metrics' });
+  }
+};
+
 module.exports = {
   registerEmployer,
   loginEmployer,
@@ -231,4 +285,5 @@ module.exports = {
   getEmployerProfile,
   updateEmployerProfile,
   updateEmployerTheme,
+  getEmployerDashboardMetrics,
 };

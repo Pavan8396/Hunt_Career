@@ -25,6 +25,24 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const getEmployerDashboardMetrics = async (token) => {
+  try {
+    const response = await fetch(`${API_URL}/employers/stats/dashboard-metrics`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch dashboard metrics');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching dashboard metrics:', error);
+    toast.error('Could not load dashboard metrics.');
+    throw error;
+  }
+};
+
 export const getApplicationForJob = async (jobId, token) => {
   try {
     const response = await fetch(`${API_URL}/jobs/${jobId}/application`, {
