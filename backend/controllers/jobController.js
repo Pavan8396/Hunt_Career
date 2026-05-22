@@ -8,7 +8,7 @@ const getJobs = async (req, res) => {
   const { search, locations, jobTypes } = req.query;
 
   try {
-    let query = {};
+    let query = { status: { $ne: 'Archived' } };
     if (search) {
       const searchLower = search.toLowerCase().trim();
       const escapedSearch = escapeRegex(searchLower);
@@ -31,7 +31,7 @@ const getJobs = async (req, res) => {
       query.job_type = { $in: typeArray };
     }
 
-    const jobs = await Job.find(query);
+    const jobs = await Job.find(query).sort({ createdAt: -1 });
     res.status(200).json(jobs);
   } catch (err) {
     console.error("Fetch jobs error:", err.message);
@@ -72,9 +72,11 @@ const createJob = async (req, res) => {
       return res.status(409).json({ message: 'A job with the same title and company already exists.' });
     }
 
+    const employer = await Employer.findById(req.user._id);
     const newJob = new Job({
       ...req.body,
       employer: req.user._id,
+      company: employer.company,
     });
     const savedJob = await newJob.save();
     await Employer.findByIdAndUpdate(req.user._id, { $push: { postedJobs: savedJob._id } });
@@ -87,11 +89,14 @@ const createJob = async (req, res) => {
 
 const getEmployerJobs = async (req, res) => {
   try {
-    const employer = await Employer.findById(req.user._id).populate('postedJobs');
+    const employer = await Employer.findById(req.user._id);
     if (!employer) {
       return res.status(404).json({ message: "Employer not found." });
     }
-    res.json(employer.postedJobs);
+
+    // Find all jobs for the company, not just the individual recruiter
+    const jobs = await Job.find({ company: employer.company, status: { $ne: 'Archived' } });
+    res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -111,53 +116,43 @@ const deleteJobs = async (req, res) => {
   const { jobIds } = req.body;
 
   try {
-    // ADMIN PATH for single delete from manage jobs page
+    // ADMIN PATH for single archive from manage jobs page
     if (req.user.isAdmin && id) {
         const job = await Job.findById(id);
         if (!job) {
             return res.status(404).json({ message: 'Job not found' });
         }
 
-        await Job.findByIdAndDelete(id);
+        job.status = 'Archived';
+        await job.save();
 
-        // Also remove from employer's postedJobs array
-        await Employer.findByIdAndUpdate(job.employer, {
-            $pull: { postedJobs: job._id }
-        });
-
-        return res.json({ message: 'Job deleted successfully by admin.' });
+        return res.json({ message: 'Job archived successfully by admin.' });
     }
 
-    // EMPLOYER PATH (original logic)
-    const employer = await Employer.findById(req.user._id);
-    if (!employer) {
-      return res.status(404).json({ message: 'Employer not found' });
-    }
-
-    let jobsToDelete = [];
+    // EMPLOYER PATH
+    let jobsToArchive = [];
     if (id) {
-      jobsToDelete.push(id);
+      jobsToArchive.push(id);
     } else if (jobIds) {
-      jobsToDelete = [...jobIds];
+      jobsToArchive = [...jobIds];
     } else {
-      // Delete all jobs
-      await Job.deleteMany({ employer: req.user._id });
-      employer.postedJobs = [];
-      await employer.save();
-      return res.json({ message: 'All jobs have been removed successfully' });
+      // Archive all jobs for this employer
+      await Job.updateMany(
+        { employer: req.user._id, status: { $ne: 'Archived' } },
+        { status: 'Archived' }
+      );
+      return res.json({ message: 'All jobs have been archived successfully' });
     }
 
-    await Job.deleteMany({ _id: { $in: jobsToDelete }, employer: req.user._id });
-
-    employer.postedJobs = employer.postedJobs.filter(
-      (jobId) => !jobsToDelete.includes(jobId.toString())
+    await Job.updateMany(
+      { _id: { $in: jobsToArchive }, employer: req.user._id },
+      { status: 'Archived' }
     );
-    await employer.save();
 
-    res.json({ message: 'Selected jobs have been removed successfully' });
+    res.json({ message: 'Selected jobs have been archived successfully' });
   } catch (error) {
-    console.error('Error deleting jobs:', error);
-    res.status(500).json({ message: 'An error occurred while deleting jobs' });
+    console.error('Error archiving jobs:', error);
+    res.status(500).json({ message: 'An error occurred while archiving jobs' });
   }
 };
 

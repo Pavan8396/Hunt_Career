@@ -1,17 +1,24 @@
 const Interview = require('../models/interviewModel');
 const Application = require('../models/applicationModel');
+const notificationService = require('../services/notificationService');
+const AuditLog = require('../models/auditLogModel');
 
 exports.scheduleInterview = async (req, res) => {
   try {
-    const { applicationId, scheduledAt, interviewerName, location } = req.body;
+    const { applicationId, scheduledAt, interviewerName, location, round, roundName } = req.body;
 
     if (!applicationId || !scheduledAt) {
       return res.status(400).json({ message: 'Application ID and schedule time are required' });
     }
 
-    const application = await Application.findById(applicationId);
+    const application = await Application.findById(applicationId).populate('job');
     if (!application) {
       return res.status(404).json({ message: 'Application not found' });
+    }
+
+    // Authorization check
+    if (application.job.employer.toString() !== req.user._id && !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Not authorized to schedule interview for this application' });
     }
 
     const interview = new Interview({
@@ -19,10 +26,32 @@ exports.scheduleInterview = async (req, res) => {
       scheduledAt,
       interviewerName,
       location,
+      round,
+      roundName,
       status: 'Scheduled'
     });
 
     await interview.save();
+
+    // Log interview scheduling
+    await AuditLog.create({
+      application: application._id,
+      actionBy: req.user._id,
+      actionByModel: 'Employer',
+      action: 'Interview Scheduled',
+      details: `Round ${round}: ${roundName} scheduled for ${new Date(scheduledAt).toLocaleString()}`,
+    });
+
+    // Create notification for applicant
+    await notificationService.createNotification({
+      recipient: application.applicant,
+      sender: req.user._id,
+      senderModel: 'Employer',
+      type: 'InterviewScheduled',
+      content: `An interview has been scheduled for ${application.job.title} on ${new Date(scheduledAt).toLocaleString()}`,
+      relatedId: interview._id,
+      relatedModel: 'Interview',
+    });
 
     // Update application status to Interviewing if it isn't already
     if (application.status !== 'Interviewing') {
@@ -41,13 +70,32 @@ exports.updateInterviewStatus = async (req, res) => {
     const { status } = req.body;
     const { interviewId } = req.params;
 
-    const interview = await Interview.findById(interviewId);
+    const interview = await Interview.findById(interviewId).populate({
+      path: 'application',
+      populate: { path: 'job' }
+    });
     if (!interview) {
       return res.status(404).json({ message: 'Interview not found' });
     }
 
+    // Authorization check
+    if (interview.application.job.employer.toString() !== req.user._id && !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Not authorized to update this interview status' });
+    }
+
     interview.status = status;
     await interview.save();
+
+    // Create notification for applicant
+    await notificationService.createNotification({
+      recipient: interview.application.applicant,
+      sender: req.user._id,
+      senderModel: 'Employer',
+      type: 'InterviewStatusUpdate',
+      content: `Your interview for ${interview.application.job.title} is now ${status}`,
+      relatedId: interview._id,
+      relatedModel: 'Interview',
+    });
 
     res.json(interview);
   } catch (error) {
@@ -60,9 +108,17 @@ exports.submitFeedback = async (req, res) => {
     const { feedback } = req.body;
     const { interviewId } = req.params;
 
-    const interview = await Interview.findById(interviewId);
+    const interview = await Interview.findById(interviewId).populate({
+      path: 'application',
+      populate: { path: 'job' }
+    });
     if (!interview) {
       return res.status(404).json({ message: 'Interview not found' });
+    }
+
+    // Authorization check
+    if (interview.application.job.employer.toString() !== req.user._id && !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Not authorized to submit feedback for this interview' });
     }
 
     interview.feedback = feedback;

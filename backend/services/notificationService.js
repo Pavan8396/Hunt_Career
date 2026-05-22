@@ -1,30 +1,50 @@
 const Chat = require('../models/chatModel');
+const Message = require('../models/messageModel');
+const Notification = require('../models/notificationModel');
 const mongoose = require('mongoose');
+
+const createNotification = async (data) => {
+  try {
+    const notification = new Notification(data);
+    await notification.save();
+    return notification;
+  } catch (error) {
+    console.error('Error creating notification:', error);
+  }
+};
 
 const getNotificationsForUser = async (userId) => {
   try {
-    const notifications = await Chat.aggregate([
+    const notifications = await Message.aggregate([
       {
         $match: {
-          participants: new mongoose.Types.ObjectId(userId),
+          read: false,
+          sender: { $ne: new mongoose.Types.ObjectId(userId) },
         },
       },
-      { $unwind: '$messages' },
+      {
+        $lookup: {
+          from: 'chats',
+          localField: 'chat',
+          foreignField: '_id',
+          as: 'chatInfo',
+        },
+      },
+      { $unwind: '$chatInfo' },
       {
         $match: {
-          'messages.read': false,
-          'messages.sender': { $ne: new mongoose.Types.ObjectId(userId) },
+          'chatInfo.participants': new mongoose.Types.ObjectId(userId),
         },
       },
       {
         $group: {
           _id: {
-            sender: '$messages.sender',
-            job: '$job',
-            application: '$application',
+            sender: '$sender',
+            job: '$chatInfo.job',
+            application: '$chatInfo.application',
           },
           count: { $sum: 1 },
-          lastMessage: { $last: '$messages.text' },
+          lastMessage: { $last: '$text' },
         },
       },
       {
@@ -103,4 +123,31 @@ const getNotificationsForUser = async (userId) => {
   }
 };
 
-module.exports = { getNotificationsForUser };
+const markAsRead = async (notificationId, userId) => {
+  try {
+    await Notification.updateOne(
+      { _id: notificationId, recipient: userId },
+      { $set: { isRead: true } }
+    );
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+  }
+};
+
+const getPersistentNotifications = async (userId) => {
+  try {
+    return await Notification.find({ recipient: userId, isRead: false })
+      .sort({ createdAt: -1 })
+      .populate('sender', 'firstName lastName companyName');
+  } catch (error) {
+    console.error('Error fetching persistent notifications:', error);
+    return [];
+  }
+};
+
+module.exports = {
+  getNotificationsForUser,
+  createNotification,
+  markAsRead,
+  getPersistentNotifications
+};

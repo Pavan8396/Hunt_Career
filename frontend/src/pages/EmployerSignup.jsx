@@ -7,6 +7,8 @@ import { isValidEmail } from '../utils/validation';
 
 const EmployerSignup = () => {
   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
     companyName: '',
     email: '',
     password: '',
@@ -16,7 +18,7 @@ const EmployerSignup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { companyName, email, password, confirmPassword } = formData;
+  const { firstName, lastName, companyName, email, password, confirmPassword } = formData;
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -28,6 +30,10 @@ const EmployerSignup = () => {
   };
 
   const validateForm = () => {
+    if (!firstName.trim() || !lastName.trim()) {
+      setError('First and Last name are required.');
+      return false;
+    }
     if (!companyName.trim()) {
       setError('Company Name is required.');
       return false;
@@ -59,7 +65,7 @@ const EmployerSignup = () => {
     setErrorMessage('');
 
     try {
-      await employerSignup(companyName, email, password);
+      await employerSignup(firstName, lastName, companyName, email, password);
       toast.success('Registered successfully! Please login.');
       navigate('/employer/login');
     } catch (error) {
@@ -84,6 +90,16 @@ const EmployerSignup = () => {
       <div className="max-w-md w-full bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl shadow-2xl backdrop-blur-sm">
         <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800 dark:text-gray-100">Employer Signup</h2>
         <form onSubmit={handleSubmit} noValidate>
+          <div className="grid grid-cols-2 gap-4 mb-5">
+            <div className="relative">
+              <label className={labelClass} htmlFor="firstName">First Name</label>
+              <input type="text" id="firstName" value={firstName} onChange={handleChange} className={inputClass.replace('pl-10', 'pl-3')} placeholder="First Name" />
+            </div>
+            <div className="relative">
+              <label className={labelClass} htmlFor="lastName">Last Name</label>
+              <input type="text" id="lastName" value={lastName} onChange={handleChange} className={inputClass.replace('pl-10', 'pl-3')} placeholder="Last Name" />
+            </div>
+          </div>
           <div className="mb-5 relative">
             <label className={labelClass} htmlFor="companyName">Company Name</label>
             <div className="relative">

@@ -864,14 +864,14 @@ export const deleteJob = async (jobId, token) => {
   }
 };
 
-export const employerSignup = async (companyName, email, password) => {
+export const employerSignup = async (firstName, lastName, companyName, email, password) => {
   try {
     const response = await fetch(`${API_URL}/employers/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ companyName, email, password }),
+      body: JSON.stringify({ firstName, lastName, companyName, email, password }),
     });
     if (!response.ok) {
       let errorMessage = 'Signup failed';

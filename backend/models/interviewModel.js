@@ -26,6 +26,14 @@ const interviewSchema = new mongoose.Schema({
   },
   location: {
     type: String,
+  },
+  round: {
+    type: Number,
+    default: 1,
+  },
+  roundName: {
+    type: String,
+    default: 'Initial Interview',
   }
 }, {
   timestamps: true,
