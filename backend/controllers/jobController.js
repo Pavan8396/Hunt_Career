@@ -63,8 +63,8 @@ const createJob = async (req, res) => {
     const escapedCompany = escapeRegex(company);
 
     const existingJob = await Job.findOne({
-      title: { $regex: new RegExp(`^${escapedTitle}$`, 'i') },
-      company: { $regex: new RegExp(`^${escapedCompany}$`, 'i') },
+      title: { $regex: `^${escapedTitle}$`, $options: 'i' },
+      company: { $regex: `^${escapedCompany}$`, $options: 'i' },
       employer: req.user._id,
     });
 
@@ -73,6 +73,9 @@ const createJob = async (req, res) => {
     }
 
     const employer = await Employer.findById(req.user._id);
+    if (!employer) {
+      return res.status(404).json({ message: 'Employer not found' });
+    }
     const newJob = new Job({
       ...req.body,
       employer: req.user._id,
@@ -188,8 +191,8 @@ const updateJob = async (req, res) => {
     const escapedTitle = escapeRegex(title);
     const escapedCompany = escapeRegex(company);
     const existingJob = await Job.findOne({
-      title: { $regex: new RegExp(`^${escapedTitle}$`, 'i') },
-      company: { $regex: new RegExp(`^${escapedCompany}$`, 'i') },
+      title: { $regex: `^${escapedTitle}$`, $options: 'i' },
+      company: { $regex: `^${escapedCompany}$`, $options: 'i' },
       employer: req.user._id,
       _id: { $ne: id },
     });

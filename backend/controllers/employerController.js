@@ -136,7 +136,7 @@ const loginEmployer = async (req, res) => {
         token,
         employer: {
           _id: employer._id,
-          name: `${employer.firstName} ${employer.lastName}`,
+          name: (employer.firstName && employer.lastName) ? `${employer.firstName} ${employer.lastName}` : employer.companyName,
           companyName: employer.companyName,
           companyId: employer.company,
           role: employer.role,

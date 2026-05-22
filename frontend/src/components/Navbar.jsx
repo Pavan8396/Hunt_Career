@@ -29,12 +29,14 @@ const Navbar = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      const name = user.name || user.companyName || '';
-      const nameParts = name.split(' ');
-      const initials =
-        nameParts.length > 1
-          ? `${nameParts[0][0]}${nameParts[1][0]}`
-          : name.slice(0, 2).toUpperCase() || 'U';
+      const name = user.name || user.companyName || 'User';
+      const nameParts = name.trim().split(/\s+/);
+      let initials = 'U';
+      if (nameParts.length >= 2) {
+        initials = `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase();
+      } else if (nameParts.length === 1 && nameParts[0].length > 0) {
+        initials = nameParts[0].slice(0, 2).toUpperCase();
+      }
       setUserInitials(initials);
     }
   }, [isAuthenticated, user]);
