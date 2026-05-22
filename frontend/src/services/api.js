@@ -202,6 +202,90 @@ export const login = async (email, password) => {
   }
 };
 
+export const scheduleInterview = async (interviewData, token) => {
+  try {
+    const response = await fetch(`${API_URL}/interviews/schedule`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(interviewData),
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to schedule interview: ${errorText || response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error scheduling interview:', error.message);
+    toast.error('Failed to schedule interview.');
+    throw error;
+  }
+};
+
+export const updateInterviewStatus = async (interviewId, status, token) => {
+  try {
+    const response = await fetch(`${API_URL}/interviews/${interviewId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to update interview status: ${errorText || response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating interview status:', error.message);
+    toast.error('Failed to update interview status.');
+    throw error;
+  }
+};
+
+export const submitInterviewFeedback = async (interviewId, feedback, token) => {
+  try {
+    const response = await fetch(`${API_URL}/interviews/${interviewId}/feedback`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ feedback }),
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to submit feedback: ${errorText || response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error submitting feedback:', error.message);
+    toast.error('Failed to submit feedback.');
+    throw error;
+  }
+};
+
+export const getInterviewsForApplication = async (applicationId, token) => {
+  try {
+    const response = await fetch(`${API_URL}/interviews/application/${applicationId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch interviews');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching interviews:', error.message);
+    toast.error('Failed to load interviews.');
+    throw error;
+  }
+};
+
 export const updateUserTheme = async (theme, token) => {
   try {
     const response = await fetch(`${API_URL}/users/theme`, {

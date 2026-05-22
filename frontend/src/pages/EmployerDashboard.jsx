@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { 
-  getEmployerJobs, 
-  getEmployerApplications, 
   getApplicationsOverTime, 
   getJobPostingsSummary, 
   getRecentActivity,
@@ -148,7 +146,7 @@ const EmployerDashboard = () => {
               <Tooltip
                 formatter={(value, name) => {
                   const total = metrics.stageSummary.reduce((acc, item) => acc + item.value, 0);
-                  const percent = ((value / total) * 100).toFixed(1);
+                  const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                   return [`${value} (${percent}%)`, name];
                 }}
               />
@@ -198,29 +196,33 @@ const EmployerDashboard = () => {
           </div>
         </div>
 
-        {/* Recent Activity Section (Inside the grid now for better space utilization) */}
+        {/* Recent Activity Section */}
         <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Recent Activity</h3>
-        <div className="space-y-3">
-          {recentActivity.map((activity) => (
-            <div key={activity._id} className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-              <div className="flex-shrink-0">
-                <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                  <span className="text-md font-semibold text-gray-600 dark:text-gray-300">
-                    {activity.applicant.firstName.charAt(0)}
-                  </span>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Recent Activity</h3>
+          <div className="space-y-3">
+            {recentActivity.map((activity) => (
+              <div key={activity._id} className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <div className="flex-shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                    <span className="text-md font-semibold text-gray-600 dark:text-gray-300">
+                      {activity.applicant?.firstName?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                    <span className="font-bold">{activity.applicant?.firstName} {activity.applicant?.lastName}</span> applied for <span className="font-semibold">{activity.job?.title}</span>
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {new Date(activity.date).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                  <span className="font-bold">{activity.applicant.firstName} {activity.applicant.lastName}</span> applied for <span className="font-semibold">{activity.job.title}</span>
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(activity.date).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
+            {recentActivity.length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-4">No recent activity</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import {
   deleteJob,
   deleteAllJobs,
   deleteMultipleJobs,
+  updateJob
 } from '../services/api';
 import { toast } from 'react-toastify';
 import { useSortableData } from '../hooks/useSortableData';
@@ -97,6 +98,16 @@ const PostedJobsPage = () => {
     setShowConfirm(true);
   };
 
+  const handleStatusChange = async (jobId, newStatus) => {
+    try {
+      await updateJob(jobId, { status: newStatus }, token);
+      toast.success(`Job status updated to ${newStatus}`);
+      fetchJobs();
+    } catch (err) {
+      toast.error('Failed to update job status');
+    }
+  };
+
   const handleCheckboxChange = (jobId) => {
     setSelectedJobs((prev) =>
       prev.includes(jobId) ? prev.filter((id) => id !== jobId) : [...prev, jobId]
@@ -165,6 +176,9 @@ const PostedJobsPage = () => {
                   <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('company')}>
                     Company {sortConfig.key === 'company' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
                   </th>
+                  <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('status')}>
+                    Status {sortConfig.key === 'status' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
+                  </th>
                   <th className="p-4 text-center">Actions</th>
                 </tr>
               </thead>
@@ -179,8 +193,22 @@ const PostedJobsPage = () => {
                           checked={selectedJobs.includes(job._id)}
                         />
                       </td>
-                      <td className="p-4">{job.title}</td>
+                      <td className="p-4 font-medium">{job.title}</td>
                       <td className="p-4">{job.company}</td>
+                      <td className="p-4">
+                        <select
+                          value={job.status}
+                          onChange={(e) => handleStatusChange(job._id, e.target.value)}
+                          className={`p-1.5 text-xs rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 font-semibold ${
+                            job.status === 'Open' ? 'text-green-600' :
+                            job.status === 'Closed' ? 'text-red-600' : 'text-yellow-600'
+                          }`}
+                        >
+                          <option value="Open">Open</option>
+                          <option value="Closed">Closed</option>
+                          <option value="Draft">Draft</option>
+                        </select>
+                      </td>
                       <td className="p-4 flex justify-center space-x-2">
                         <Link
                           to={`/employer/jobs/${job._id}/applicants`}

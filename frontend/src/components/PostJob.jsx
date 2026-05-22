@@ -11,6 +11,7 @@ const PostJob = ({ onJobPosted, jobData }) => {
     description: '',
     candidate_required_location: '',
     job_type: 'Full-Time',
+    status: 'Open',
   });
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useContext(AuthContext);
@@ -24,11 +25,12 @@ const PostJob = ({ onJobPosted, jobData }) => {
         description: jobData.description,
         candidate_required_location: jobData.candidate_required_location,
         job_type: jobData.job_type,
+        status: jobData.status || 'Open',
       });
     }
   }, [jobData]);
 
-  const { title, company, description, candidate_required_location, job_type } = formData;
+  const { title, company, description, candidate_required_location, job_type, status } = formData;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -112,6 +114,14 @@ const PostJob = ({ onJobPosted, jobData }) => {
           <option>Contract</option>
           <option>Internship</option>
           <option>Freelance</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+        <select id="status" value={status} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+          <option value="Open">Open (Active)</option>
+          <option value="Closed">Closed</option>
+          <option value="Draft">Draft</option>
         </select>
       </div>
       <button type="submit" disabled={isLoading} className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
