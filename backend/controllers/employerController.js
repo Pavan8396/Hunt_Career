@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require('../config/env');
@@ -223,50 +224,87 @@ const updateEmployerTheme = async (req, res) => {
 
 const getEmployerDashboardMetrics = async (req, res) => {
   try {
-    const employerId = req.user._id;
-    const jobs = await Job.find({ employer: employerId });
-    const jobIds = jobs.map(job => job._id);
+    const employerId = new mongoose.Types.ObjectId(req.user._id);
 
-    const applications = await Application.find({ job: { $in: jobIds } });
-    const applicationIds = applications.map(app => app._id);
+    const metrics = await Job.aggregate([
+      { $match: { employer: employerId } },
+      {
+        $lookup: {
+          from: 'applications',
+          localField: '_id',
+          foreignField: 'job',
+          as: 'applications'
+        }
+      },
+      {
+        $facet: {
+          jobMetrics: [
+            {
+              $group: {
+                _id: null,
+                totalJobs: { $sum: 1 },
+                activeRequests: { $sum: { $cond: [{ $eq: ['$status', 'Open'] }, 1, 0] } }
+              }
+            }
+          ],
+          applicationMetrics: [
+            { $unwind: '$applications' },
+            {
+              $group: {
+                _id: '$applications.status',
+                count: { $sum: 1 }
+              }
+            }
+          ],
+          interviewMetrics: [
+            { $unwind: '$applications' },
+            {
+              $lookup: {
+                from: 'interviews',
+                localField: 'applications._id',
+                foreignField: 'application',
+                as: 'interviews'
+              }
+            },
+            { $unwind: '$interviews' },
+            {
+              $group: {
+                _id: null,
+                scheduled: { $sum: { $cond: [{ $eq: ['$interviews.status', 'Scheduled'] }, 1, 0] } },
+                completed: { $sum: { $cond: [{ $eq: ['$interviews.status', 'Completed'] }, 1, 0] } },
+                feedbackGiven: { $sum: { $cond: [{ $and: [{ $eq: ['$interviews.status', 'Completed'] }, { $ne: ['$interviews.feedback', null] }, { $ne: ['$interviews.feedback', ""] }] }, 1, 0] } },
+                feedbackPending: { $sum: { $cond: [{ $and: [{ $eq: ['$interviews.status', 'Completed'] }, { $or: [{ $eq: ['$interviews.feedback', null] }, { $eq: ['$interviews.feedback', ""] }] }] }, 1, 0] } }
+              }
+            }
+          ]
+        }
+      }
+    ]);
 
-    const interviews = await Interview.find({ application: { $in: applicationIds } });
+    const jobData = metrics[0].jobMetrics[0] || { totalJobs: 0, activeRequests: 0 };
+    const appData = metrics[0].applicationMetrics || [];
+    const interviewData = metrics[0].interviewMetrics[0] || { scheduled: 0, completed: 0, feedbackGiven: 0, feedbackPending: 0 };
 
-    // Active Candidates (Not rejected or dropped)
-    const activeCandidatesCount = applications.filter(app =>
-      !['Rejected', 'Dropped'].includes(app.status)
-    ).length;
+    const totalApplications = appData.reduce((sum, item) => sum + item.count, 0);
+    const activeCandidates = appData
+      .filter(item => !['Rejected', 'Dropped'].includes(item._id))
+      .reduce((sum, item) => sum + item.count, 0);
 
-    // Active Requests (Open jobs)
-    const activeRequestsCount = jobs.filter(job => job.status === 'Open').length;
-
-    // Interview Metrics
-    const interviewScheduled = interviews.filter(i => i.status === 'Scheduled').length;
-    const interviewCompleted = interviews.filter(i => i.status === 'Completed').length;
-    const feedbackGiven = interviews.filter(i => i.status === 'Completed' && i.feedback).length;
-    const feedbackPending = interviews.filter(i => i.status === 'Completed' && !i.feedback).length;
-
-    // Candidate Stage Summary
-    const stageSummary = applications.reduce((acc, app) => {
-      acc[app.status] = (acc[app.status] || 0) + 1;
-      return acc;
-    }, {});
-
-    const formattedStageSummary = Object.keys(stageSummary).map(stage => ({
-      name: stage,
-      value: stageSummary[stage]
+    const stageSummary = appData.map(item => ({
+      name: item._id,
+      value: item.count
     }));
 
     res.json({
-      totalJobs: jobs.length,
-      totalApplications: applications.length,
-      activeCandidates: activeCandidatesCount,
-      activeRequests: activeRequestsCount,
-      interviewScheduled,
-      interviewCompleted,
-      feedbackGiven,
-      feedbackPending,
-      stageSummary: formattedStageSummary
+      totalJobs: jobData.totalJobs,
+      totalApplications,
+      activeCandidates,
+      activeRequests: jobData.activeRequests,
+      interviewScheduled: interviewData.scheduled,
+      interviewCompleted: interviewData.completed,
+      feedbackGiven: interviewData.feedbackGiven,
+      feedbackPending: interviewData.feedbackPending,
+      stageSummary
     });
   } catch (error) {
     console.error('Failed to fetch employer dashboard metrics', error);

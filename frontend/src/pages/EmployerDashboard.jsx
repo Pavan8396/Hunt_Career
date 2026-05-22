@@ -25,12 +25,12 @@ import {
 } from '@heroicons/react/outline';
 
 const EmployerDashboard = () => {
-  const [jobs, setJobs] = useState([]);
-  const [totalApplications, setTotalApplications] = useState(0);
   const [applicationsOverTime, setApplicationsOverTime] = useState([]);
   const [jobPostingsSummary, setJobPostingsSummary] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [metrics, setMetrics] = useState({
+    totalJobs: 0,
+    totalApplications: 0,
     activeCandidates: 0,
     activeRequests: 0,
     interviewScheduled: 0,
@@ -44,16 +44,12 @@ const EmployerDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [employerJobs, allApplications, applicationsTime, jobSummary, activity, dashboardMetrics] = await Promise.all([
-          getEmployerJobs(token),
-          getEmployerApplications(token),
+        const [applicationsTime, jobSummary, activity, dashboardMetrics] = await Promise.all([
           getApplicationsOverTime(token),
           getJobPostingsSummary(token),
           getRecentActivity(token),
           getEmployerDashboardMetrics(token),
         ]);
-        setJobs(employerJobs);
-        setTotalApplications(allApplications.length);
         setApplicationsOverTime(applicationsTime);
         setJobPostingsSummary(jobSummary);
         setRecentActivity(activity);
@@ -66,30 +62,33 @@ const EmployerDashboard = () => {
     if (token) fetchDashboardData();
   }, [token]);
 
-  const avgApplicationsPerJob = totalApplications > 0 && jobs.length > 0 
-    ? (totalApplications / jobs.length).toFixed(1) 
+  const avgApplicationsPerJob = metrics.totalApplications > 0 && metrics.totalJobs > 0
+    ? (metrics.totalApplications / metrics.totalJobs).toFixed(1)
     : 0;
 
   const COLORS = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
 
   const StatCard = ({ icon, title, value, color }) => (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex items-center hover:shadow-lg transition-shadow">
-      <div className={`p-3 rounded-full ${color} text-white`}>{icon}</div>
-      <div className="ml-4">
-        <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300">{title}</h3>
-        <p className="text-3xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex items-center hover:shadow-md transition-shadow">
+      <div className={`p-2 rounded-lg ${color} text-white`}>{React.cloneElement(icon, { className: 'h-6 w-6' })}</div>
+      <div className="ml-3">
+        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</h3>
+        <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
       </div>
     </div>
   );
 
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-3xl font-bold mb-6">Welcome, {user?.name || 'Employer'}!</h1>
+    <div className="p-4 space-y-6 max-w-7xl mx-auto">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Employer Dashboard</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Welcome back, {user?.name}</p>
+      </div>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        <StatCard icon={<BriefcaseIcon className="h-8 w-8" />} title="Total Jobs Posted" value={jobs.length} color="bg-blue-500" />
-        <StatCard icon={<DocumentTextIcon className="h-8 w-8" />} title="Total Applications" value={totalApplications} color="bg-indigo-500" />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <StatCard icon={<BriefcaseIcon className="h-8 w-8" />} title="Total Jobs Posted" value={metrics.totalJobs} color="bg-blue-500" />
+        <StatCard icon={<DocumentTextIcon className="h-8 w-8" />} title="Total Applications" value={metrics.totalApplications} color="bg-indigo-500" />
         <StatCard icon={<HashtagIcon className="h-8 w-8" />} title="Avg. Apps per Job" value={avgApplicationsPerJob} color="bg-pink-500" />
         <StatCard icon={<UserGroupIcon className="h-8 w-8" />} title="Active Candidates" value={metrics.activeCandidates} color="bg-green-500" />
         <StatCard icon={<ClipboardCheckIcon className="h-8 w-8" />} title="Active Requests" value={metrics.activeRequests} color="bg-yellow-500" />
@@ -100,12 +99,12 @@ const EmployerDashboard = () => {
       </div>
 
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Area Chart */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
-          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Applications Over Time</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={applicationsOverTime} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
+          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Applications Over Time</h3>
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={applicationsOverTime} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorApplications" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#4ade80" stopOpacity={0.6} />
@@ -125,16 +124,16 @@ const EmployerDashboard = () => {
         </div>
 
         {/* Candidate Stage Pie Chart */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
-          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Candidate Stage Summary</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
+          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Candidate Stage Summary</h3>
+          <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
                 data={metrics.stageSummary}
                 cx="50%"
                 cy="50%"
-                outerRadius={100}
-                innerRadius={60}
+                outerRadius={80}
+                innerRadius={50}
                 dataKey="value"
                 paddingAngle={4}
                 animationDuration={500}
@@ -159,11 +158,11 @@ const EmployerDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Job Postings by Type Bar Chart */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
-          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Job Postings by Type</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
+          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Jobs by Type</h3>
+          <ResponsiveContainer width="100%" height={200}>
             <BarChart data={jobPostingsSummary}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="name" />
@@ -175,15 +174,15 @@ const EmployerDashboard = () => {
         </div>
 
         {/* Hiring Funnel (Simplified) */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
-          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Hiring Funnel</h3>
-          <div className="space-y-4">
+        <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
+          <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Hiring Funnel</h3>
+          <div className="space-y-3">
             {[
-              { label: 'Total Applications', value: totalApplications, color: 'bg-indigo-500' },
+              { label: 'Total Applications', value: metrics.totalApplications, color: 'bg-indigo-500' },
               { label: 'Interviewed', value: metrics.interviewScheduled + metrics.interviewCompleted, color: 'bg-purple-500' },
               { label: 'Identified / Offered', value: (metrics.stageSummary.find(s => s.name === 'Candidate Identified')?.value || 0) + (metrics.stageSummary.find(s => s.name === 'Offered')?.value || 0), color: 'bg-teal-500' },
             ].map((step, index) => {
-              const percentage = totalApplications > 0 ? (step.value / totalApplications) * 100 : 0;
+              const percentage = metrics.totalApplications > 0 ? (step.value / metrics.totalApplications) * 100 : 0;
               return (
                 <div key={index}>
                   <div className="flex justify-between mb-1">
@@ -198,12 +197,11 @@ const EmployerDashboard = () => {
             })}
           </div>
         </div>
-      </div>
 
-      {/* Recent Activity Section */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Recent Activity</h3>
-        <div className="space-y-4">
+        {/* Recent Activity Section (Inside the grid now for better space utilization) */}
+        <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+        <h3 className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-4">Recent Activity</h3>
+        <div className="space-y-3">
           {recentActivity.map((activity) => (
             <div key={activity._id} className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
               <div className="flex-shrink-0">
