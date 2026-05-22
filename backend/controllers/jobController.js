@@ -67,6 +67,7 @@ const createJob = async (req, res) => {
       title: new RegExp(`^${escapedTitle}$`, 'i'),
       company: new RegExp(`^${escapedCompany}$`, 'i'),
       employer: req.user._id,
+      status: { $ne: 'Archived' }
     });
 
     if (existingJob) {
@@ -196,6 +197,7 @@ const updateJob = async (req, res) => {
       company: new RegExp(`^${escapedCompany}$`, 'i'),
       employer: req.user._id,
       _id: { $ne: id },
+      status: { $ne: 'Archived' }
     });
 
     if (existingJob) {

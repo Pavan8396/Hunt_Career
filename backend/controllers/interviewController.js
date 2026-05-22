@@ -86,16 +86,7 @@ exports.updateInterviewStatus = async (req, res) => {
     interview.status = status;
     await interview.save();
 
-    // Create notification for applicant
-    await notificationService.createNotification({
-      recipient: interview.application.applicant,
-      sender: req.user._id,
-      senderModel: 'Employer',
-      type: 'InterviewStatusUpdate',
-      content: `Your interview for ${interview.application.job.title} is now ${status}`,
-      relatedId: interview._id,
-      relatedModel: 'Interview',
-    });
+    // No notification for interview status update as per user request (only scheduled and offered)
 
     res.json(interview);
   } catch (error) {

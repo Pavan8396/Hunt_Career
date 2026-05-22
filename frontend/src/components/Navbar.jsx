@@ -101,19 +101,29 @@ const Navbar = () => {
           )}
         </button>
         {isNotificationOpen && (
-          <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-            <div className="p-4 font-bold border-b dark:border-gray-600">
+          <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 max-h-[400px] overflow-y-auto">
+            <div className="p-3 text-sm font-bold border-b dark:border-gray-600 sticky top-0 bg-white dark:bg-gray-700 z-10">
               Notifications
             </div>
             {(notifications.length > 0 || persistentNotifications.length > 0) ? (
-              <>
+              <div className="text-xs">
               {persistentNotifications.map((notif) => (
                 <div
                   key={notif._id}
                   className="p-4 border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
                   onClick={() => {
                     markNotificationAsRead(notif._id);
-                    const path = userType === 'employer' ? `/employer/jobs/${notif.relatedId}/applicants` : '/applied';
+                    let path = '/';
+                    if (userType === 'employer') {
+                      if (notif.type === 'NewApplication') {
+                        path = `/employer/jobs/${notif.relatedId}/applicants`;
+                      } else if (notif.relatedModel === 'Interview' || notif.relatedModel === 'Application') {
+                         // This is more complex, might need to fetch job ID, but for now assuming direct relatedId logic works for some
+                         path = `/employer/dashboard`;
+                      }
+                    } else {
+                      path = '/applied';
+                    }
                     navigate(path);
                     setIsNotificationOpen(false);
                   }}
@@ -137,7 +147,7 @@ const Navbar = () => {
                   </div>
                 </div>
               ))}
-              </>
+              </div>
             ) : (
               <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                 No new notifications
