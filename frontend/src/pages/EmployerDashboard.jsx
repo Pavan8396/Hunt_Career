@@ -5,13 +5,24 @@ import {
   getEmployerApplications, 
   getApplicationsOverTime, 
   getJobPostingsSummary, 
-  getRecentActivity 
+  getRecentActivity,
+  getEmployerDashboardMetrics
 } from '../services/api';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
-  PieChart, Pie, Cell 
+  PieChart, Pie, Cell, BarChart, Bar
 } from 'recharts';
-import { BriefcaseIcon, DocumentTextIcon, HashtagIcon } from '@heroicons/react/outline';
+import {
+  BriefcaseIcon,
+  DocumentTextIcon,
+  HashtagIcon,
+  UserGroupIcon,
+  ClipboardCheckIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  ChatAlt2Icon,
+  ClockIcon
+} from '@heroicons/react/outline';
 
 const EmployerDashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -19,23 +30,34 @@ const EmployerDashboard = () => {
   const [applicationsOverTime, setApplicationsOverTime] = useState([]);
   const [jobPostingsSummary, setJobPostingsSummary] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [metrics, setMetrics] = useState({
+    activeCandidates: 0,
+    activeRequests: 0,
+    interviewScheduled: 0,
+    interviewCompleted: 0,
+    feedbackGiven: 0,
+    feedbackPending: 0,
+    stageSummary: []
+  });
   const { user, token } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [employerJobs, allApplications, applicationsTime, jobSummary, activity] = await Promise.all([
+        const [employerJobs, allApplications, applicationsTime, jobSummary, activity, dashboardMetrics] = await Promise.all([
           getEmployerJobs(token),
           getEmployerApplications(token),
           getApplicationsOverTime(token),
           getJobPostingsSummary(token),
           getRecentActivity(token),
+          getEmployerDashboardMetrics(token),
         ]);
         setJobs(employerJobs);
         setTotalApplications(allApplications.length);
         setApplicationsOverTime(applicationsTime);
         setJobPostingsSummary(jobSummary);
         setRecentActivity(activity);
+        setMetrics(dashboardMetrics);
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
       }
@@ -47,6 +69,8 @@ const EmployerDashboard = () => {
   const avgApplicationsPerJob = totalApplications > 0 && jobs.length > 0 
     ? (totalApplications / jobs.length).toFixed(1) 
     : 0;
+
+  const COLORS = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
 
   const StatCard = ({ icon, title, value, color }) => (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md flex items-center hover:shadow-lg transition-shadow">
@@ -63,10 +87,16 @@ const EmployerDashboard = () => {
       <h1 className="text-3xl font-bold mb-6">Welcome, {user?.name || 'Employer'}!</h1>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <StatCard icon={<BriefcaseIcon className="h-8 w-8" />} title="Total Jobs Posted" value={jobs.length} color="bg-blue-500" />
         <StatCard icon={<DocumentTextIcon className="h-8 w-8" />} title="Total Applications" value={totalApplications} color="bg-indigo-500" />
         <StatCard icon={<HashtagIcon className="h-8 w-8" />} title="Avg. Apps per Job" value={avgApplicationsPerJob} color="bg-pink-500" />
+        <StatCard icon={<UserGroupIcon className="h-8 w-8" />} title="Active Candidates" value={metrics.activeCandidates} color="bg-green-500" />
+        <StatCard icon={<ClipboardCheckIcon className="h-8 w-8" />} title="Active Requests" value={metrics.activeRequests} color="bg-yellow-500" />
+        <StatCard icon={<CalendarIcon className="h-8 w-8" />} title="Interviews Scheduled" value={metrics.interviewScheduled} color="bg-purple-500" />
+        <StatCard icon={<CheckCircleIcon className="h-8 w-8" />} title="Interviews Completed" value={metrics.interviewCompleted} color="bg-teal-500" />
+        <StatCard icon={<ChatAlt2Icon className="h-8 w-8" />} title="Feedback Given" value={metrics.feedbackGiven} color="bg-orange-500" />
+        <StatCard icon={<ClockIcon className="h-8 w-8" />} title="Feedback Pending" value={metrics.feedbackPending} color="bg-red-400" />
       </div>
 
       {/* Charts Section */}
@@ -94,31 +124,31 @@ const EmployerDashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Pie Chart */}
+        {/* Candidate Stage Pie Chart */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
-          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Job Postings by Type</h3>
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Candidate Stage Summary</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={jobPostingsSummary}
+                data={metrics.stageSummary}
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
                 innerRadius={60}
-                dataKey="count"
+                dataKey="value"
                 paddingAngle={4}
                 animationDuration={500}
               >
-                {jobPostingsSummary.map((entry, index) => (
+                {metrics.stageSummary.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={['#6EE7B7', '#FBBF24', '#60A5FA', '#F87171'][index % 4]}
+                    fill={COLORS[index % COLORS.length]}
                   />
                 ))}
               </Pie>
               <Tooltip
                 formatter={(value, name) => {
-                  const total = jobPostingsSummary.reduce((acc, item) => acc + item.count, 0);
+                  const total = metrics.stageSummary.reduce((acc, item) => acc + item.value, 0);
                   const percent = ((value / total) * 100).toFixed(1);
                   return [`${value} (${percent}%)`, name];
                 }}
@@ -126,6 +156,47 @@ const EmployerDashboard = () => {
               <Legend verticalAlign="bottom" height={36}/>
             </PieChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Job Postings by Type Bar Chart */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Job Postings by Type</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={jobPostingsSummary}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Hiring Funnel (Simplified) */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md min-w-0">
+          <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300 mb-4">Hiring Funnel</h3>
+          <div className="space-y-4">
+            {[
+              { label: 'Total Applications', value: totalApplications, color: 'bg-indigo-500' },
+              { label: 'Interviewed', value: metrics.interviewScheduled + metrics.interviewCompleted, color: 'bg-purple-500' },
+              { label: 'Identified / Offered', value: (metrics.stageSummary.find(s => s.name === 'Candidate Identified')?.value || 0) + (metrics.stageSummary.find(s => s.name === 'Offered')?.value || 0), color: 'bg-teal-500' },
+            ].map((step, index) => {
+              const percentage = totalApplications > 0 ? (step.value / totalApplications) * 100 : 0;
+              return (
+                <div key={index}>
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{step.label}</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{step.value}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                    <div className={`${step.color} h-2.5 rounded-full`} style={{ width: `${percentage}%` }}></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 

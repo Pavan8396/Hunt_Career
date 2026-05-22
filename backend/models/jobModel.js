@@ -6,6 +6,7 @@ const jobSchema = new mongoose.Schema({
   description: { type: String, required: true },
   candidate_required_location: { type: String, required: true },
   job_type: { type: String, required: true },
+  status: { type: String, enum: ['Open', 'Closed', 'Draft'], default: 'Open' },
   employer: { type: mongoose.Schema.Types.ObjectId, ref: 'Employer', required: true },
 }, {
   timestamps: true,
