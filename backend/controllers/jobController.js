@@ -1,37 +1,32 @@
-const mongoose = require('mongoose');
 const Job = require('../models/jobModel');
 const Employer = require('../models/employerModel');
-const Application = require('../models/applicationModel');
-const { escapeRegex } = require('../utils/regexUtils');
+// const Application = require('../models/applicationModel');
+const { Op } = require('sequelize');
 
 const getJobs = async (req, res) => {
   const { search, locations, jobTypes } = req.query;
 
   try {
-    let query = {};
+    let where = {};
     if (search) {
-      const searchLower = search.toLowerCase().trim();
-      const escapedSearch = escapeRegex(searchLower);
-      query.$or = [
-        { title: { $regex: escapedSearch, $options: 'i' } },
-        { company: { $regex: escapedSearch, $options: 'i' } },
-        { description: { $regex: escapedSearch, $options: 'i' } },
-        { candidate_required_location: { $regex: escapedSearch, $options: 'i' } },
-        { job_type: { $regex: escapedSearch, $options: 'i' } },
+      where[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { company: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } },
+        { candidate_required_location: { [Op.like]: `%${search}%` } },
+        { job_type: { [Op.like]: `%${search}%` } },
       ];
     }
     if (locations) {
       const locArray = locations.split(';').map(loc => loc.trim());
-      query.candidate_required_location = {
-        $in: locArray.map(loc => new RegExp(`^${escapeRegex(loc)}$`, 'i'))
-      };
+      where.candidate_required_location = { [Op.in]: locArray };
     }
     if (jobTypes) {
       const typeArray = jobTypes.split(',').map(type => type.trim());
-      query.job_type = { $in: typeArray };
+      where.job_type = { [Op.in]: typeArray };
     }
 
-    const jobs = await Job.find(query);
+    const jobs = await Job.findAll({ where });
     res.status(200).json(jobs);
   } catch (err) {
     console.error("Fetch jobs error:", err.message);
@@ -41,10 +36,7 @@ const getJobs = async (req, res) => {
 
 const getJobById = async (req, res) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ error: "Invalid job ID" });
-    }
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findByPk(req.params.id);
     if (job) {
       res.json(job);
     } else {
@@ -59,26 +51,25 @@ const getJobById = async (req, res) => {
 const createJob = async (req, res) => {
   try {
     const { title, company } = req.body;
-    const escapedTitle = escapeRegex(title);
-    const escapedCompany = escapeRegex(company);
 
     const existingJob = await Job.findOne({
-      title: { $regex: new RegExp(`^${escapedTitle}$`, 'i') },
-      company: { $regex: new RegExp(`^${escapedCompany}$`, 'i') },
-      employer: req.user._id,
+      where: {
+        title: { [Op.like]: title },
+        company: { [Op.like]: company },
+        employerId: req.user.id,
+      }
     });
 
     if (existingJob) {
       return res.status(409).json({ message: 'A job with the same title and company already exists.' });
     }
 
-    const newJob = new Job({
+    const newJob = await Job.create({
       ...req.body,
-      employer: req.user._id,
+      employerId: req.user.id,
     });
-    const savedJob = await newJob.save();
-    await Employer.findByIdAndUpdate(req.user._id, { $push: { postedJobs: savedJob._id } });
-    res.status(201).json(savedJob);
+
+    res.status(201).json(newJob);
   } catch (error) {
     console.error('Error creating job:', error);
     res.status(400).json({ message: error.message });
@@ -87,11 +78,8 @@ const createJob = async (req, res) => {
 
 const getEmployerJobs = async (req, res) => {
   try {
-    const employer = await Employer.findById(req.user._id).populate('postedJobs');
-    if (!employer) {
-      return res.status(404).json({ message: "Employer not found." });
-    }
-    res.json(employer.postedJobs);
+    const jobs = await Job.findAll({ where: { employerId: req.user.id } });
+    res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -99,7 +87,7 @@ const getEmployerJobs = async (req, res) => {
 
 const getJobsByEmployerId = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.params.employerId });
+    const jobs = await Job.findAll({ where: { employerId: req.params.employerId } });
     res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -111,27 +99,14 @@ const deleteJobs = async (req, res) => {
   const { jobIds } = req.body;
 
   try {
-    // ADMIN PATH for single delete from manage jobs page
     if (req.user.isAdmin && id) {
-        const job = await Job.findById(id);
+        const job = await Job.findByPk(id);
         if (!job) {
             return res.status(404).json({ message: 'Job not found' });
         }
 
-        await Job.findByIdAndDelete(id);
-
-        // Also remove from employer's postedJobs array
-        await Employer.findByIdAndUpdate(job.employer, {
-            $pull: { postedJobs: job._id }
-        });
-
+        await job.destroy();
         return res.json({ message: 'Job deleted successfully by admin.' });
-    }
-
-    // EMPLOYER PATH (original logic)
-    const employer = await Employer.findById(req.user._id);
-    if (!employer) {
-      return res.status(404).json({ message: 'Employer not found' });
     }
 
     let jobsToDelete = [];
@@ -140,19 +115,16 @@ const deleteJobs = async (req, res) => {
     } else if (jobIds) {
       jobsToDelete = [...jobIds];
     } else {
-      // Delete all jobs
-      await Job.deleteMany({ employer: req.user._id });
-      employer.postedJobs = [];
-      await employer.save();
+      await Job.destroy({ where: { employerId: req.user.id } });
       return res.json({ message: 'All jobs have been removed successfully' });
     }
 
-    await Job.deleteMany({ _id: { $in: jobsToDelete }, employer: req.user._id });
-
-    employer.postedJobs = employer.postedJobs.filter(
-      (jobId) => !jobsToDelete.includes(jobId.toString())
-    );
-    await employer.save();
+    await Job.destroy({
+        where: {
+            id: { [Op.in]: jobsToDelete },
+            employerId: req.user.id
+        }
+    });
 
     res.json({ message: 'Selected jobs have been removed successfully' });
   } catch (error) {
@@ -162,49 +134,39 @@ const deleteJobs = async (req, res) => {
 };
 
 const getApplicationForJob = async (req, res) => {
-  //console.log(`[getApplicationForJob] Checking for job: ${req.params.id}, applicant: ${req.user._id}`);
-  try {
-    const application = await Application.findOne({
-      job: req.params.id,
-      applicant: req.user._id,
-    });
-    //console.log(`[getApplicationForJob] Found application:`, application);
-    res.json(application);
-  } catch (error) {
-    console.error('[getApplicationForJob] Error fetching application for job:', error);
-    res.status(500).json({ message: 'Failed to fetch application status' });
-  }
+  // Application model not yet migrated
+  res.status(501).json({ message: "Not implemented yet" });
 };
 
 const updateJob = async (req, res) => {
   try {
     const { id } = req.params;
-    const job = await Job.findById(id);
+    const job = await Job.findByPk(id);
 
     if (!job) {
       return res.status(404).json({ message: 'Job not found' });
     }
 
-    if (job.employer.toString() !== req.user._id && !req.user.isAdmin) {
+    if (job.employerId !== req.user.id && !req.user.isAdmin) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
     const { title, company } = req.body;
-    const escapedTitle = escapeRegex(title);
-    const escapedCompany = escapeRegex(company);
     const existingJob = await Job.findOne({
-      title: { $regex: new RegExp(`^${escapedTitle}$`, 'i') },
-      company: { $regex: new RegExp(`^${escapedCompany}$`, 'i') },
-      employer: req.user._id,
-      _id: { $ne: id },
+      where: {
+        title: { [Op.like]: title },
+        company: { [Op.like]: company },
+        employerId: job.employerId,
+        id: { [Op.ne]: id },
+      }
     });
 
     if (existingJob) {
       return res.status(409).json({ message: 'A job with the same title and company already exists.' });
     }
 
-    const updatedJob = await Job.findByIdAndUpdate(id, req.body, { new: true });
-    res.json(updatedJob);
+    await job.update(req.body);
+    res.json(job);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

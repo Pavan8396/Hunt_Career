@@ -1,12 +1,12 @@
 const app = require('./app');
 const { PORT } = require('./config/env');
-const { connectToMongo } = require('./config/db');
+const { connectDB } = require('./config/db');
 
 const http = require('http');
 const initSocket = require('./socket');
 
 const startServer = async () => {
-  await connectToMongo(); // Ensure DB connection before starting server
+  await connectDB(); // Ensure DB connection before starting server
   const server = http.createServer(app);
   initSocket(server);
 

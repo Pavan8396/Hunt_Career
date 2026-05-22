@@ -1,29 +1,32 @@
 const User = require('../models/userModel');
 
 const findUserByEmail = async (email) => {
-  return User.findOne({ email });
+  return User.findOne({ where: { email } });
 };
 
 const createUser = async (userData) => {
-  const user = new User(userData);
-  await user.save();
-  return user;
+  return User.create(userData);
 };
 
 const findUserForLogin = async (email) => {
-  return User.findOne({ email });
+  return User.findOne({ where: { email } });
 };
 
 const getUserProfile = async (email) => {
-  return User.findOne({ email }).select('-password');
+  return User.findOne({
+    where: { email },
+    attributes: { exclude: ['password'] }
+  });
 };
 
 const getUserById = async (id) => {
-  return User.findById(id).select('-password');
+  return User.findByPk(id, {
+    attributes: { exclude: ['password'] }
+  });
 };
 
 const updateUserProfile = async (userId, userData) => {
-  const user = await User.findById(userId);
+  const user = await User.findByPk(userId);
 
   if (!user) {
     return null;
@@ -43,8 +46,8 @@ const updateUserProfile = async (userId, userData) => {
     }
   });
 
-  const updatedUser = await user.save();
-  return updatedUser;
+  await user.save();
+  return user;
 };
 
 module.exports = {

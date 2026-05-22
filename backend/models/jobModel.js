@@ -1,16 +1,43 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const jobSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  company: { type: String, required: true },
-  description: { type: String, required: true },
-  candidate_required_location: { type: String, required: true },
-  job_type: { type: String, required: true },
-  employer: { type: mongoose.Schema.Types.ObjectId, ref: 'Employer', required: true },
+const Job = sequelize.define('Job', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  company: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
+  candidate_required_location: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  job_type: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  employerId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'Employers',
+      key: 'id',
+    },
+  },
 }, {
+  tableName: 'Jobs',
   timestamps: true,
 });
-
-const Job = mongoose.model('Job', jobSchema, 'Jobs');
 
 module.exports = Job;
