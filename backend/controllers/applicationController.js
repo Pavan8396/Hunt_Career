@@ -44,8 +44,8 @@ exports.applyForJob = async (req, res) => {
       senderModel: 'User',
       type: 'NewApplication',
       content: `New application received for ${job.title}`,
-      relatedId: application._id,
-      relatedModel: 'Application',
+      relatedId: job._id, // Use Job ID for navigation
+      relatedModel: 'Job',
     });
 
     res.status(201).json({ message: 'Application submitted successfully' });
@@ -84,16 +84,18 @@ exports.updateApplicationStatus = async (req, res) => {
       newStatus: status,
     });
 
-    // Create notification for applicant
-    await notificationService.createNotification({
-      recipient: application.applicant,
-      sender: req.user._id,
-      senderModel: 'Employer',
-      type: 'ApplicationStatusUpdate',
-      content: `Your application for ${application.job.title} is now ${status}`,
-      relatedId: application._id,
-      relatedModel: 'Application',
-    });
+    // Create notification for applicant ONLY if status is 'Offered'
+    if (status === 'Offered') {
+      await notificationService.createNotification({
+        recipient: application.applicant,
+        sender: req.user._id,
+        senderModel: 'Employer',
+        type: 'ApplicationStatusUpdate',
+        content: `Your application for ${application.job.title} is now ${status}`,
+        relatedId: application._id,
+        relatedModel: 'Application',
+      });
+    }
 
     res.json({ message: `Application status updated to ${status}` });
   } catch (error) {

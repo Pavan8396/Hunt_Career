@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { 
   getApplicationsOverTime, 
@@ -38,6 +39,7 @@ const EmployerDashboard = () => {
     stageSummary: []
   });
   const { user, token } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -93,7 +95,9 @@ const EmployerDashboard = () => {
         <StatCard icon={<CalendarIcon className="h-8 w-8" />} title="Interviews Scheduled" value={metrics.interviewScheduled} color="bg-purple-500" />
         <StatCard icon={<CheckCircleIcon className="h-8 w-8" />} title="Interviews Completed" value={metrics.interviewCompleted} color="bg-teal-500" />
         <StatCard icon={<ChatAlt2Icon className="h-8 w-8" />} title="Feedback Given" value={metrics.feedbackGiven} color="bg-orange-500" />
-        <StatCard icon={<ClockIcon className="h-8 w-8" />} title="Feedback Pending" value={metrics.feedbackPending} color="bg-red-400" />
+        <div className="cursor-pointer" onClick={() => navigate('/employer/posted-jobs')}>
+          <StatCard icon={<ClockIcon className="h-8 w-8" />} title="Feedback Pending" value={metrics.feedbackPending} color="bg-red-400" />
+        </div>
       </div>
 
       {/* Charts Section */}
