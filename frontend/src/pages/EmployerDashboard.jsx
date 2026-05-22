@@ -69,11 +69,11 @@ const EmployerDashboard = () => {
   const COLORS = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
 
   const StatCard = ({ icon, title, value, color }) => (
-    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex items-center hover:shadow-md transition-shadow">
-      <div className={`p-2 rounded-lg ${color} text-white`}>{React.cloneElement(icon, { className: 'h-6 w-6' })}</div>
-      <div className="ml-3">
-        <h3 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{title}</h3>
-        <p className="text-xl font-bold text-gray-900 dark:text-gray-100">{value}</p>
+    <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex items-center hover:shadow-md transition-shadow">
+      <div className={`p-2 rounded-lg ${color} text-white shrink-0`}>{React.cloneElement(icon, { className: 'h-5 w-5' })}</div>
+      <div className="ml-2 min-w-0">
+        <h3 className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-tight truncate">{title}</h3>
+        <p className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-none">{value}</p>
       </div>
     </div>
   );
