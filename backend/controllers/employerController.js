@@ -281,6 +281,65 @@ const getEmployerDashboardMetrics = async (req, res) => {
       }
     ]);
 
+    // Fallback for case-sensitive collections if standard ones are empty
+    if (metrics[0].jobMetrics.length === 0) {
+       const altMetrics = await mongoose.connection.db.collection('Jobs').aggregate([
+        { $match: { employer: employerId } },
+        {
+          $lookup: {
+            from: 'Applications',
+            localField: '_id',
+            foreignField: 'job',
+            as: 'applications'
+          }
+        },
+        {
+          $facet: {
+            jobMetrics: [
+              {
+                $group: {
+                  _id: null,
+                  totalJobs: { $sum: 1 },
+                  activeRequests: { $sum: { $cond: [{ $eq: ['$status', 'Open'] }, 1, 0] } }
+                }
+              }
+            ],
+            applicationMetrics: [
+              { $unwind: '$applications' },
+              {
+                $group: {
+                  _id: '$applications.status',
+                  count: { $sum: 1 }
+                }
+              }
+            ],
+            interviewMetrics: [
+              { $unwind: '$applications' },
+              {
+                $lookup: {
+                  from: 'Interviews',
+                  localField: 'applications._id',
+                  foreignField: 'application',
+                  as: 'interviews'
+                }
+              },
+              { $unwind: '$interviews' },
+              {
+                $group: {
+                  _id: null,
+                  scheduled: { $sum: { $cond: [{ $eq: ['$interviews.status', 'Scheduled'] }, 1, 0] } },
+                  completed: { $sum: { $cond: [{ $eq: ['$interviews.status', 'Completed'] }, 1, 0] } },
+                  feedbackGiven: { $sum: { $cond: [{ $and: [{ $eq: ['$interviews.status', 'Completed'] }, { $ne: ['$interviews.feedback', null] }, { $ne: ['$interviews.feedback', ""] }] }, 1, 0] } },
+                  feedbackPending: { $sum: { $cond: [{ $and: [{ $eq: ['$interviews.status', 'Completed'] }, { $or: [{ $eq: ['$interviews.feedback', null] }, { $eq: ['$interviews.feedback', ""] }] }] }, 1, 0] } }
+                }
+              }
+            ]
+          }
+        }
+      ]).toArray();
+      if (altMetrics.length > 0) metrics[0] = altMetrics[0];
+    }
+
     const jobData = metrics[0].jobMetrics[0] || { totalJobs: 0, activeRequests: 0 };
     const appData = metrics[0].applicationMetrics || [];
     const interviewData = metrics[0].interviewMetrics[0] || { scheduled: 0, completed: 0, feedbackGiven: 0, feedbackPending: 0 };
