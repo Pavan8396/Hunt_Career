@@ -80,7 +80,7 @@ const createJob = async (req, res) => {
     const newJob = new Job({
       ...req.body,
       employer: req.user._id,
-      company: employer.company,
+      companyId: employer.company,
     });
     const savedJob = await newJob.save();
     await Employer.findByIdAndUpdate(req.user._id, { $push: { postedJobs: savedJob._id } });
@@ -99,7 +99,7 @@ const getEmployerJobs = async (req, res) => {
     }
 
     // Find all jobs for the company, not just the individual recruiter
-    const jobs = await Job.find({ company: employer.company, status: { $ne: 'Archived' } });
+    const jobs = await Job.find({ companyId: employer.company, status: { $ne: 'Archived' } });
     res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
