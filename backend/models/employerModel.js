@@ -1,10 +1,26 @@
 const mongoose = require('mongoose');
 
 const employerSchema = new mongoose.Schema({
-  companyName: {
+  firstName: {
     type: String,
     required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+  },
+  companyName: { // Deprecated: move to company model
+    type: String,
     trim: true,
+  },
+  company: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company',
+  },
+  role: {
+    type: String,
+    enum: ['Owner', 'Recruiter', 'HiringManager'],
+    default: 'Owner',
   },
   email: {
     type: String,
@@ -16,19 +32,6 @@ const employerSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-  },
-  postedJobs: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Job',
-  }],
-  companyLogo: {
-    type: String,
-  },
-  companyDescription: {
-    type: String,
-  },
-  website: {
-    type: String,
   },
   isActive: {
     type: Boolean,

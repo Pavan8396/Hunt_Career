@@ -39,7 +39,9 @@ const ApplicantsPage = () => {
   const [newInterview, setNewInterview] = useState({
     scheduledAt: '',
     interviewerName: '',
-    location: ''
+    location: '',
+    round: 1,
+    roundName: 'Initial Interview'
   });
   const [feedback, setFeedback] = useState('');
 
@@ -133,7 +135,7 @@ const ApplicantsPage = () => {
       }, token);
       toast.success('Interview scheduled successfully');
       setShowScheduleModal(false);
-      setNewInterview({ scheduledAt: '', interviewerName: '', location: '' });
+      setNewInterview({ scheduledAt: '', interviewerName: '', location: '', round: 1, roundName: 'Initial Interview' });
       fetchApplications();
     } catch (err) {
       toast.error('Failed to schedule interview');
@@ -270,7 +272,9 @@ const ApplicantsPage = () => {
                             {appInterviews.map((interview) => (
                               <div key={interview._id} className="flex items-center justify-between bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700">
                                 <div className="text-sm">
-                                  <span className="font-semibold">{new Date(interview.scheduledAt).toLocaleString()}</span>
+                                  <span className="font-semibold">Round {interview.round}: {interview.roundName}</span>
+                                  <span className="mx-2 text-gray-300">|</span>
+                                  <span className="text-gray-600 dark:text-gray-400">{new Date(interview.scheduledAt).toLocaleString()}</span>
                                   <span className="mx-2 text-gray-300">|</span>
                                   <span className="text-gray-600 dark:text-gray-400">{interview.interviewerName || 'TBD'}</span>
                                   <span className="mx-2 text-gray-300">|</span>
@@ -351,6 +355,29 @@ const ApplicantsPage = () => {
                   value={newInterview.interviewerName}
                   onChange={(e) => setNewInterview({ ...newInterview, interviewerName: e.target.value })}
                 />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Round #</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                    value={newInterview.round}
+                    onChange={(e) => setNewInterview({ ...newInterview, round: parseInt(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Round Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Technical"
+                    className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                    value={newInterview.roundName}
+                    onChange={(e) => setNewInterview({ ...newInterview, roundName: e.target.value })}
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Location / Link</label>

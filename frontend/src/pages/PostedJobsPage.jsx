@@ -41,7 +41,7 @@ const PostedJobsPage = () => {
   const { items: sortedJobs, requestSort, sortConfig } = useSortableData(jobs, { key: 'title', direction: 'ascending' });
 
   const handleDeleteJob = (jobId) => {
-    setConfirmMessage('Are you sure you want to delete this job?');
+    setConfirmMessage('Are you sure you want to archive this job? Applicants will still be able to see their application history.');
     setConfirmAction(() => async () => {
       const originalJobs = [...jobs];
       const updatedJobs = jobs.filter((job) => job._id !== jobId);
@@ -49,10 +49,10 @@ const PostedJobsPage = () => {
       setShowConfirm(false);
       try {
         await deleteJob(jobId, token);
-        toast.success('Job deleted successfully!');
+        toast.success('Job archived successfully!');
       } catch (error) {
-        console.error('Failed to delete job:', error);
-        toast.error('Failed to delete job. Reverting changes.');
+        console.error('Failed to archive job:', error);
+        toast.error('Failed to archive job. Reverting changes.');
         setJobs(originalJobs);
       }
     });
@@ -60,7 +60,7 @@ const PostedJobsPage = () => {
   };
 
   const handleDeleteAllJobs = () => {
-    setConfirmMessage('Are you sure you want to delete all jobs?');
+    setConfirmMessage('Are you sure you want to archive all jobs? Applicants will still be able to see their application history.');
     setConfirmAction(() => async () => {
       const originalJobs = [...jobs];
       setJobs([]);
@@ -68,10 +68,10 @@ const PostedJobsPage = () => {
       setShowConfirm(false);
       try {
         await deleteAllJobs(token);
-        toast.success('All jobs deleted successfully!');
+        toast.success('All jobs archived successfully!');
       } catch (error) {
-        console.error('Failed to delete all jobs:', error);
-        toast.error('Failed to delete all jobs. Reverting changes.');
+        console.error('Failed to archive all jobs:', error);
+        toast.error('Failed to archive all jobs. Reverting changes.');
         setJobs(originalJobs);
       }
     });
@@ -79,7 +79,7 @@ const PostedJobsPage = () => {
   };
 
   const handleDeleteMultipleJobs = () => {
-    setConfirmMessage(`Are you sure you want to delete ${selectedJobs.length} selected jobs?`);
+    setConfirmMessage(`Are you sure you want to archive ${selectedJobs.length} selected jobs? Applicants will still be able to see their application history.`);
     setConfirmAction(() => async () => {
       const originalJobs = [...jobs];
       const updatedJobs = jobs.filter((job) => !selectedJobs.includes(job._id));
@@ -88,10 +88,10 @@ const PostedJobsPage = () => {
       setShowConfirm(false);
       try {
         await deleteMultipleJobs(selectedJobs, token);
-        toast.success('Selected jobs deleted successfully!');
+        toast.success('Selected jobs archived successfully!');
       } catch (error) {
-        console.error('Failed to delete multiple jobs:', error);
-        toast.error('Failed to delete selected jobs. Reverting changes.');
+        console.error('Failed to archive multiple jobs:', error);
+        toast.error('Failed to archive selected jobs. Reverting changes.');
         setJobs(originalJobs);
       }
     });
@@ -143,20 +143,20 @@ const PostedJobsPage = () => {
           <div className="flex space-x-2 mb-4">
             <button
               onClick={handleDeleteAllJobs}
-              className="p-2 bg-red-600 text-white rounded flex items-center space-x-2"
-              title="Delete All Jobs"
+              className="p-2 bg-yellow-600 text-white rounded flex items-center space-x-2"
+              title="Archive All Jobs"
             >
               <TrashIcon className="h-5 w-5" />
-              <span>Delete All</span>
+              <span>Archive All</span>
             </button>
             <button
               onClick={handleDeleteMultipleJobs}
-              className="p-2 bg-red-600 text-white rounded flex items-center space-x-2"
+              className="p-2 bg-yellow-600 text-white rounded flex items-center space-x-2"
               disabled={selectedJobs.length === 0}
-              title="Delete Selected Jobs"
+              title="Archive Selected Jobs"
             >
               <TrashIcon className="h-5 w-5" />
-              <span>Delete Selected</span>
+              <span>Archive Selected</span>
             </button>
           </div>
           <div className="overflow-x-auto">
@@ -201,12 +201,14 @@ const PostedJobsPage = () => {
                           onChange={(e) => handleStatusChange(job._id, e.target.value)}
                           className={`p-1.5 text-xs rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 font-semibold ${
                             job.status === 'Open' ? 'text-green-600' :
-                            job.status === 'Closed' ? 'text-red-600' : 'text-yellow-600'
+                            job.status === 'Closed' ? 'text-red-600' :
+                            job.status === 'Archived' ? 'text-gray-500' : 'text-yellow-600'
                           }`}
                         >
                           <option value="Open">Open</option>
                           <option value="Closed">Closed</option>
                           <option value="Draft">Draft</option>
+                          <option value="Archived">Archived</option>
                         </select>
                       </td>
                       <td className="p-4 flex justify-center space-x-2">
@@ -227,7 +229,7 @@ const PostedJobsPage = () => {
                         <button
                           onClick={() => handleDeleteJob(job._id)}
                           className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition"
-                          title="Delete Job"
+                          title="Archive Job"
                         >
                           <TrashIcon className="h-5 w-5" />
                         </button>
@@ -244,7 +246,7 @@ const PostedJobsPage = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              Confirm Delete
+              Confirm Action
             </h3>
             <p className="text-gray-600 dark:text-gray-200 mb-6">{confirmMessage}</p>
             <div className="flex justify-end gap-4">
@@ -258,7 +260,7 @@ const PostedJobsPage = () => {
               <button
                 onClick={confirmAction}
                 className="px-4 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700 transition"
-                aria-label="Confirm Delete"
+                aria-label="Confirm"
               >
                 Confirm
               </button>

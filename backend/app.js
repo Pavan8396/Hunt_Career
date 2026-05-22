@@ -7,6 +7,10 @@ require('./models/employerModel');
 require('./models/jobModel');
 require('./models/applicationModel');
 require('./models/chatModel');
+require('./models/messageModel');
+require('./models/notificationModel');
+require('./models/auditLogModel');
+require('./models/companyModel');
 
 const jwt = require("jsonwebtoken"); // Still needed for JWT operations if any are left, but authController handles its own
 const bcrypt = require("bcryptjs"); // Still needed for bcrypt operations if any are left, but authController handles its own

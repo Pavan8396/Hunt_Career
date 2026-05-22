@@ -15,7 +15,7 @@ const Navbar = () => {
 
   const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const { isAuthenticated, user, userType, logout } = useContext(AuthContext);
-  const { notifications } = useContext(ChatContext);
+  const { notifications, persistentNotifications, markNotificationAsRead } = useContext(ChatContext);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +25,7 @@ const Navbar = () => {
 
   const hideAuthLinksPaths = ['/', '/login', '/signup', '/employer/login', '/employer/signup'];
 
-  const totalUnread = notifications.reduce((sum, notif) => sum + notif.count, 0);
+  const totalUnread = notifications.reduce((sum, notif) => sum + notif.count, 0) + persistentNotifications.length;
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -103,8 +103,24 @@ const Navbar = () => {
             <div className="p-4 font-bold border-b dark:border-gray-600">
               Notifications
             </div>
-            {notifications.length > 0 ? (
-              notifications.map((notif, index) => (
+            {(notifications.length > 0 || persistentNotifications.length > 0) ? (
+              <>
+              {persistentNotifications.map((notif) => (
+                <div
+                  key={notif._id}
+                  className="p-4 border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                  onClick={() => {
+                    markNotificationAsRead(notif._id);
+                    const path = userType === 'employer' ? `/employer/jobs/${notif.relatedId}/applicants` : '/applied';
+                    navigate(path);
+                    setIsNotificationOpen(false);
+                  }}
+                >
+                  <div className="font-semibold">{notif.content}</div>
+                  <div className="text-xs text-gray-500 mt-1">{new Date(notif.createdAt).toLocaleString()}</div>
+                </div>
+              ))}
+              {notifications.map((notif, index) => (
                 <div
                   key={`${notif.senderId}-${notif.jobId}-${index}`}
                   onClick={() => handleNotificationClick(notif)}
@@ -118,7 +134,8 @@ const Navbar = () => {
                     {notif.count} new messages
                   </div>
                 </div>
-              ))
+              ))}
+              </>
             ) : (
               <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                 No new notifications

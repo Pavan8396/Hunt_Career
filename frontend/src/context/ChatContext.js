@@ -19,6 +19,7 @@ const ChatProvider = ({ children }) => {
   const [recipient, setRecipient] = useState(null);
   const [activeJobTitle, setActiveJobTitle] = useState(null);
   const [notifications, setNotifications] = useState([]);
+  const [persistentNotifications, setPersistentNotifications] = useState([]);
   const { user, token } = useContext(AuthContext);
   const socketRef = useRef(null);
 
@@ -34,6 +35,10 @@ const ChatProvider = ({ children }) => {
     setNotifications(serverNotifications);
   }, []);
 
+  const handlePersistentNotifications = useCallback((serverNotifications) => {
+    setPersistentNotifications(serverNotifications);
+  }, []);
+
   useEffect(() => {
     if (user && token) {
       const socket = io('http://localhost:5000', { query: { token } });
@@ -41,14 +46,16 @@ const ChatProvider = ({ children }) => {
 
       socket.on('receiveMessage', handleNewMessage);
       socket.on('notifications', handleNotifications);
+      socket.on('persistentNotifications', handlePersistentNotifications);
 
       return () => {
         socket.off('receiveMessage', handleNewMessage);
         socket.off('notifications', handleNotifications);
+        socket.off('persistentNotifications', handlePersistentNotifications);
         socket.disconnect();
       };
     }
-  }, [user, token, handleNewMessage, handleNotifications]);
+  }, [user, token, handleNewMessage, handleNotifications, handlePersistentNotifications]);
 
   const openChatForApplication = useCallback(
     async (applicationId, recipientName, jobTitle) => {
@@ -123,9 +130,15 @@ const ChatProvider = ({ children }) => {
     isChatOpen,
     recipient,
     notifications,
+    persistentNotifications,
     openChatForApplication,
     sendMessage,
     closeChat,
+    markNotificationAsRead: (notificationId) => {
+      if (socketRef.current) {
+        socketRef.current.emit('markNotificationAsRead', { notificationId });
+      }
+    },
     deleteChat,
     activeApplicationId,
     activeJobTitle,

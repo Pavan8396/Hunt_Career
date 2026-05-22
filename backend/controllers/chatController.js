@@ -1,4 +1,5 @@
 const Chat = require('../models/chatModel');
+const Message = require('../models/messageModel');
 const notificationService = require('../services/notificationService');
 const mongoose = require('mongoose');
 
@@ -17,8 +18,10 @@ exports.getChatHistory = async (req, res) => {
       return res.json([]);
     }
 
+    const messages = await Message.find({ chat: chat._id }).sort({ timestamp: 1 }).lean();
+
     const senderIds = [
-      ...new Set(chat.messages.map((m) => m.sender.toString())),
+      ...new Set(messages.map((m) => m.sender.toString())),
     ].map((id) => new mongoose.Types.ObjectId(id));
 
     const users = await User.find({ _id: { $in: senderIds } })
@@ -39,7 +42,7 @@ exports.getChatHistory = async (req, res) => {
       senderMap.set(e._id.toString(), { _id: e._id, name: e.companyName })
     );
 
-    const populatedMessages = chat.messages.map((message) => ({
+    const populatedMessages = messages.map((message) => ({
       ...message,
       sender: senderMap.get(message.sender.toString()),
     }));
@@ -57,7 +60,11 @@ exports.deleteChatHistory = async (req, res) => {
     return res.status(400).json({ message: 'Invalid application ID' });
   }
   try {
-    await Chat.findOneAndDelete({ application: applicationId });
+    const chat = await Chat.findOne({ application: applicationId });
+    if (chat) {
+      await Message.deleteMany({ chat: chat._id });
+      await Chat.findByIdAndDelete(chat._id);
+    }
     res.status(200).json({ message: 'Chat history deleted successfully' });
   } catch (error) {
     console.error('Error deleting chat history:', error);

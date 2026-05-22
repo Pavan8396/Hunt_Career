@@ -63,11 +63,13 @@ const updateEmployerProfile = async (req, res) => {
   }
 };
 
-const registerEmployer = async (req, res) => {
-  const { companyName, email, password } = req.body;
+const Company = require('../models/companyModel');
 
-  if (!companyName || !email || !password) {
-    return res.status(400).json({ message: "All fields are required: companyName, email, password" });
+const registerEmployer = async (req, res) => {
+  const { firstName, lastName, companyName, email, password } = req.body;
+
+  if (!firstName || !lastName || !companyName || !email || !password) {
+    return res.status(400).json({ message: "All fields are required: firstName, lastName, companyName, email, password" });
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -87,10 +89,21 @@ const registerEmployer = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Create Company first
+    const company = new Company({
+      name: companyName,
+      email: email, // Use owner email as company email initially
+    });
+    await company.save();
+
     const employer = new Employer({
+      firstName,
+      lastName,
       companyName,
+      company: company._id,
       email,
       password: hashedPassword,
+      role: 'Owner'
     });
 
     await employer.save();
@@ -121,7 +134,15 @@ const loginEmployer = async (req, res) => {
       const token = jwt.sign({ _id: employer._id, email: employer.email, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
-        employer: { _id: employer._id, name: employer.companyName, email: employer.email, theme: employer.theme }
+        employer: {
+          _id: employer._id,
+          name: `${employer.firstName} ${employer.lastName}`,
+          companyName: employer.companyName,
+          companyId: employer.company,
+          role: employer.role,
+          email: employer.email,
+          theme: employer.theme
+        }
       });
     } else {
       res.status(401).json({ message: "Invalid email or password" });
@@ -134,7 +155,8 @@ const loginEmployer = async (req, res) => {
 
 const getEmployerApplications = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.user._id });
+    const employer = await Employer.findById(req.user._id);
+    const jobs = await Job.find({ company: employer.company });
     const jobIds = jobs.map(job => job._id);
     const applications = await Application.find({ job: { $in: jobIds } });
     res.json(applications);
@@ -145,7 +167,8 @@ const getEmployerApplications = async (req, res) => {
 
 const getApplicationsOverTime = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.user._id });
+    const employer = await Employer.findById(req.user._id);
+    const jobs = await Job.find({ company: employer.company });
     const jobIds = jobs.map(job => job._id);
     const applications = await Application.find({ job: { $in: jobIds } });
     const data = applications.reduce((acc, app) => {
@@ -162,7 +185,8 @@ const getApplicationsOverTime = async (req, res) => {
 
 const getJobPostingsSummary = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.user._id });
+    const employer = await Employer.findById(req.user._id);
+    const jobs = await Job.find({ company: employer.company });
     const data = jobs.reduce((acc, job) => {
       if (job.job_type) {
         acc[job.job_type] = (acc[job.job_type] || 0) + 1;
@@ -178,7 +202,8 @@ const getJobPostingsSummary = async (req, res) => {
 
 const getRecentActivity = async (req, res) => {
   try {
-    const jobs = await Job.find({ employer: req.user._id });
+    const employer = await Employer.findById(req.user._id);
+    const jobs = await Job.find({ company: employer.company });
     const jobIds = jobs.map(job => job._id);
     const applications = await Application.find({ job: { $in: jobIds } })
       .sort({ date: -1 })
@@ -224,10 +249,11 @@ const updateEmployerTheme = async (req, res) => {
 
 const getEmployerDashboardMetrics = async (req, res) => {
   try {
-    const employerId = new mongoose.Types.ObjectId(req.user._id);
+    const employer = await Employer.findById(req.user._id);
+    const companyId = employer.company;
 
     const metrics = await Job.aggregate([
-      { $match: { employer: employerId } },
+      { $match: { company: companyId } },
       {
         $lookup: {
           from: 'applications',
@@ -284,7 +310,7 @@ const getEmployerDashboardMetrics = async (req, res) => {
     // Fallback for case-sensitive collections if standard ones are empty
     if (metrics[0].jobMetrics.length === 0) {
        const altMetrics = await mongoose.connection.db.collection('Jobs').aggregate([
-        { $match: { employer: employerId } },
+        { $match: { company: companyId } },
         {
           $lookup: {
             from: 'Applications',
