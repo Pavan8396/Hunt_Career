@@ -164,6 +164,15 @@ const initSocket = (server) => {
       }
     });
 
+    socket.on('markAllNotificationsAsRead', async () => {
+      try {
+        await notificationService.markAllAsRead(userId);
+        sendNotifications(userId);
+      } catch (error) {
+        console.error('Error marking all notifications as read:', error);
+      }
+    });
+
     socket.on('disconnect', () => {
       userSockets.delete(userId.toString());
     });

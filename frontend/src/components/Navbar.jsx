@@ -13,7 +13,7 @@ const Navbar = () => {
   const [userInitials, setUserInitials] = useState('');
 
   const { isAuthenticated, user, userType, logout } = useContext(AuthContext);
-  const { notifications, persistentNotifications, markNotificationAsRead } = useContext(ChatContext);
+  const { notifications, persistentNotifications, markNotificationAsRead, markAllAsRead } = useContext(ChatContext);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -100,8 +100,19 @@ const Navbar = () => {
         </button>
         {isNotificationOpen && (
           <div className="absolute right-0 mt-2 w-80 bg-white  text-gray-900  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 max-h-[400px] overflow-y-auto">
-            <div className="p-3 text-sm font-bold border-b  sticky top-0 bg-white  z-10">
-              Notifications
+            <div className="p-3 text-sm font-bold border-b  sticky top-0 bg-white  z-10 flex justify-between items-center">
+              <span>Notifications</span>
+              {(notifications.length > 0 || persistentNotifications.length > 0) && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    markAllAsRead();
+                  }}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-normal"
+                >
+                  Mark all as read
+                </button>
+              )}
             </div>
             {(notifications.length > 0 || persistentNotifications.length > 0) ? (
               <div className="text-xs">

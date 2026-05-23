@@ -332,8 +332,8 @@ const Signup = () => {
                 disabled={isLoading}
                 className={`py-2 px-4 rounded-lg text-white font-semibold transition duration-200 ease-in-out flex items-center justify-center ${
                   isLoading
-                    ? 'bg-blue-400 cursor-not-allowed
-                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
+                    ? 'bg-blue-400 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'
                 }`}
                 aria-label="Sign up"
                 tabIndex={0}

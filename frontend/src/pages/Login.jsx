@@ -153,7 +153,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`${buttonClass} ${isLoading ? 'bg-blue-400 cursor-not-allowed  : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
+            className={`${buttonClass} ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'}`}
             aria-label="Login"
             tabIndex={0}
           >

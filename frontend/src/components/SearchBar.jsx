@@ -60,8 +60,8 @@ const SearchBar = forwardRef(({ onSearch, initialValue = '' }, ref) => {
         disabled={isSearching || !inputValue.trim()}
         className={`px-4 py-2 rounded-r-md text-white transition ${
           isSearching || !inputValue.trim()
-            ? 'bg-blue-400 cursor-not-allowed
-            : 'bg-blue-600 hover:bg-blue-700
+            ? 'bg-blue-400 cursor-not-allowed'
+            : 'bg-blue-600 hover:bg-blue-700'
         }`}
         aria-label="Search"
       >

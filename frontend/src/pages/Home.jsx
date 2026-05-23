@@ -406,8 +406,8 @@ const Home = () => {
           <p
             className={`px-4 py-2 rounded ${
               notification.type === 'success'
-                ? 'bg-green-100 text-green-700
-                : 'bg-red-100 text-red-700
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
             }`}
           >
             {notification.message}
@@ -441,7 +441,7 @@ const Home = () => {
                     key={page}
                     onClick={() => changePage(page)}
                     className={`px-3 py-1 border rounded ${currentPage === page ? 'bg-blue-600 text-white' : ''
-                      } hover:bg-blue-100 transition     ${currentPage === page ? ' : ''}`}
+                      } hover:bg-blue-100 transition`}
                     aria-label={`Go to page ${page}`}
                   >
                     {page}

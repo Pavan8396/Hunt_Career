@@ -314,8 +314,8 @@ const JobDetails = () => {
           <p
             className={`px-4 py-2 rounded ${
               notification.type === 'success'
-                ? 'bg-green-100 text-green-700
-                : 'bg-red-100 text-red-700
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
             }`}
           >
             {notification.message}
@@ -346,8 +346,8 @@ const JobDetails = () => {
                 onClick={handleConfirm}
                 className={`px-4 py-2 text-sm text-white rounded transition ${
                   confirmAction === 'save'
-                    ? 'bg-green-600 hover:bg-green-700
-                    : 'bg-red-600 hover:bg-red-700
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-red-600 hover:bg-red-700'
                 }`}
                 aria-label={
                   confirmAction === 'save' ? 'Confirm Save' : 'Confirm Unsave'
