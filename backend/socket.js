@@ -55,13 +55,14 @@ const initSocket = (server) => {
 
     socket.on(
       'sendMessage',
-      async ({ applicationId, senderId, text }) => {
+      async ({ applicationId, text }) => {
         try {
+          const senderId = userId;
           const application = await Application.findById(applicationId).populate('job');
           if (!application) return;
 
           const recipientId =
-            userId.toString() === application.applicant.toString()
+            senderId.toString() === application.applicant.toString()
               ? application.job.employer
               : application.applicant;
 
@@ -94,7 +95,7 @@ const initSocket = (server) => {
           const room = io.sockets.adapter.rooms.get(applicationId);
           const isRecipientInRoom = room && Array.from(room).some(sid => {
              const s = io.sockets.sockets.get(sid);
-             return s && s.user._id.toString() === recipientId.toString();
+             return s && s.user && s.user._id.toString() === recipientId.toString();
           });
 
           if (!isRecipientInRoom) {
