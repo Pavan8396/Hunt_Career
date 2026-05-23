@@ -69,11 +69,11 @@ const EmployerDashboard = () => {
   const COLORS = ['#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
 
   const StatCard = ({ icon, title, value, color }) => (
-    <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 flex items-center hover:shadow-md transition-shadow">
+    <div className="bg-white  p-3 rounded-lg shadow-sm border border-gray-100  flex items-center hover:shadow-md transition-shadow">
       <div className={`p-2 rounded-lg ${color} text-white shrink-0`}>{React.cloneElement(icon, { className: 'h-5 w-5' })}</div>
       <div className="ml-2 min-w-0">
-        <h3 className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-tight truncate">{title}</h3>
-        <p className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-none">{value}</p>
+        <h3 className="text-[10px] font-semibold text-gray-400  uppercase tracking-tight truncate">{title}</h3>
+        <p className="text-lg font-bold text-gray-900  leading-none">{value}</p>
       </div>
     </div>
   );
@@ -81,8 +81,8 @@ const EmployerDashboard = () => {
   return (
     <div className="p-4 space-y-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Employer Dashboard</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Welcome back, {user?.name}</p>
+        <h1 className="text-2xl font-bold text-gray-900 ">Employer Dashboard</h1>
+        <p className="text-sm text-gray-500 ">Welcome back, {user?.name}</p>
       </div>
 
       {/* Stats Section */}
@@ -103,8 +103,8 @@ const EmployerDashboard = () => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Area Chart */}
-        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Applications Over Time</h3>
+        <div className="bg-white  p-5 rounded-lg shadow-sm border border-gray-100  min-w-0">
+          <h3 className="text-sm font-semibold text-gray-700  mb-4 uppercase tracking-wide">Applications Over Time</h3>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={applicationsOverTime} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
               <defs>
@@ -126,8 +126,8 @@ const EmployerDashboard = () => {
         </div>
 
         {/* Candidate Stage Pie Chart */}
-        <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Candidate Stage Summary</h3>
+        <div className="bg-white  p-5 rounded-lg shadow-sm border border-gray-100  min-w-0">
+          <h3 className="text-sm font-semibold text-gray-700  mb-4 uppercase tracking-wide">Candidate Stage Summary</h3>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
@@ -162,8 +162,8 @@ const EmployerDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Job Postings by Type Bar Chart */}
-        <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Jobs by Type</h3>
+        <div className="lg:col-span-1 bg-white  p-5 rounded-lg shadow-sm border border-gray-100  min-w-0">
+          <h3 className="text-sm font-semibold text-gray-700  mb-4 uppercase tracking-wide">Jobs by Type</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={jobPostingsSummary}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -176,9 +176,9 @@ const EmployerDashboard = () => {
         </div>
 
         {/* Hiring Funnel (Simplified) */}
-        <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Hiring Funnel</h3>
-          <div className="space-y-3">
+        <div className="lg:col-span-1 bg-white p-5 rounded-lg shadow-sm border border-gray-100 min-w-0">
+          <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">Hiring Funnel</h3>
+          <div className="space-y-4">
             {[
               { label: 'Total Applications', value: metrics.totalApplications, color: 'bg-indigo-500' },
               { label: 'Interviewed', value: metrics.interviewScheduled + metrics.interviewCompleted, color: 'bg-purple-500' },
@@ -186,13 +186,16 @@ const EmployerDashboard = () => {
             ].map((step, index) => {
               const percentage = metrics.totalApplications > 0 ? (step.value / metrics.totalApplications) * 100 : 0;
               return (
-                <div key={index}>
+                <div key={index} className="relative">
                   <div className="flex justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{step.label}</span>
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{step.value}</span>
+                    <span className="text-xs font-medium text-gray-600 truncate mr-2">{step.label}</span>
+                    <span className="text-xs font-bold text-gray-800">{step.value}</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                    <div className={`${step.color} h-2.5 rounded-full`} style={{ width: `${percentage}%` }}></div>
+                  <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                    <div
+                      className={`${step.color} h-full rounded-full transition-all duration-500`}
+                      style={{ width: `${Math.min(100, percentage)}%` }}
+                    ></div>
                   </div>
                 </div>
               );
@@ -201,23 +204,23 @@ const EmployerDashboard = () => {
         </div>
 
         {/* Recent Activity Section */}
-        <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wide">Recent Activity</h3>
+        <div className="lg:col-span-1 bg-white  p-5 rounded-lg shadow-sm border border-gray-100 ">
+          <h3 className="text-sm font-semibold text-gray-700  mb-4 uppercase tracking-wide">Recent Activity</h3>
           <div className="space-y-3">
             {recentActivity.map((activity) => (
-              <div key={activity._id} className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+              <div key={activity._id} className="flex items-center p-2 rounded-lg hover:bg-gray-100  transition-colors">
                 <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                    <span className="text-md font-semibold text-gray-600 dark:text-gray-300">
+                  <div className="h-10 w-10 rounded-full bg-gray-200  flex items-center justify-center">
+                    <span className="text-md font-semibold text-gray-600 ">
                       {activity.applicant?.firstName?.charAt(0) || 'U'}
                     </span>
                   </div>
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                  <p className="text-sm font-medium text-gray-900 ">
                     <span className="font-bold">{activity.applicant?.firstName} {activity.applicant?.lastName}</span> applied for <span className="font-semibold">{activity.job?.title}</span>
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-500 ">
                     {new Date(activity.date).toLocaleDateString()}
                   </p>
                 </div>

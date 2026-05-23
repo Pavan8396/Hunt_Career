@@ -18,7 +18,7 @@ const AuthenticatedLayout = ({ children }) => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
+    <div className="h-screen flex flex-col bg-gray-100 ">
       <Navbar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} />

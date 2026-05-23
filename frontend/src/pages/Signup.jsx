@@ -125,16 +125,16 @@ const Signup = () => {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-16"
+      className="min-h-screen flex items-center justify-center bg-gray-100  py-16"
       style={{
         backgroundImage: `url('/images/career-background.jpg')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}
     >
-      <div className="max-w-md w-full bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 p-8 rounded-xl shadow-2xl backdrop-blur-sm">
-        <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800 dark:text-gray-100">Sign Up</h2>
-        <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-4">
+      <div className="max-w-md w-full bg-gradient-to-br from-white to-gray-50   p-8 rounded-xl shadow-2xl backdrop-blur-sm">
+        <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800 ">Sign Up</h2>
+        <p className="text-center text-sm text-gray-600  mb-4">
           Step {step} of 3
         </p>
 
@@ -142,11 +142,11 @@ const Signup = () => {
         {step === 1 && (
           <div>
             <div className="mb-5 relative">
-              <label className="block text-gray-600 dark:text-gray-300 mb-2 font-medium" htmlFor="firstName">
+              <label className="block text-gray-600  mb-2 font-medium" htmlFor="firstName">
                 First Name
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 ">
                   <FaUser />
                 </span>
                 <input
@@ -154,18 +154,18 @@ const Signup = () => {
                   id="firstName"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 transition duration-200 ease-in-out hover:border-blue-400 dark:hover:border-blue-500"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  bg-white  text-gray-900  transition duration-200 ease-in-out hover:border-blue-400 "
                   placeholder="Enter your first name"
                   aria-label="First Name"
                 />
               </div>
             </div>
             <div className="mb-5 relative">
-              <label className="block text-gray-600 dark:text-gray-300 mb-2 font-medium" htmlFor="lastName">
+              <label className="block text-gray-600  mb-2 font-medium" htmlFor="lastName">
                 Last Name
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 ">
                   <FaUser />
                 </span>
                 <input
@@ -173,7 +173,7 @@ const Signup = () => {
                   id="lastName"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 transition duration-200 ease-in-out hover:border-blue-400 dark:hover:border-blue-500"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  bg-white  text-gray-900  transition duration-200 ease-in-out hover:border-blue-400 "
                   placeholder="Enter your last name"
                   aria-label="Last Name"
                 />
@@ -181,14 +181,14 @@ const Signup = () => {
             </div>
 
             {navigationError && (
-              <p className="text-red-500 text-sm mb-5 dark:text-red-400 text-center">{navigationError}</p>
+              <p className="text-red-500 text-sm mb-5  text-center">{navigationError}</p>
             )}
 
             <div className="flex justify-end mb-5">
               <button
                 type="button"
                 onClick={handleNext}
-                className="py-2 px-4 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-700 dark:to-blue-800 dark:hover:from-blue-800 dark:hover:to-blue-900 transition duration-200 ease-in-out"
+                className="py-2 px-4 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800     transition duration-200 ease-in-out"
               >
                 Next
               </button>
@@ -200,11 +200,11 @@ const Signup = () => {
         {step === 2 && (
           <div>
             <div className="mb-5 relative">
-              <label className="block text-gray-600 dark:text-gray-300 mb-2 font-medium" htmlFor="email">
+              <label className="block text-gray-600  mb-2 font-medium" htmlFor="email">
                 Email
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 ">
                   <FaEnvelope />
                 </span>
                 <input
@@ -212,18 +212,18 @@ const Signup = () => {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 transition duration-200 ease-in-out hover:border-blue-400 dark:hover:border-blue-500"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  bg-white  text-gray-900  transition duration-200 ease-in-out hover:border-blue-400 "
                   placeholder="Enter your email"
                   aria-label="Email"
                 />
               </div>
             </div>
             <div className="mb-5 relative">
-              <label className="block text-gray-600 dark:text-gray-300 mb-2 font-medium" htmlFor="password">
+              <label className="block text-gray-600  mb-2 font-medium" htmlFor="password">
                 Password
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 ">
                   <FaLock />
                 </span>
                 <input
@@ -231,12 +231,12 @@ const Signup = () => {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 transition duration-200 ease-in-out hover:border-blue-400 dark:hover:border-blue-500"
+                  className="w-full pl-10 pr-10 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  bg-white  text-gray-900  transition duration-200 ease-in-out hover:border-blue-400 "
                   placeholder="Enter your password"
                   aria-label="Password"
                 />
                 <span
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 dark:text-gray-500 cursor-pointer"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400  cursor-pointer"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -244,11 +244,11 @@ const Signup = () => {
               </div>
             </div>
             <div className="mb-5 relative">
-              <label className="block text-gray-600 dark:text-gray-300 mb-2 font-medium" htmlFor="confirmPassword">
+              <label className="block text-gray-600  mb-2 font-medium" htmlFor="confirmPassword">
                 Confirm Password
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 ">
                   <FaLock />
                 </span>
                 <input
@@ -256,12 +256,12 @@ const Signup = () => {
                   id="confirmPassword"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 transition duration-200 ease-in-out hover:border-blue-400 dark:hover:border-blue-500"
+                  className="w-full pl-10 pr-10 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  bg-white  text-gray-900  transition duration-200 ease-in-out hover:border-blue-400 "
                   placeholder="Confirm your password"
                   aria-label="Confirm Password"
                 />
                 <span
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 dark:text-gray-500 cursor-pointer"
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400  cursor-pointer"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
@@ -270,21 +270,21 @@ const Signup = () => {
             </div>
 
             {navigationError && (
-              <p className="text-red-500 text-sm mb-5 dark:text-red-400 text-center">{navigationError}</p>
+              <p className="text-red-500 text-sm mb-5  text-center">{navigationError}</p>
             )}
 
             <div className="flex justify-between mb-5">
               <button
                 type="button"
                 onClick={handlePrevious}
-                className="py-2 px-4 rounded-lg text-gray-700 dark:text-gray-200 font-semibold border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out"
+                className="py-2 px-4 rounded-lg text-gray-700  font-semibold border border-gray-300  bg-white  hover:bg-gray-100  transition duration-200 ease-in-out"
               >
                 Previous
               </button>
               <button
                 type="button"
                 onClick={handleNext}
-                className="py-2 px-4 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-700 dark:to-blue-800 dark:hover:from-blue-800 dark:hover:to-blue-900 transition duration-200 ease-in-out"
+                className="py-2 px-4 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800     transition duration-200 ease-in-out"
               >
                 Next
               </button>
@@ -296,11 +296,11 @@ const Signup = () => {
         {step === 3 && (
           <form onSubmit={handleSubmit}>
             <div className="mb-5 relative">
-              <label className="block text-gray-600 dark:text-gray-300 mb-2 font-medium" htmlFor="phoneNumber">
+              <label className="block text-gray-600  mb-2 font-medium" htmlFor="phoneNumber">
                 Phone Number
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 dark:text-gray-500">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400 ">
                   <FaPhone />
                 </span>
                 <input
@@ -308,7 +308,7 @@ const Signup = () => {
                   id="phoneNumber"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 transition duration-200 ease-in-out hover:border-blue-400 dark:hover:border-blue-500"
+                  className="w-full pl-10 pr-3 py-3 border border-gray-300  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500  bg-white  text-gray-900  transition duration-200 ease-in-out hover:border-blue-400 "
                   placeholder="Enter your phone number (10 digits)"
                   aria-label="Phone Number"
                 />
@@ -316,14 +316,14 @@ const Signup = () => {
             </div>
 
             {hasSubmitted && submissionError && (
-              <p className="text-red-500 text-sm mb-5 dark:text-red-400 text-center">{submissionError}</p>
+              <p className="text-red-500 text-sm mb-5  text-center">{submissionError}</p>
             )}
 
             <div className="flex justify-between mb-5">
               <button
                 type="button"
                 onClick={handlePrevious}
-                className="py-2 px-4 rounded-lg text-gray-700 dark:text-gray-200 font-semibold border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 ease-in-out"
+                className="py-2 px-4 rounded-lg text-gray-700  font-semibold border border-gray-300  bg-white  hover:bg-gray-100  transition duration-200 ease-in-out"
               >
                 Previous
               </button>
@@ -332,8 +332,8 @@ const Signup = () => {
                 disabled={isLoading}
                 className={`py-2 px-4 rounded-lg text-white font-semibold transition duration-200 ease-in-out flex items-center justify-center ${
                   isLoading
-                    ? 'bg-blue-400 cursor-not-allowed dark:bg-blue-500'
-                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-700 dark:to-blue-800 dark:hover:from-blue-800 dark:hover:to-blue-900'
+                    ? 'bg-blue-400 cursor-not-allowed
+                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
                 }`}
                 aria-label="Sign up"
                 tabIndex={0}
@@ -370,16 +370,16 @@ const Signup = () => {
           </form>
         )}
 
-        <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
-          <p className="text-center text-sm text-gray-600 dark:text-gray-300">
+        <div className="mt-6 border-t border-gray-200  pt-4">
+          <p className="text-center text-sm text-gray-600 ">
             Already have an account?{' '}
             <Link
               to="/login"
-              className="text-blue-600 dark:text-blue-400 relative inline-block group"
+              className="text-blue-600  relative inline-block group"
               aria-label="Log in"
             >
               Log in
-              <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-blue-600  transition-all duration-300 group-hover:w-full"></span>
             </Link>
           </p>
         </div>

@@ -53,6 +53,10 @@ const initSocket = (server) => {
       socket.join(applicationId);
     });
 
+    socket.on('leaveRoom', ({ applicationId }) => {
+      socket.leave(applicationId);
+    });
+
     socket.on(
       'sendMessage',
       async ({ applicationId, text }) => {

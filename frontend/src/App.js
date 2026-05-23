@@ -22,7 +22,6 @@ import AdminPostJobPage from './pages/AdminPostJobPage';
 import AdminEditJobPage from './pages/AdminEditJobPage';
 import Layout from './components/Layout';
 import AuthenticatedLayout from './components/AuthenticatedLayout';
-import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ChatProvider } from './context/ChatContext';
 import { useContext } from 'react';
@@ -49,7 +48,6 @@ const GuestOrAuthenticatedRoute = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <ThemeProvider>
         <ChatProvider>
           <Router>
             <Routes>
@@ -115,10 +113,10 @@ function App() {
               <Route path="/signup" element={<Layout><Signup /></Layout>} />
               <Route path="/employer/login" element={<Layout><EmployerLogin /></Layout>} />
               <Route path="/employer/signup" element={<Layout><EmployerSignup /></Layout>} />
-              <Route path="/about" element={<Layout><div className="p-4 max-w-4xl mx-auto"><h1 className="text-2xl font-bold dark:text-gray-200">About</h1><p className="dark:text-gray-300">Learn more about Hunt-Career.</p></div></Layout>} />
-              <Route path="/contact" element={<Layout><div className="p-4 max-w-4xl mx-auto"><h1 className="text-2xl font-bold dark:text-gray-200">Contact</h1><p className="dark:text-gray-300">Contact us at support@hunt-career.com.</p></div></Layout>} />
-              <Route path="/privacy" element={<Layout><div className="p-4 max-w-4xl mx-auto"><h1 className="text-2xl font-bold dark:text-gray-200">Privacy Policy</h1><p className="dark:text-gray-300">Your privacy matters to us.</p></div></Layout>} />
-              <Route path="*" element={<Layout><div className="p-4 text-center dark:text-gray-200">404 - Page Not Found</div></Layout>} />
+              <Route path="/about" element={<Layout><div className="p-4 max-w-4xl mx-auto"><h1 className="text-2xl font-bold ">About</h1><p className="">Learn more about Hunt-Career.</p></div></Layout>} />
+              <Route path="/contact" element={<Layout><div className="p-4 max-w-4xl mx-auto"><h1 className="text-2xl font-bold ">Contact</h1><p className="">Contact us at support@hunt-career.com.</p></div></Layout>} />
+              <Route path="/privacy" element={<Layout><div className="p-4 max-w-4xl mx-auto"><h1 className="text-2xl font-bold ">Privacy Policy</h1><p className="">Your privacy matters to us.</p></div></Layout>} />
+              <Route path="*" element={<Layout><div className="p-4 text-center ">404 - Page Not Found</div></Layout>} />
             </Routes>
             <ToastContainer
               position="top-center"
@@ -127,7 +125,6 @@ function App() {
             />
           </Router>
         </ChatProvider>
-      </ThemeProvider>
     </AuthProvider>
   );
 }

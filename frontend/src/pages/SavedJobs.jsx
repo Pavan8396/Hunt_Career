@@ -71,11 +71,11 @@ const SavedJobs = () => {
   if (loading) {
     return (
       <div className="p-4">
-        <h2 className="text-2xl font-bold mb-4 dark:text-gray-200">Saved Jobs</h2>
+        <h2 className="text-2xl font-bold mb-4 ">Saved Jobs</h2>
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-3/4 dark:bg-gray-600"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 dark:bg-gray-600"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3 dark:bg-gray-600"></div>
+          <div className="h-6 bg-gray-200 rounded w-3/4 "></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 "></div>
+          <div className="h-4 bg-gray-200 rounded w-1/3 "></div>
         </div>
       </div>
     );
@@ -84,10 +84,10 @@ const SavedJobs = () => {
   if (error) {
     return (
       <div className="p-4 text-center">
-        <p className="text-red-500 dark:text-red-400">{error}</p>
+        <p className="text-red-500 ">{error}</p>
         <Link
           to="/"
-          className="text-blue-600 hover:underline text-sm mt-4 inline-block dark:text-blue-400"
+          className="text-blue-600 hover:underline text-sm mt-4 inline-block "
           aria-label="Back to home"
         >
           ← Back to Home
@@ -98,7 +98,7 @@ const SavedJobs = () => {
 
   return (
     <div className="p-4 relative">
-      <h2 className="text-2xl font-bold mb-4 dark:text-gray-200">Saved Jobs</h2>
+      <h2 className="text-2xl font-bold mb-4 ">Saved Jobs</h2>
       {savedJobs.length === 0 ? (
         <EmptyState
           icon={BookmarkIcon}
@@ -109,8 +109,8 @@ const SavedJobs = () => {
         />
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
-            <thead className="bg-gray-200 dark:bg-gray-700">
+          <table className="min-w-full bg-white  rounded-lg shadow-md">
+            <thead className="bg-gray-200 ">
               <tr>
                 <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('title')}>
                   Job Title {sortConfig.key === 'title' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
@@ -126,7 +126,7 @@ const SavedJobs = () => {
             </thead>
             <tbody>
               {sortedJobs.map((job) => (
-                <tr key={job._id} className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <tr key={job._id} className="border-b  hover:bg-gray-100 ">
                   <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job._id)}>{job.title}</td>
                   <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job._id)}>{job.company}</td>
                   <td className="p-4 cursor-pointer" onClick={() => handleCardClick(job._id)}>{job.job_type}</td>
@@ -168,17 +168,17 @@ const SavedJobs = () => {
       {/* Custom Confirmation Dialog */}
       {showConfirm && jobToRemove && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-4">
+          <div className="bg-white  p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-gray-900  mb-4">
               Confirm Remove
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-600  mb-6">
               Are you sure you want to remove the job "{jobToRemove.title}" from saved jobs?
             </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={handleCancelRemove}
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                className="px-4 py-2 text-sm text-gray-600  border border-gray-300  rounded hover:bg-gray-100  transition"
                 aria-label="Cancel"
               >
                 Cancel

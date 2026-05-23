@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AuthContext } from '../context/AuthContext';
 import { createJob, updateJob } from '../services/api';
+import ReactMarkdown from 'react-markdown';
 
 const PostJob = ({ onJobPosted, jobData }) => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const PostJob = ({ onJobPosted, jobData }) => {
     job_type: 'Full-Time',
     status: 'Open',
   });
+  const [showPreview, setShowPreview] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -91,24 +93,46 @@ const PostJob = ({ onJobPosted, jobData }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Job Title</label>
-        <input type="text" id="title" value={title} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700 ">Job Title</label>
+        <input type="text" id="title" value={title} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm   " />
       </div>
       <div>
-        <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Company</label>
-        <input type="text" id="company" value={company} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+        <label htmlFor="company" className="block text-sm font-medium text-gray-700 ">Company</label>
+        <input type="text" id="company" value={company} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm   " />
       </div>
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-        <textarea id="description" value={description} onChange={handleChange} rows="4" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></textarea>
+        <div className="flex justify-between items-center mb-1">
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700 ">Description (Markdown Supported)</label>
+          <button
+            type="button"
+            onClick={() => setShowPreview(!showPreview)}
+            className="text-xs text-blue-600 hover:underline"
+          >
+            {showPreview ? 'Hide Preview' : 'Show Preview'}
+          </button>
+        </div>
+        {showPreview ? (
+          <div className="mt-1 p-3 border border-gray-300 rounded-md bg-gray-50 min-h-[150px] prose prose-sm max-w-none">
+             <ReactMarkdown>{description || '*No description entered*'}</ReactMarkdown>
+          </div>
+        ) : (
+          <textarea
+            id="description"
+            value={description}
+            onChange={handleChange}
+            rows="6"
+            placeholder="Use markdown for formatting (e.g. ## for headers, * for bullets)"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          ></textarea>
+        )}
       </div>
       <div>
-        <label htmlFor="candidate_required_location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
-        <input type="text" id="candidate_required_location" value={candidate_required_location} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+        <label htmlFor="candidate_required_location" className="block text-sm font-medium text-gray-700 ">Location</label>
+        <input type="text" id="candidate_required_location" value={candidate_required_location} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm   " />
       </div>
       <div>
-        <label htmlFor="job_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Job Type</label>
-        <select id="job_type" value={job_type} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+        <label htmlFor="job_type" className="block text-sm font-medium text-gray-700 ">Job Type</label>
+        <select id="job_type" value={job_type} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm   ">
           <option>Full-Time</option>
           <option>Part-Time</option>
           <option>Contract</option>
@@ -117,8 +141,8 @@ const PostJob = ({ onJobPosted, jobData }) => {
         </select>
       </div>
       <div>
-        <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-        <select id="status" value={status} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+        <label htmlFor="status" className="block text-sm font-medium text-gray-700 ">Status</label>
+        <select id="status" value={status} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm   ">
           <option value="Open">Open (Active)</option>
           <option value="Closed">Closed</option>
           <option value="Draft">Draft</option>

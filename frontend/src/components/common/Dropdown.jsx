@@ -49,7 +49,7 @@ const Dropdown = ({ trigger, children }) => {
       </div>
       {isOpen && (
         <div
-          className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 dark:bg-gray-700 ring-1 ring-black ring-opacity-5"
+          className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50  ring-1 ring-black ring-opacity-5"
           role="menu"
         >
           {React.Children.map(children, (child) =>

@@ -25,6 +25,28 @@ export const fetchJobs = async (searchTerm = '', locations = [], jobTypes = []) 
   }
 };
 
+export const updateInterview = async (interviewId, interviewData, token) => {
+  try {
+    const response = await fetch(`${API_URL}/interviews/${interviewId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(interviewData),
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to update interview: ${errorText || response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating interview:', error.message);
+    toast.error('Failed to update interview.');
+    throw error;
+  }
+};
+
 export const getEmployerDashboardMetrics = async (token) => {
   try {
     const response = await fetch(`${API_URL}/employers/stats/dashboard-metrics`, {
@@ -582,6 +604,27 @@ export const submitReview = async (employerId, reviewData, token) => {
   } catch (error) {
     console.error('Error submitting review:', error.message);
     throw error; // Re-throw to be caught by the component
+  }
+};
+
+export const updateReview = async (employerId, reviewId, reviewData, token) => {
+  try {
+    const response = await fetch(`${API_URL}/employers/${employerId}/reviews/${reviewId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reviewData),
+    });
+    if (!response.ok) {
+      const errorBody = await response.json();
+      throw new Error(errorBody.message || 'Failed to update review');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating review:', error.message);
+    throw error;
   }
 };
 

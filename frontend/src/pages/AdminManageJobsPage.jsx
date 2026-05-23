@@ -52,32 +52,32 @@ const AdminManageJobsPage = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Manage Jobs</h1>
+    <div className="p-4 sm:p-6 lg:p-8  min-h-screen">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 ">Manage Jobs</h1>
       <div>
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
-          <thead className="bg-gray-50 dark:bg-gray-800">
+        <table className="min-w-full divide-y divide-gray-200  table-fixed">
+          <thead className="bg-gray-50 ">
             <tr>
-              <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
-              <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Job Type</th>
-              <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
-              <th className="w-auto px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+              <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Title</th>
+              <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Job Type</th>
+              <th className="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Location</th>
+              <th className="w-auto px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="bg-white  divide-y divide-gray-200 ">
             {jobs.map((job) => (
               <tr key={job._id} className="relative z-0">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 ">
                     <Tooltip text={job.title}>
                         <span>{job.title}</span>
                     </Tooltip>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
                     <Tooltip text={job.job_type}>
                         <span>{job.job_type}</span>
                     </Tooltip>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
                     <Tooltip text={job.candidate_required_location}>
                         <span>{job.candidate_required_location}</span>
                     </Tooltip>
@@ -85,12 +85,12 @@ const AdminManageJobsPage = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-4">
                         <Tooltip text="Edit Job">
-                            <Link to={`/employer/post-job/${job._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                            <Link to={`/employer/post-job/${job._id}`} className="text-indigo-600 hover:text-indigo-900  ">
                                 <PencilIcon className="h-5 w-5" />
                             </Link>
                         </Tooltip>
                         <Tooltip text="Delete Job">
-                            <button onClick={() => handleDelete(job._id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                            <button onClick={() => handleDelete(job._id)} className="text-red-600 hover:text-red-900  ">
                                 <TrashIcon className="h-5 w-5" />
                             </button>
                         </Tooltip>

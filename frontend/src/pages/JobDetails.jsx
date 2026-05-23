@@ -176,13 +176,13 @@ const JobDetails = () => {
     return (
       <div className="p-4 max-w-3xl mx-auto">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-3/4 mb-2 dark:bg-gray-600"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2 dark:bg-gray-600"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3 mb-4 dark:bg-gray-600"></div>
-          <div className="h-10 bg-gray-200 rounded w-24 mb-6 dark:bg-gray-600"></div>
-          <div className="h-5 bg-gray-200 rounded w-full mb-2 dark:bg-gray-600"></div>
-          <div className="h-5 bg-gray-200 rounded w-full mb-2 dark:bg-gray-600"></div>
-          <div className="h-5 bg-gray-200 rounded w-5/6 dark:bg-gray-600"></div>
+          <div className="h-6 bg-gray-200 rounded w-3/4 mb-2 "></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2 "></div>
+          <div className="h-4 bg-gray-200 rounded w-1/3 mb-4 "></div>
+          <div className="h-10 bg-gray-200 rounded w-24 mb-6 "></div>
+          <div className="h-5 bg-gray-200 rounded w-full mb-2 "></div>
+          <div className="h-5 bg-gray-200 rounded w-full mb-2 "></div>
+          <div className="h-5 bg-gray-200 rounded w-5/6 "></div>
         </div>
       </div>
     );
@@ -191,10 +191,10 @@ const JobDetails = () => {
   if (error) {
     return (
       <div className="p-4 max-w-3xl mx-auto text-center">
-        <p className="text-red-500 dark:text-red-400">{error}</p>
+        <p className="text-red-500 ">{error}</p>
         <Link
           to="/home"
-          className="text-blue-600 hover:underline text-sm mt-4 inline-block dark:text-blue-200 dark:hover:text-blue-100"
+          className="text-blue-600 hover:underline text-sm mt-4 inline-block  "
           aria-label="Back to home"
         >
           ← Back to Home
@@ -206,10 +206,10 @@ const JobDetails = () => {
   if (!job) {
     return (
       <div className="p-4 max-w-3xl mx-auto text-center">
-        <p className="text-gray-500 dark:text-gray-200">Job not found.</p>
+        <p className="text-gray-500 ">Job not found.</p>
         <Link
           to="/home"
-          className="text-blue-600 hover:underline text-sm mt-4 inline-block dark:text-blue-200 dark:hover:text-blue-100"
+          className="text-blue-600 hover:underline text-sm mt-4 inline-block  "
           aria-label="Back to home"
         >
           ← Back to Home
@@ -220,16 +220,16 @@ const JobDetails = () => {
 
   return (
     <div className="p-4 max-w-3xl mx-auto relative">
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg dark:shadow-gray-800/50">
+      <div className="bg-white  p-6 rounded-lg shadow-lg ">
         <Link
           to="/home"
-          className="text-blue-600 hover:underline text-sm dark:text-blue-200 dark:hover:text-blue-100 mb-4 inline-block"
+          className="text-blue-600 hover:underline text-sm   mb-4 inline-block"
           aria-label="Back to home"
         >
           ← Back to Home
         </Link>
 
-        <div className="bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-700 dark:to-blue-900 p-6 rounded-lg mb-6">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-700   p-6 rounded-lg mb-6">
           <h1 className="text-3xl font-bold text-white">{job.title}</h1>
           <p className="text-gray-200 mt-2">{job.company}</p>
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-200">
@@ -281,10 +281,10 @@ const JobDetails = () => {
           )}
         </div>
 
-        <div className="border-t dark:border-gray-700 my-6"></div>
+        <div className="border-t  my-6"></div>
 
-        <div className="prose max-w-none dark:prose-invert prose-p:text-gray-700 dark:text-white prose-h3:text-gray-900 dark:prose-h3:text-gray-100 prose-h4:text-gray-900 dark:prose-h4:text-gray-100 prose-ul:text-gray-700 dark:text-white prose-ol:text-gray-700 dark:text-white">
-          <h2 className="text-2xl font-semibold mb-4 dark:text-gray-100">
+        <div className="prose max-w-none  prose-p:text-gray-700  prose-h3:text-gray-900  prose-h4:text-gray-900  prose-ul:text-gray-700  prose-ol:text-gray-700 ">
+          <h2 className="text-2xl font-semibold mb-4 ">
             Job Description
           </h2>
           <ReactMarkdown>{job.description}</ReactMarkdown>
@@ -292,12 +292,12 @@ const JobDetails = () => {
 
         {job && job.employer && (
           <>
-            <div className="border-t dark:border-gray-700 my-6 pt-6">
+            <div className="border-t  my-6 pt-6">
               <ReviewList employerId={job.employer} />
             </div>
 
             {isAuthenticated && user?.type !== 'employer' && (
-              <div className="border-t dark:border-gray-700 my-6 pt-6">
+              <div className="border-t  my-6 pt-6">
                 <ReviewForm
                   employerId={job.employer}
                   token={token}
@@ -314,8 +314,8 @@ const JobDetails = () => {
           <p
             className={`px-4 py-2 rounded ${
               notification.type === 'success'
-                ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                ? 'bg-green-100 text-green-700
+                : 'bg-red-100 text-red-700
             }`}
           >
             {notification.message}
@@ -325,18 +325,18 @@ const JobDetails = () => {
 
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <div className="bg-white  p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-gray-900  mb-4">
               Confirm {confirmAction === 'save' ? 'Save' : 'Unsave'}
             </h3>
-            <p className="text-gray-600 dark:text-gray-200 mb-6">
+            <p className="text-gray-600  mb-6">
               Are you sure you want to {confirmAction} the job "{job.title}"?
             </p>
             <div className="flex justify-end gap-4">
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition"
+                className="px-4 py-2 text-sm text-gray-600  border border-gray-300  rounded hover:bg-gray-100   transition"
                 aria-label="Cancel"
               >
                 Cancel
@@ -346,8 +346,8 @@ const JobDetails = () => {
                 onClick={handleConfirm}
                 className={`px-4 py-2 text-sm text-white rounded transition ${
                   confirmAction === 'save'
-                    ? 'bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700'
-                    : 'bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700'
+                    ? 'bg-green-600 hover:bg-green-700
+                    : 'bg-red-600 hover:bg-red-700
                 }`}
                 aria-label={
                   confirmAction === 'save' ? 'Confirm Save' : 'Confirm Unsave'

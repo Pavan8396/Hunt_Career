@@ -160,8 +160,8 @@ const PostedJobsPage = () => {
             </button>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
-              <thead className="bg-gray-200 dark:bg-gray-700">
+            <table className="min-w-full bg-white  rounded-lg shadow-md">
+              <thead className="bg-gray-200 ">
                 <tr>
                   <th className="p-4 text-left">
                     <input
@@ -185,7 +185,7 @@ const PostedJobsPage = () => {
               <tbody>
                 {sortedJobs.map((job) => (
                   <React.Fragment key={job._id}>
-                    <tr className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <tr className="border-b  hover:bg-gray-100 ">
                       <td className="p-4">
                         <input
                           type="checkbox"
@@ -199,7 +199,7 @@ const PostedJobsPage = () => {
                         <select
                           value={job.status}
                           onChange={(e) => handleStatusChange(job._id, e.target.value)}
-                          className={`p-1.5 text-xs rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600 font-semibold ${
+                          className={`p-1.5 text-xs rounded-md border-gray-300   font-semibold ${
                             job.status === 'Open' ? 'text-green-600' :
                             job.status === 'Closed' ? 'text-red-600' :
                             job.status === 'Archived' ? 'text-gray-500' : 'text-yellow-600'
@@ -244,15 +244,15 @@ const PostedJobsPage = () => {
       )}
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <div className="bg-white  p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-gray-900  mb-4">
               Confirm Action
             </h3>
-            <p className="text-gray-600 dark:text-gray-200 mb-6">{confirmMessage}</p>
+            <p className="text-gray-600  mb-6">{confirmMessage}</p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition"
+                className="px-4 py-2 text-sm text-gray-600  border border-gray-300  rounded hover:bg-gray-100   transition"
                 aria-label="Cancel"
               >
                 Cancel

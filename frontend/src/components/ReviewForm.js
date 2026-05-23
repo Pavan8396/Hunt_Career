@@ -34,7 +34,7 @@ const ReviewForm = ({ employerId, token, onReviewSubmitted }) => {
       <h3 className="text-xl font-semibold mb-4">Write a Review</h3>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700 dark:text-gray-300 mb-2">Your Rating</label>
+          <label className="block text-gray-700  mb-2">Your Rating</label>
           <div className="flex">
             {[...Array(5)].map((star, index) => {
               const ratingValue = index + 1;
@@ -60,12 +60,12 @@ const ReviewForm = ({ employerId, token, onReviewSubmitted }) => {
           </div>
         </div>
         <div className="mb-4">
-          <label htmlFor="comment" className="block text-gray-700 dark:text-gray-300 mb-2">Your Comment</label>
+          <label htmlFor="comment" className="block text-gray-700  mb-2">Your Comment</label>
           <textarea
             id="comment"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+            className="w-full p-2 border rounded  "
             rows="4"
             placeholder="Share your experience with this company..."
           ></textarea>
