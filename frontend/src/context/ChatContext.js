@@ -9,6 +9,7 @@ import React, {
 import io from 'socket.io-client';
 import { AuthContext } from './AuthContext';
 import { getChatHistory, deleteChatHistory } from '../services/api';
+import { toast } from 'react-toastify';
 
 const ChatContext = createContext();
 
@@ -29,7 +30,12 @@ const ChatProvider = ({ children }) => {
       ...prev,
       [applicationId]: [...(prev[applicationId] || []), message],
     }));
-  }, []);
+
+    // Trigger toast if chat is not open for this application
+    if (activeApplicationId !== applicationId) {
+      toast.info(`New message from ${message.sender.name}`);
+    }
+  }, [activeApplicationId]);
 
   const handleNotifications = useCallback((serverNotifications) => {
     setNotifications(serverNotifications);

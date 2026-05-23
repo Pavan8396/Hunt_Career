@@ -72,7 +72,13 @@ const loginUser = async (req, res) => {
       if (!user.isActive) {
         return res.status(403).json({ message: "Your account has been suspended. Please contact support." });
       }
-      const token = jwt.sign({ _id: user._id, email: user.email, type: 'user', isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign({
+        _id: user._id,
+        email: user.email,
+        type: 'user',
+        isAdmin: user.isAdmin,
+        name: user.name
+      }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
         user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin, theme: user.theme },

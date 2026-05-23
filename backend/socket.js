@@ -65,8 +65,8 @@ const initSocket = (server) => {
               application: applicationId,
               job: application.job._id,
               participants: [senderId, recipientId],
-              messages: [],
             });
+            await chat.save();
           }
 
           const newMessage = new Message({

@@ -24,7 +24,7 @@ const getNotificationsForUser = async (userId) => {
       },
       {
         $lookup: {
-          from: 'chats',
+          from: 'Chats',
           localField: 'chat',
           foreignField: '_id',
           as: 'chatInfo',
@@ -71,7 +71,7 @@ const getNotificationsForUser = async (userId) => {
       },
       {
         $lookup: {
-          from: 'employers',
+          from: 'Employers',
           localField: '_id.sender',
           foreignField: '_id',
           as: 'employerInfo',
@@ -134,11 +134,25 @@ const markAsRead = async (notificationId, userId) => {
   }
 };
 
+const markAllAsRead = async (userId) => {
+  try {
+    await Notification.updateMany(
+      { recipient: userId, isRead: false },
+      { $set: { isRead: true } }
+    );
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error);
+  }
+};
+
 const getPersistentNotifications = async (userId) => {
   try {
     return await Notification.find({ recipient: userId, isRead: false })
       .sort({ createdAt: -1 })
-      .populate('sender', 'firstName lastName companyName');
+      .populate({
+        path: 'sender',
+        select: 'firstName lastName companyName'
+      });
   } catch (error) {
     console.error('Error fetching persistent notifications:', error);
     return [];
@@ -149,5 +163,6 @@ module.exports = {
   getNotificationsForUser,
   createNotification,
   markAsRead,
+  markAllAsRead,
   getPersistentNotifications
 };
