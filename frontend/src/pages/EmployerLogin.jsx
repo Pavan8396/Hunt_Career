@@ -97,7 +97,8 @@ const EmployerLogin = () => {
 
           {errorMessage && <p className="text-red-500 text-sm mb-5  text-center">{errorMessage}</p>}
 
-          <button type="submit" disabled={isLoading} className={`${buttonClass} ${isLoading ? 'bg-blue-400 cursor-not-allowed  : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
+          <button type="submit" disabled={isLoading} className={`${buttonClass} ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800'}`}
+          >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>

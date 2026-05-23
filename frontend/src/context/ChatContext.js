@@ -153,6 +153,11 @@ const ChatProvider = ({ children }) => {
         socketRef.current.emit('markNotificationAsRead', { notificationId });
       }
     },
+    markAllAsRead: () => {
+      if (socketRef.current) {
+        socketRef.current.emit('markAllNotificationsAsRead');
+      }
+    },
     deleteChat,
     activeApplicationId,
     activeJobTitle,
