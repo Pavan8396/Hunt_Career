@@ -34,6 +34,10 @@ const notificationSchema = new mongoose.Schema({
     required: true,
     enum: ['Application', 'Interview', 'Job'],
   },
+  jobId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Job',
+  },
   isRead: {
     type: Boolean,
     default: false,
