@@ -14,6 +14,7 @@ const createNotification = async (data) => {
 };
 
 const getNotificationsForUser = async (userId) => {
+  // console.log(`[notificationService] getNotificationsForUser: ${userId}`);
   try {
     const notifications = await Message.aggregate([
       {
@@ -113,6 +114,7 @@ const getNotificationsForUser = async (userId) => {
         },
       },
     ]);
+    // console.log(`[notificationService] Aggregation result for ${userId}:`, notifications.length);
     return notifications;
   } catch (error) {
     console.error(
@@ -147,12 +149,14 @@ const markAllAsRead = async (userId) => {
 
 const getPersistentNotifications = async (userId) => {
   try {
-    return await Notification.find({ recipient: userId, isRead: false })
+    const notifs = await Notification.find({ recipient: userId, isRead: false })
       .sort({ createdAt: -1 })
       .populate({
         path: 'sender',
         select: 'firstName lastName companyName'
       });
+    // console.log(`[notificationService] getPersistentNotifications for ${userId}:`, notifs.length);
+    return notifs;
   } catch (error) {
     console.error('Error fetching persistent notifications:', error);
     return [];
