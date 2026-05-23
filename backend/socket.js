@@ -30,6 +30,12 @@ const initSocket = (server) => {
     try {
       const chatNotifications = await notificationService.getNotificationsForUser(userId);
       const persistentNotifications = await notificationService.getPersistentNotifications(userId);
+
+      // console.log(`[Socket] Sending to ${userId}:`, {
+      //   chats: chatNotifications.length,
+      //   persistent: persistentNotifications.length
+      // });
+
       userSocket.emit('notifications', chatNotifications);
       userSocket.emit('persistentNotifications', persistentNotifications);
     } catch (error) {
@@ -84,6 +90,25 @@ const initSocket = (server) => {
             sender: { _id: senderId, name: socket.user.name },
           });
 
+          // Check if recipient is in the room
+          const room = io.sockets.adapter.rooms.get(applicationId);
+          const isRecipientInRoom = room && Array.from(room).some(sid => {
+             const s = io.sockets.sockets.get(sid);
+             return s && s.user._id.toString() === recipientId.toString();
+          });
+
+          if (!isRecipientInRoom) {
+            await notificationService.createNotification({
+              recipient: recipientId,
+              sender: senderId,
+              senderModel: socket.user.type === 'employer' ? 'Employer' : 'User',
+              type: 'NewMessage',
+              content: `New message from ${socket.user.name} regarding ${application.job.title}`,
+              relatedId: applicationId,
+              relatedModel: 'Application',
+            });
+          }
+
           sendNotifications(recipientId.toString());
         } catch (error) {
           console.error('Error handling sendMessage:', error);
@@ -100,6 +125,14 @@ const initSocket = (server) => {
             { $set: { read: true } }
           );
         }
+
+        // Also mark persistent notifications for this application as read
+        const Notification = require('./models/notificationModel');
+        await Notification.updateMany(
+          { recipient: userId, relatedId: applicationId, type: 'NewMessage', isRead: false },
+          { $set: { isRead: true } }
+        );
+
         sendNotifications(userId);
       } catch (error) {
         console.error('Error marking messages as read:', error);
