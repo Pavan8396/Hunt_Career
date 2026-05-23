@@ -14,7 +14,6 @@ const createNotification = async (data) => {
 };
 
 const getNotificationsForUser = async (userId) => {
-  // console.log(`[notificationService] getNotificationsForUser: ${userId}`);
   try {
     const notifications = await Message.aggregate([
       {
@@ -104,6 +103,7 @@ const getNotificationsForUser = async (userId) => {
                   '$senderDetails.lastName',
                 ],
               },
+              'Unknown Sender'
             ],
           },
           jobId: '$_id.job',
@@ -114,7 +114,6 @@ const getNotificationsForUser = async (userId) => {
         },
       },
     ]);
-    // console.log(`[notificationService] Aggregation result for ${userId}:`, notifications.length);
     return notifications;
   } catch (error) {
     console.error(
@@ -155,7 +154,6 @@ const getPersistentNotifications = async (userId) => {
         path: 'sender',
         select: 'firstName lastName companyName'
       });
-    // console.log(`[notificationService] getPersistentNotifications for ${userId}:`, notifs.length);
     return notifs;
   } catch (error) {
     console.error('Error fetching persistent notifications:', error);

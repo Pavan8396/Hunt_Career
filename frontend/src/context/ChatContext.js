@@ -90,7 +90,6 @@ const ChatProvider = ({ children }) => {
       if (text.trim() && activeApplicationId && user && socketRef.current) {
         const messageDataForSocket = {
           applicationId: activeApplicationId,
-          senderId: user._id,
           text,
         };
 

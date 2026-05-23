@@ -132,7 +132,8 @@ const Navbar = () => {
                       if (notif.type === 'NewMessage') {
                         handleNotificationClick({
                           applicationId: notif.relatedId,
-                          senderName: notif.sender?.companyName || 'Employer',
+                          senderName: notif.sender?.companyName || (notif.sender?.firstName ? `${notif.sender.firstName} ${notif.sender.lastName}` : 'Employer'),
+                          jobId: notif.jobId
                         });
                         return;
                       }
