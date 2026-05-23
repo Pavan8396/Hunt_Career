@@ -131,7 +131,13 @@ const loginEmployer = async (req, res) => {
       if (!employer.isActive) {
         return res.status(403).json({ message: "Your account has been suspended. Please contact support." });
       }
-      const token = jwt.sign({ _id: employer._id, email: employer.email, type: 'employer' }, JWT_SECRET, { expiresIn: "1h" });
+      const employerName = (employer.firstName && employer.lastName) ? `${employer.firstName} ${employer.lastName}` : employer.companyName;
+      const token = jwt.sign({
+        _id: employer._id,
+        email: employer.email,
+        type: 'employer',
+        name: employerName
+      }, JWT_SECRET, { expiresIn: "1h" });
       res.json({
         token,
         employer: {
