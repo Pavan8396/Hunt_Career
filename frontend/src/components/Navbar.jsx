@@ -116,18 +116,17 @@ const Navbar = () => {
                     let path = '/';
                     if (userType === 'employer') {
                       if (notif.type === 'NewApplication') {
-                        path = `/employer/jobs/${notif.relatedId}/applicants`;
+                        path = `/employer/jobs/${notif.jobId || notif.relatedId}/applicants`;
                       } else if (notif.type === 'NewMessage') {
                         // For messages, open the chat. relatedId is the Application ID
                         handleNotificationClick({
                            applicationId: notif.relatedId,
                            senderName: notif.sender?.firstName ? `${notif.sender.firstName} ${notif.sender.lastName}` : (notif.sender?.companyName || 'Sender'),
-                           // We don't have job ID or title easily available here without extra fetching,
-                           // but openChatForApplication can handle missing jobTitle by fetching history
+                           jobId: notif.jobId
                         });
                         return;
                       } else if (notif.relatedModel === 'Interview' || notif.relatedModel === 'Application') {
-                         path = `/employer/dashboard`;
+                         path = notif.jobId ? `/employer/jobs/${notif.jobId}/applicants` : `/employer/dashboard`;
                       }
                     } else {
                       if (notif.type === 'NewMessage') {

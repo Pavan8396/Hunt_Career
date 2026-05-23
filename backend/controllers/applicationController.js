@@ -46,6 +46,7 @@ exports.applyForJob = async (req, res) => {
       content: `New application received for ${job.title}`,
       relatedId: job._id, // Use Job ID for navigation
       relatedModel: 'Job',
+      jobId: job._id,
     });
 
     res.status(201).json({ message: 'Application submitted successfully' });
@@ -94,6 +95,7 @@ exports.updateApplicationStatus = async (req, res) => {
         content: `Your application for ${application.job.title} is now ${status}`,
         relatedId: application._id,
         relatedModel: 'Application',
+        jobId: application.job._id,
       });
     }
 

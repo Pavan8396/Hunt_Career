@@ -51,6 +51,7 @@ exports.scheduleInterview = async (req, res) => {
       content: `An interview has been scheduled for ${application.job.title} on ${new Date(scheduledAt).toLocaleString()}`,
       relatedId: interview._id,
       relatedModel: 'Interview',
+      jobId: application.job._id,
     });
 
     // Update application status to Interviewing if it isn't already

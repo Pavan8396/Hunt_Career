@@ -98,15 +98,26 @@ const initSocket = (server) => {
           });
 
           if (!isRecipientInRoom) {
-            await notificationService.createNotification({
+            const Notification = require('./models/notificationModel');
+            const existingNotif = await Notification.findOne({
               recipient: recipientId,
-              sender: senderId,
-              senderModel: socket.user.type === 'employer' ? 'Employer' : 'User',
-              type: 'NewMessage',
-              content: `New message from ${socket.user.name} regarding ${application.job.title}`,
               relatedId: applicationId,
-              relatedModel: 'Application',
+              type: 'NewMessage',
+              isRead: false
             });
+
+            if (!existingNotif) {
+              await notificationService.createNotification({
+                recipient: recipientId,
+                sender: senderId,
+                senderModel: socket.user.type === 'employer' ? 'Employer' : 'User',
+                type: 'NewMessage',
+                content: `New message from ${socket.user.name} regarding ${application.job.title}`,
+                relatedId: applicationId,
+                relatedModel: 'Application',
+                jobId: application.job._id
+              });
+            }
           }
 
           sendNotifications(recipientId.toString());
