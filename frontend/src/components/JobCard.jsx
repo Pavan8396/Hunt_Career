@@ -84,7 +84,7 @@ const JobCard = ({
   };
 
   return (
-    <div className="relative flex flex-col justify-between border rounded p-4 shadow hover:shadow-md transition bg-white dark:bg-gray-800 dark:border-gray-700 cursor-pointer h-full">
+    <div className="relative flex flex-col justify-between border rounded p-4 shadow hover:shadow-md transition bg-white   cursor-pointer h-full">
       <div
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
@@ -92,14 +92,14 @@ const JobCard = ({
         tabIndex={0}
         aria-label={`View details for ${title} at ${company}`}
       >
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">{title}</h3>
-        <p className="text-gray-600 dark:text-gray-400">{company}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <h3 className="text-lg font-semibold text-gray-900 ">{title}</h3>
+        <p className="text-gray-600 ">{company}</p>
+        <p className="text-sm text-gray-500 ">
           {job_type} • {candidate_required_location}
         </p>
 
         {description && (
-          <p className="text-sm text-gray-700 dark:text-gray-300 mt-3 line-clamp-3">
+          <p className="text-sm text-gray-700  mt-3 line-clamp-3">
             {description}
           </p>
         )}
@@ -108,7 +108,7 @@ const JobCard = ({
       <div className="mt-4 flex justify-between items-center">
         <span
           onClick={handleCardClick}
-          className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
+          className="text-blue-600  text-sm hover:underline"
           role="button"
           tabIndex={0}
           onKeyDown={handleKeyDown}
@@ -136,8 +136,8 @@ const JobCard = ({
           <p
             className={`px-4 py-1 rounded text-sm ${
               notification.type === 'success'
-                ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300'
-                : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                ? 'bg-green-100 text-green-700
+                : 'bg-red-100 text-red-700
             }`}
           >
             {notification.message}
@@ -147,17 +147,17 @@ const JobCard = ({
 
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-4">
+          <div className="bg-white  p-6 rounded-lg shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-gray-900  mb-4">
               Confirm {confirmAction === 'save' ? 'Save' : 'Unsave'}
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-600  mb-6">
               Are you sure you want to {confirmAction} the job &quot;{title}&quot;?
             </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={handleCancel}
-                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                className="px-4 py-2 text-sm text-gray-600  border border-gray-300  rounded hover:bg-gray-100  transition"
                 aria-label="Cancel"
               >
                 Cancel

@@ -4,7 +4,7 @@ import Chatbox from './Chatbox';
 
 const Layout = ({ children }) => {
   return (
-    <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
+    <div className="h-screen flex flex-col bg-gray-100 ">
       <Navbar />
       <main className="flex-grow overflow-y-auto">{children}</main>
       <Chatbox />

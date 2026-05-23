@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require('../config/env');
 const Employer = require('../models/employerModel');
+const Company = require('../models/companyModel');
 
 const getEmployerProfile = async (req, res) => {
   try {
@@ -19,7 +20,7 @@ const getEmployerProfile = async (req, res) => {
 
 const updateEmployerProfile = async (req, res) => {
   try {
-    const employer = await Employer.findById(req.user._id);
+    const employer = await Employer.findById(req.user._id).populate('company');
 
     if (employer) {
       // Prevent email updates
@@ -27,16 +28,24 @@ const updateEmployerProfile = async (req, res) => {
         return res.status(400).json({ message: 'Email address cannot be changed.' });
       }
 
-      // Update fields if they are present in the request. The `in` operator is used
-      // for safety as req.body from multer may not have hasOwnProperty.
-      if ('companyName' in req.body) {
-        employer.companyName = req.body.companyName;
-      }
-      if ('companyDescription' in req.body) {
-        employer.companyDescription = req.body.companyDescription;
-      }
-      if ('website' in req.body) {
-        employer.website = req.body.website;
+      // Update Employer fields
+      if ('firstName' in req.body) employer.firstName = req.body.firstName;
+      if ('lastName' in req.body) employer.lastName = req.body.lastName;
+
+      // Update Company fields
+      if (employer.company) {
+        const company = await Company.findById(employer.company);
+        if (company) {
+          if ('companyName' in req.body) {
+            company.name = req.body.companyName;
+            employer.companyName = req.body.companyName; // Keep sync for now
+          }
+          if ('companyDescription' in req.body) company.description = req.body.companyDescription;
+          if ('website' in req.body) company.website = req.body.website;
+          if (req.file) company.logo = req.file.path;
+
+          await company.save();
+        }
       }
 
       if (req.file) {
@@ -47,6 +56,8 @@ const updateEmployerProfile = async (req, res) => {
 
       res.json({
         _id: updatedEmployer._id,
+        firstName: updatedEmployer.firstName,
+        lastName: updatedEmployer.lastName,
         companyName: updatedEmployer.companyName,
         email: updatedEmployer.email,
         companyDescription: updatedEmployer.companyDescription,
@@ -62,8 +73,6 @@ const updateEmployerProfile = async (req, res) => {
     res.status(500).json({ message: 'Failed to update employer profile' });
   }
 };
-
-const Company = require('../models/companyModel');
 
 const registerEmployer = async (req, res) => {
   const { firstName, lastName, companyName, email, password } = req.body;
@@ -299,8 +308,8 @@ const getEmployerDashboardMetrics = async (req, res) => {
                 _id: null,
                 scheduled: { $sum: { $cond: [{ $eq: ['$interviews.status', 'Scheduled'] }, 1, 0] } },
                 completed: { $sum: { $cond: [{ $eq: ['$interviews.status', 'Completed'] }, 1, 0] } },
-                feedbackGiven: { $sum: { $cond: [{ $and: [{ $eq: ['$interviews.status', 'Completed'] }, { $ne: ['$interviews.feedback', null] }, { $ne: ['$interviews.feedback', ""] }] }, 1, 0] } },
-                feedbackPending: { $sum: { $cond: [{ $and: [{ $eq: ['$interviews.status', 'Completed'] }, { $or: [{ $eq: ['$interviews.feedback', null] }, { $eq: ['$interviews.feedback', ""] }] }] }, 1, 0] } }
+                feedbackGiven: { $sum: { $cond: [{ $and: [{ $eq: ['$interviews.status', 'Completed'] }, { $ne: [{ $ifNull: ['$interviews.feedback', ''] }, ''] }] }, 1, 0] } },
+                feedbackPending: { $sum: { $cond: [{ $and: [{ $eq: ['$interviews.status', 'Completed'] }, { $eq: [{ $ifNull: ['$interviews.feedback', ''] }, ''] }] }, 1, 0] } }
               }
             }
           ]

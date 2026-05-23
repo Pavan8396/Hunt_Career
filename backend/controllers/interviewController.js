@@ -115,8 +115,43 @@ exports.submitFeedback = async (req, res) => {
 
     interview.feedback = feedback;
     interview.feedbackSubmittedAt = Date.now();
+    // Logic fix: Ensure status is 'Completed' when feedback is submitted
+    if (interview.status === 'Scheduled') {
+      interview.status = 'Completed';
+    }
     await interview.save();
 
+    res.json(interview);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateInterview = async (req, res) => {
+  try {
+    const { interviewId } = req.params;
+    const { scheduledAt, interviewerName, location, round, roundName } = req.body;
+
+    const interview = await Interview.findById(interviewId).populate({
+      path: 'application',
+      populate: { path: 'job' }
+    });
+
+    if (!interview) {
+      return res.status(404).json({ message: 'Interview not found' });
+    }
+
+    if (interview.application.job.employer.toString() !== req.user._id && !req.user.isAdmin) {
+      return res.status(403).json({ message: 'Not authorized to update this interview' });
+    }
+
+    if (scheduledAt) interview.scheduledAt = scheduledAt;
+    if (interviewerName) interview.interviewerName = interviewerName;
+    if (location) interview.location = location;
+    if (round) interview.round = round;
+    if (roundName) interview.roundName = roundName;
+
+    await interview.save();
     res.json(interview);
   } catch (error) {
     res.status(500).json({ message: error.message });

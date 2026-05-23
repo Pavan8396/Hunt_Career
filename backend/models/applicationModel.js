@@ -13,7 +13,7 @@ const applicationSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Submitted', 'In Review', 'Screening', 'Interviewing', 'Candidate Identified', 'Offered', 'Rejected', 'Dropped'],
+    enum: ['Submitted', 'In Review', 'Screening', 'Interviewing', 'Candidate Identified', 'Offered', 'Rejected'],
     default: 'Submitted',
   },
   date: {
@@ -22,4 +22,4 @@ const applicationSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Application', applicationSchema);
+module.exports = mongoose.model('Application', applicationSchema, 'Applications');

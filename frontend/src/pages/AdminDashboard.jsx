@@ -75,32 +75,32 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Admin Dashboard</h1>
+    <div className="p-4 sm:p-6 lg:p-8  min-h-screen">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 ">Admin Dashboard</h1>
 
       {stats && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Users</h2>
-            <p className="text-3xl text-gray-900 dark:text-gray-100">{stats.totalUsers}</p>
+          <div className="bg-white  p-4 rounded-lg shadow">
+            <h2 className="text-lg font-semibold text-gray-700 ">Total Users</h2>
+            <p className="text-3xl text-gray-900 ">{stats.totalUsers}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Employers</h2>
-            <p className="text-3xl text-gray-900 dark:text-gray-100">{stats.totalEmployers}</p>
+          <div className="bg-white  p-4 rounded-lg shadow">
+            <h2 className="text-lg font-semibold text-gray-700 ">Total Employers</h2>
+            <p className="text-3xl text-gray-900 ">{stats.totalEmployers}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Jobs</h2>
-            <p className="text-3xl text-gray-900 dark:text-gray-100">{stats.totalJobs}</p>
+          <div className="bg-white  p-4 rounded-lg shadow">
+            <h2 className="text-lg font-semibold text-gray-700 ">Total Jobs</h2>
+            <p className="text-3xl text-gray-900 ">{stats.totalJobs}</p>
           </div>
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Total Reviews</h2>
-            <p className="text-3xl text-gray-900 dark:text-gray-100">{stats.totalReviews}</p>
+          <div className="bg-white  p-4 rounded-lg shadow">
+            <h2 className="text-lg font-semibold text-gray-700 ">Total Reviews</h2>
+            <p className="text-3xl text-gray-900 ">{stats.totalReviews}</p>
           </div>
         </div>
       )}
 
       <div>
-        <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="border-b border-gray-200 ">
           <nav className="-mb-px flex space-x-8" aria-label="Tabs">
             <button
               onClick={() => setActiveTab('users')}
@@ -108,7 +108,7 @@ const AdminDashboard = () => {
                 activeTab === 'users'
                   ? 'border-indigo-500 text-indigo-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm dark:text-gray-300 dark:hover:text-gray-100`}
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
             >
               Job Seekers
             </button>
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
                 activeTab === 'employers'
                   ? 'border-indigo-500 text-indigo-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm dark:text-gray-300 dark:hover:text-gray-100`}
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
             >
               Employers
             </button>
@@ -239,25 +239,25 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
             </div>
         </div>
         <div>
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
-            <thead className="bg-gray-50 dark:bg-gray-800">
+          <table className="min-w-full divide-y divide-gray-200  table-fixed">
+            <thead className="bg-gray-50 ">
               <tr>
-                <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
-                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
-                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Make Admin</th>
-                <th className="w-auto px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Name</th>
+                <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Email</th>
+                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Active</th>
+                <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Make Admin</th>
+                <th className="w-auto px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-white  divide-y divide-gray-200 ">
               {users.map((user) => (
-                <tr key={user._id} className="relative z-0 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                <tr key={user._id} className="relative z-0 hover:bg-gray-50 ">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 ">
                     <Tooltip text={`${user.firstName} ${user.lastName}`}>
                       <span className="truncate">{user.firstName} {user.lastName}</span>
                     </Tooltip>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
                     <Tooltip text={user.email}>
                       <span className="truncate">{user.email}</span>
                     </Tooltip>
@@ -271,12 +271,12 @@ const UserManagement = ({ users, setUsers, fetchUsers }) => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-4">
                       <Tooltip text="Edit User">
-                        <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                        <Link to={`/profile/${user._id}`} className="text-indigo-600 hover:text-indigo-900  ">
                           <PencilIcon className="h-5 w-5" />
                         </Link>
                       </Tooltip>
                       <Tooltip text="Delete User">
-                        <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                        <button onClick={() => handleDelete(user)} className="text-red-600 hover:text-red-900  ">
                           <TrashIcon className="h-5 w-5" />
                         </button>
                       </Tooltip>
@@ -403,24 +403,24 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                 </div>
             </div>
             <div>
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 table-fixed">
-                    <thead className="bg-gray-50 dark:bg-gray-800">
+                <table className="min-w-full divide-y divide-gray-200  table-fixed">
+                    <thead className="bg-gray-50 ">
                         <tr>
-                            <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Company Name</th>
-                            <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
-                            <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Active</th>
-                            <th className="w-auto px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Company Name</th>
+                            <th className="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Email</th>
+                            <th className="w-1/6 px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Active</th>
+                            <th className="w-auto px-6 py-3 text-left text-xs font-medium text-gray-500  uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody className="bg-white  divide-y divide-gray-200 ">
                         {employers.map((employer) => (
-                            <tr key={employer._id} className="relative z-0 hover:bg-gray-50 dark:hover:bg-gray-800">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            <tr key={employer._id} className="relative z-0 hover:bg-gray-50 ">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 ">
                                     <Tooltip text={employer.companyName}>
                                         <span className="truncate">{employer.companyName}</span>
                                     </Tooltip>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 ">
                                     <Tooltip text={employer.email}>
                                         <span className="truncate">{employer.email}</span>
                                     </Tooltip>
@@ -431,17 +431,17 @@ const EmployerManagement = ({ employers, setEmployers, fetchEmployers }) => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <div className="flex items-center space-x-4">
                                         <Tooltip text="Edit Employer">
-                                            <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                            <button onClick={() => handleEdit(employer)} className="text-indigo-600 hover:text-indigo-900  ">
                                                 <PencilIcon className="h-5 w-5" />
                                             </button>
                                         </Tooltip>
                                         <Tooltip text="Manage Jobs">
-                                            <Link to={`/admin/employer/${employer._id}/jobs`} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                                            <Link to={`/admin/employer/${employer._id}/jobs`} className="text-green-600 hover:text-green-900  ">
                                                 <EyeIcon className="h-5 w-5" />
                                             </Link>
                                         </Tooltip>
                                         <Tooltip text="Delete Employer">
-                                            <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                                            <button onClick={() => handleDelete(employer)} className="text-red-600 hover:text-red-900  ">
                                                 <TrashIcon className="h-5 w-5" />
                                             </button>
                                         </Tooltip>

@@ -70,28 +70,28 @@ const Chatbox = () => {
   return (
     <div
       ref={chatboxRef}
-      className="fixed bottom-4 right-4 w-96 h-auto bg-white dark:bg-gray-800 rounded-xl shadow-2xl flex flex-col z-50"
+      className="fixed bottom-4 right-4 w-96 h-auto bg-white  rounded-xl shadow-2xl flex flex-col z-50"
     >
-      <header className="bg-gray-50 dark:bg-gray-900 p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      <header className="bg-gray-50  p-3 border-b border-gray-200  flex justify-between items-center">
         <div className="flex-grow">
-          <h3 className="font-bold text-md text-gray-800 dark:text-gray-100">
+          <h3 className="font-bold text-md text-gray-800 ">
             {recipient}
           </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-1">
+          <p className="text-xs text-gray-500  truncate mt-1">
             RE: {activeJobTitle}
           </p>
         </div>
         <div className="flex items-center space-x-2">
           <button
             onClick={deleteChat}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="text-gray-400 hover:text-gray-600 "
             aria-label="Delete chat"
           >
             <TrashIcon className="h-5 w-5" />
           </button>
           <button
             onClick={closeChat}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="text-gray-400 hover:text-gray-600 "
             aria-label="Close chat"
           >
             <XIcon className="h-5 w-5" />
@@ -112,7 +112,7 @@ const Chatbox = () => {
                 className={`px-3 py-2 rounded-xl max-w-[75%] break-words cursor-pointer ${
                   isSender
                     ? 'bg-lime-200 text-black rounded-br-none'
-                    : 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100 rounded-bl-none'
+                    : 'bg-gray-100 text-gray-900   rounded-bl-none'
                 }`}
               >
                 <p className="text-sm">{msg.text}</p>
@@ -121,7 +121,7 @@ const Chatbox = () => {
                     className={`text-xs mt-1 ${
                       isSender
                         ? 'text-gray-600 text-right'
-                        : 'text-gray-500 dark:text-gray-400 text-left'
+                        : 'text-gray-500  text-left'
                     }`}
                   >
                     {formatTimestamp(msg.timestamp)}
@@ -134,13 +134,13 @@ const Chatbox = () => {
         <div ref={messagesEndRef} />
       </main>
 
-      <footer className="bg-gray-50 dark:bg-gray-900 p-3 border-t border-gray-200 dark:border-gray-700">
+      <footer className="bg-gray-50  p-3 border-t border-gray-200 ">
         <form onSubmit={handleSendMessage} className="flex items-center">
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            className="flex-grow p-2 text-sm border-gray-300 rounded-full focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+            className="flex-grow p-2 text-sm border-gray-300 rounded-full focus:ring-blue-500 focus:border-blue-500   "
             placeholder="Type a message..."
           />
           <button

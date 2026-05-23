@@ -39,4 +39,4 @@ const interviewSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-module.exports = mongoose.model('Interview', interviewSchema);
+module.exports = mongoose.model('Interview', interviewSchema, 'Interviews');

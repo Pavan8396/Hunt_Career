@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { MoonIcon, MenuIcon, XIcon, BellIcon, UserCircleIcon, LogoutIcon } from '@heroicons/react/outline';
-import { ThemeContext } from '../context/ThemeContext';
+import { MenuIcon, XIcon, BellIcon, UserCircleIcon, LogoutIcon } from '@heroicons/react/outline';
 import { AuthContext } from '../context/AuthContext';
 import { ChatContext } from '../context/ChatContext';
 import { toast } from 'react-toastify';
@@ -13,7 +12,6 @@ const Navbar = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [userInitials, setUserInitials] = useState('');
 
-  const { isDarkMode, toggleDarkMode } = useContext(ThemeContext);
   const { isAuthenticated, user, userType, logout } = useContext(AuthContext);
   const { notifications, persistentNotifications, markNotificationAsRead } = useContext(ChatContext);
 
@@ -101,8 +99,8 @@ const Navbar = () => {
           )}
         </button>
         {isNotificationOpen && (
-          <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 max-h-[400px] overflow-y-auto">
-            <div className="p-3 text-sm font-bold border-b dark:border-gray-600 sticky top-0 bg-white dark:bg-gray-700 z-10">
+          <div className="absolute right-0 mt-2 w-80 bg-white  text-gray-900  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50 max-h-[400px] overflow-y-auto">
+            <div className="p-3 text-sm font-bold border-b  sticky top-0 bg-white  z-10">
               Notifications
             </div>
             {(notifications.length > 0 || persistentNotifications.length > 0) ? (
@@ -110,7 +108,7 @@ const Navbar = () => {
               {persistentNotifications.map((notif) => (
                 <div
                   key={notif._id}
-                  className="p-4 border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                  className="p-4 border-b  hover:bg-gray-100  cursor-pointer"
                   onClick={() => {
                     markNotificationAsRead(notif._id);
                     let path = '/';
@@ -122,7 +120,8 @@ const Navbar = () => {
                         handleNotificationClick({
                            applicationId: notif.relatedId,
                            senderName: notif.sender?.firstName ? `${notif.sender.firstName} ${notif.sender.lastName}` : (notif.sender?.companyName || 'Sender'),
-                           jobId: notif.jobId
+                           jobId: notif.jobId,
+                           jobTitle: notif.content.split('regarding ')[1] || ''
                         });
                         return;
                       } else if (notif.relatedModel === 'Interview' || notif.relatedModel === 'Application') {
@@ -133,7 +132,8 @@ const Navbar = () => {
                         handleNotificationClick({
                           applicationId: notif.relatedId,
                           senderName: notif.sender?.companyName || (notif.sender?.firstName ? `${notif.sender.firstName} ${notif.sender.lastName}` : 'Employer'),
-                          jobId: notif.jobId
+                          jobId: notif.jobId,
+                          jobTitle: notif.content.split('regarding ')[1] || ''
                         });
                         return;
                       }
@@ -151,10 +151,10 @@ const Navbar = () => {
                 <div
                   key={`${notif.senderId}-${notif.jobId}-${index}`}
                   onClick={() => handleNotificationClick(notif)}
-                  className="p-4 border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+                  className="p-4 border-b  hover:bg-gray-100  cursor-pointer"
                 >
                   <div className="font-semibold">{notif.senderName}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                  <div className="text-sm text-gray-500  truncate">
                     {notif.lastMessage}
                   </div>
                   <div className="text-xs text-blue-500 mt-1">
@@ -164,7 +164,7 @@ const Navbar = () => {
               ))}
               </div>
             ) : (
-              <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+              <div className="p-4 text-center text-gray-500 ">
                 No new notifications
               </div>
             )}
@@ -180,47 +180,39 @@ const Navbar = () => {
           </button>
         }
       >
-        <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 border-b dark:border-gray-600">
+        <div className="px-4 py-2 text-sm text-gray-500  border-b ">
           Signed in as <br />
           <span className="font-semibold">{user.name || user.companyName}</span>
         </div>
         <Link
           to={userType === 'employer' ? '/employer/profile' : '/profile'}
-          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+          className="flex items-center px-4 py-2 text-sm text-gray-700  hover:bg-gray-100 "
         >
           <UserCircleIcon className="h-5 w-5 mr-2" />
           My Profile
         </Link>
-        <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
+        <div className="border-t border-gray-200  my-1" />
         <Link
           to="/about"
-          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+          className="flex items-center px-4 py-2 text-sm text-gray-700  hover:bg-gray-100 "
         >
           About
         </Link>
         <Link
           to="/contact"
-          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+          className="flex items-center px-4 py-2 text-sm text-gray-700  hover:bg-gray-100 "
         >
           Contact
         </Link>
         <Link
           to="/privacy"
-          className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+          className="flex items-center px-4 py-2 text-sm text-gray-700  hover:bg-gray-100 "
         >
           Privacy Policy
         </Link>
-        <div className="border-t border-gray-200 dark:border-gray-600 my-1" />
-        <button
-          onClick={toggleDarkMode}
-          className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-        >
-          <MoonIcon className="h-5 w-5 mr-2" />
-          {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-        </button>
         <button
           onClick={handleLogout}
-          className="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-gray-600"
+          className="w-full text-left flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 "
         >
           <LogoutIcon className="h-5 w-5 mr-2" />
           Logout
@@ -231,45 +223,38 @@ const Navbar = () => {
 
   const MobileMenu = () => (
     <div
-      className="md:hidden absolute top-16 right-4 w-48 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50"
+      className="md:hidden absolute top-16 right-4 w-48 bg-white  text-gray-900  rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50"
       ref={mobileMenuRef}
     >
       {isAuthenticated ? (
         <>
-          <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">
+          <div className="px-4 py-2 text-sm text-gray-500 ">
             Welcome, {user.name || user.companyName}
           </div>
           <Link
             to="/about"
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            className="block px-4 py-2 hover:bg-gray-100 "
             onClick={() => setIsMobileMenuOpen(false)}
           >
             About
           </Link>
           <Link
             to="/contact"
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            className="block px-4 py-2 hover:bg-gray-100 "
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Contact
           </Link>
           <Link
             to="/privacy"
-            className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            className="block px-4 py-2 hover:bg-gray-100 "
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Privacy Policy
           </Link>
           <button
-            onClick={toggleDarkMode}
-            className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center"
-          >
-            <MoonIcon className="h-5 w-5 mr-2" />
-            {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-          </button>
-          <button
             onClick={handleLogout}
-            className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 text-red-600 hover:text-red-700"
+            className="w-full text-left px-4 py-2 hover:bg-gray-100  text-red-600 hover:text-red-700"
           >
             Logout
           </button>
@@ -279,14 +264,14 @@ const Navbar = () => {
           <>
             <Link
               to="/login"
-              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              className="block px-4 py-2 hover:bg-gray-100 "
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Login
             </Link>
             <Link
               to="/signup"
-              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              className="block px-4 py-2 hover:bg-gray-100 "
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Signup
@@ -298,7 +283,7 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="bg-blue-600 text-white p-4 shadow-md dark:bg-gray-800">
+    <nav className="bg-blue-600 text-white p-4 shadow-md ">
       <div className="container mx-auto flex justify-between items-center">
         <Link
           to={
@@ -340,17 +325,17 @@ const Navbar = () => {
         {isMobileMenuOpen && <MobileMenu />}
         {showConfirm && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-4">
+            <div className="bg-white  p-6 rounded-lg shadow-lg max-w-sm w-full">
+              <h3 className="text-lg font-semibold text-gray-900  mb-4">
                 Confirm Logout
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-gray-600  mb-6">
                 Are you sure you want to logout?
               </p>
               <div className="flex justify-end gap-4">
                 <button
                   onClick={handleCancelLogout}
-                  className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  className="px-4 py-2 text-sm text-gray-600  border border-gray-300  rounded hover:bg-gray-100  transition"
                   aria-label="Cancel"
                 >
                   Cancel

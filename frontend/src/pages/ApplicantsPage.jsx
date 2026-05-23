@@ -7,7 +7,8 @@ import {
   scheduleInterview,
   getInterviewsForApplication,
   updateInterviewStatus,
-  submitInterviewFeedback
+  submitInterviewFeedback,
+  updateInterview,
 } from '../services/api';
 import { toast } from 'react-toastify';
 import { ChatContext } from '../context/ChatContext';
@@ -36,6 +37,7 @@ const ApplicantsPage = () => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [selectedInterview, setSelectedInterview] = useState(null);
+  const [isEditingInterview, setIsEditingInterview] = useState(false);
   const [newInterview, setNewInterview] = useState({
     scheduledAt: '',
     interviewerName: '',
@@ -129,16 +131,22 @@ const ApplicantsPage = () => {
     e.preventDefault();
     try {
       const token = sessionStorage.getItem('token');
-      await scheduleInterview({
-        applicationId: selectedAppForInterview._id,
-        ...newInterview
-      }, token);
-      toast.success('Interview scheduled successfully');
+      if (isEditingInterview) {
+        await updateInterview(selectedInterview._id, newInterview, token);
+        toast.success('Interview updated successfully');
+      } else {
+        await scheduleInterview({
+          applicationId: selectedAppForInterview._id,
+          ...newInterview
+        }, token);
+        toast.success('Interview scheduled successfully');
+      }
       setShowScheduleModal(false);
+      setIsEditingInterview(false);
       setNewInterview({ scheduledAt: '', interviewerName: '', location: '', round: 1, roundName: 'Initial Interview' });
       fetchApplications();
     } catch (err) {
-      toast.error('Failed to schedule interview');
+      toast.error(isEditingInterview ? 'Failed to update interview' : 'Failed to schedule interview');
     }
   };
 
@@ -202,8 +210,8 @@ const ApplicantsPage = () => {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
-          <thead className="bg-gray-200 dark:bg-gray-700">
+        <table className="min-w-full bg-white  rounded-lg shadow-md">
+          <thead className="bg-gray-200 ">
             <tr>
               <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('applicant.firstName')}>
                 Applicant Name {sortConfig.key === 'applicant.firstName' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
@@ -223,14 +231,14 @@ const ApplicantsPage = () => {
                 const appInterviews = interviews[app._id] || [];
                 return (
                   <React.Fragment key={app._id}>
-                    <tr className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <tr className="border-b  hover:bg-gray-100 ">
                       <td className="p-4 font-medium">{`${app.applicant.firstName} ${app.applicant.lastName}`}</td>
                       <td className="p-4">{new Date(app.date).toLocaleDateString()}</td>
                       <td className="p-4">
                         <select
                           value={app.status}
                           onChange={(e) => handleStatusChange(app._id, e.target.value)}
-                          className="p-2 text-sm rounded-md border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                          className="p-2 text-sm rounded-md border-gray-300  "
                         >
                           <option value="Submitted">Submitted</option>
                           <option value="In Review">In Review</option>
@@ -239,14 +247,13 @@ const ApplicantsPage = () => {
                           <option value="Candidate Identified">Candidate Identified</option>
                           <option value="Offered">Offered</option>
                           <option value="Rejected">Rejected</option>
-                          <option value="Dropped">Dropped</option>
                         </select>
                       </td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center space-x-2">
                           <button
                             onClick={() => openChatForApplication(app._id, `${app.applicant.firstName} ${app.applicant.lastName}`, jobTitle)}
-                            className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition dark:bg-blue-900 dark:text-blue-200"
+                            className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition  "
                             title="Chat with applicant"
                           >
                             <ChatIcon className="h-5 w-5" />
@@ -256,7 +263,7 @@ const ApplicantsPage = () => {
                               setSelectedAppForInterview(app);
                               setShowScheduleModal(true);
                             }}
-                            className="p-2 bg-green-100 text-green-600 rounded-full hover:bg-green-200 transition dark:bg-green-900 dark:text-green-200"
+                            className="p-2 bg-green-100 text-green-600 rounded-full hover:bg-green-200 transition  "
                             title="Schedule Interview"
                           >
                             <CalendarIcon className="h-5 w-5" />
@@ -265,18 +272,18 @@ const ApplicantsPage = () => {
                       </td>
                     </tr>
                     {appInterviews.length > 0 && (
-                      <tr className="bg-gray-50 dark:bg-gray-900/50">
+                      <tr className="bg-gray-50 ">
                         <td colSpan="4" className="px-8 py-2">
                           <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Interviews</div>
                           <div className="space-y-2">
                             {appInterviews.map((interview) => (
-                              <div key={interview._id} className="flex items-center justify-between bg-white dark:bg-gray-800 p-2 rounded border border-gray-200 dark:border-gray-700">
+                              <div key={interview._id} className="flex items-center justify-between bg-white  p-2 rounded border border-gray-200 ">
                                 <div className="text-sm">
                                   <span className="font-semibold">Round {interview.round}: {interview.roundName}</span>
                                   <span className="mx-2 text-gray-300">|</span>
-                                  <span className="text-gray-600 dark:text-gray-400">{new Date(interview.scheduledAt).toLocaleString()}</span>
+                                  <span className="text-gray-600 ">{new Date(interview.scheduledAt).toLocaleString()}</span>
                                   <span className="mx-2 text-gray-300">|</span>
-                                  <span className="text-gray-600 dark:text-gray-400">{interview.interviewerName || 'TBD'}</span>
+                                  <span className="text-gray-600 ">{interview.interviewerName || 'TBD'}</span>
                                   <span className="mx-2 text-gray-300">|</span>
                                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                                     interview.status === 'Scheduled' ? 'bg-blue-100 text-blue-800' :
@@ -287,12 +294,31 @@ const ApplicantsPage = () => {
                                 </div>
                                 <div className="flex space-x-2">
                                   {interview.status === 'Scheduled' && (
-                                    <button
-                                      onClick={() => handleUpdateInterviewStatus(interview._id, 'Completed')}
-                                      className="text-xs text-green-600 hover:underline flex items-center"
-                                    >
-                                      <CheckCircleIcon className="h-4 w-4 mr-1" /> Complete
-                                    </button>
+                                    <>
+                                      <button
+                                        onClick={() => {
+                                          setSelectedInterview(interview);
+                                          setNewInterview({
+                                            scheduledAt: new Date(interview.scheduledAt).toISOString().slice(0, 16),
+                                            interviewerName: interview.interviewerName || '',
+                                            location: interview.location || '',
+                                            round: interview.round,
+                                            roundName: interview.roundName
+                                          });
+                                          setIsEditingInterview(true);
+                                          setShowScheduleModal(true);
+                                        }}
+                                        className="text-xs text-blue-600 hover:underline flex items-center"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button
+                                        onClick={() => handleUpdateInterviewStatus(interview._id, 'Completed')}
+                                        className="text-xs text-green-600 hover:underline flex items-center"
+                                      >
+                                        <CheckCircleIcon className="h-4 w-4 mr-1" /> Complete
+                                      </button>
+                                    </>
                                   )}
                                   {interview.status === 'Completed' && (
                                     <button
@@ -330,10 +356,10 @@ const ApplicantsPage = () => {
       {/* Schedule Interview Modal */}
       {showScheduleModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
+          <div className="bg-white  rounded-lg shadow-xl w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Schedule Interview</h2>
-              <button onClick={() => setShowScheduleModal(false)}><XIcon className="h-6 w-6" /></button>
+              <h2 className="text-xl font-bold">{isEditingInterview ? 'Edit Interview' : 'Schedule Interview'}</h2>
+              <button onClick={() => { setShowScheduleModal(false); setIsEditingInterview(false); }}><XIcon className="h-6 w-6" /></button>
             </div>
             <form onSubmit={handleScheduleInterview} className="space-y-4">
               <div>
@@ -341,7 +367,7 @@ const ApplicantsPage = () => {
                 <input
                   type="datetime-local"
                   required
-                  className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                  className="w-full p-2 border rounded  "
                   value={newInterview.scheduledAt}
                   onChange={(e) => setNewInterview({ ...newInterview, scheduledAt: e.target.value })}
                 />
@@ -351,7 +377,7 @@ const ApplicantsPage = () => {
                 <input
                   type="text"
                   placeholder="e.g. Hiring Manager"
-                  className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                  className="w-full p-2 border rounded  "
                   value={newInterview.interviewerName}
                   onChange={(e) => setNewInterview({ ...newInterview, interviewerName: e.target.value })}
                 />
@@ -363,7 +389,7 @@ const ApplicantsPage = () => {
                     type="number"
                     required
                     min="1"
-                    className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                    className="w-full p-2 border rounded  "
                     value={newInterview.round}
                     onChange={(e) => setNewInterview({ ...newInterview, round: parseInt(e.target.value) })}
                   />
@@ -373,7 +399,7 @@ const ApplicantsPage = () => {
                   <input
                     type="text"
                     placeholder="e.g. Technical"
-                    className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                    className="w-full p-2 border rounded  "
                     value={newInterview.roundName}
                     onChange={(e) => setNewInterview({ ...newInterview, roundName: e.target.value })}
                   />
@@ -384,7 +410,7 @@ const ApplicantsPage = () => {
                 <input
                   type="text"
                   placeholder="e.g. Zoom Link or Office address"
-                  className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                  className="w-full p-2 border rounded  "
                   value={newInterview.location}
                   onChange={(e) => setNewInterview({ ...newInterview, location: e.target.value })}
                 />
@@ -400,7 +426,7 @@ const ApplicantsPage = () => {
       {/* Feedback Modal */}
       {showFeedbackModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
+          <div className="bg-white  rounded-lg shadow-xl w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Interview Feedback</h2>
               <button onClick={() => setShowFeedbackModal(false)}><XIcon className="h-6 w-6" /></button>
@@ -411,7 +437,7 @@ const ApplicantsPage = () => {
                 <textarea
                   rows="5"
                   required
-                  className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                  className="w-full p-2 border rounded  "
                   placeholder="How did the candidate perform?"
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}

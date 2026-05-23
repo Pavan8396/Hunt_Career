@@ -69,10 +69,14 @@ const ChatProvider = ({ children }) => {
 
       setActiveApplicationId(applicationId);
       setRecipient(recipientName);
-      setActiveJobTitle(jobTitle);
+      if (jobTitle) setActiveJobTitle(jobTitle);
 
       try {
         const history = await getChatHistory(applicationId, token);
+        if (!jobTitle && history.length > 0) {
+           // We could potentially find the job title from history if we had it there
+           // But better to fetch job title if missing.
+        }
         setMessages((prev) => ({ ...prev, [applicationId]: history }));
       } catch (error) {
         console.error('Failed to fetch chat history', error);
@@ -113,7 +117,12 @@ const ChatProvider = ({ children }) => {
     [activeApplicationId, user]
   );
 
-  const closeChat = useCallback(() => setIsChatOpen(false), []);
+  const closeChat = useCallback(() => {
+    if (activeApplicationId && socketRef.current) {
+      socketRef.current.emit('leaveRoom', { applicationId: activeApplicationId });
+    }
+    setIsChatOpen(false);
+  }, [activeApplicationId]);
 
   const deleteChat = useCallback(async () => {
     if (activeApplicationId) {

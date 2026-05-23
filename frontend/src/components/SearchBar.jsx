@@ -38,7 +38,7 @@ const SearchBar = forwardRef(({ onSearch, initialValue = '' }, ref) => {
         <input
           type="text"
           placeholder="Search jobs by title, company, or keyword..."
-          className="w-full px-10 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-600 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:placeholder-gray-400"
+          className="w-full px-10 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-600    "
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -48,7 +48,7 @@ const SearchBar = forwardRef(({ onSearch, initialValue = '' }, ref) => {
         {inputValue && (
           <button
             onClick={handleClear}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700  "
             aria-label="Clear search"
           >
             <XIcon className="h-5 w-5" />
@@ -60,8 +60,8 @@ const SearchBar = forwardRef(({ onSearch, initialValue = '' }, ref) => {
         disabled={isSearching || !inputValue.trim()}
         className={`px-4 py-2 rounded-r-md text-white transition ${
           isSearching || !inputValue.trim()
-            ? 'bg-blue-400 cursor-not-allowed dark:bg-blue-500'
-            : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
+            ? 'bg-blue-400 cursor-not-allowed
+            : 'bg-blue-600 hover:bg-blue-700
         }`}
         aria-label="Search"
       >

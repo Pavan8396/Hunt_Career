@@ -47,11 +47,11 @@ const AdminPostJobPage = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 dark:bg-gray-900 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Post a New Job</h1>
+    <div className="p-4 sm:p-6 lg:p-8  min-h-screen">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 ">Post a New Job</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="employer" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="employer" className="block text-sm font-medium text-gray-700 ">
             Employer
           </label>
           <select
@@ -71,7 +71,7 @@ const AdminPostJobPage = () => {
           </select>
         </div>
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 ">
             Job Title
           </label>
           <input
@@ -85,7 +85,7 @@ const AdminPostJobPage = () => {
           />
         </div>
         <div>
-          <label htmlFor="company" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="company" className="block text-sm font-medium text-gray-700 ">
             Company Name
           </label>
           <input
@@ -99,7 +99,7 @@ const AdminPostJobPage = () => {
           />
         </div>
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700 ">
             Job Description
           </label>
           <textarea
@@ -113,7 +113,7 @@ const AdminPostJobPage = () => {
           ></textarea>
         </div>
         <div>
-          <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="requirements" className="block text-sm font-medium text-gray-700 ">
             Requirements
           </label>
           <textarea
@@ -126,7 +126,7 @@ const AdminPostJobPage = () => {
           ></textarea>
         </div>
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="location" className="block text-sm font-medium text-gray-700 ">
             Location
           </label>
           <input
@@ -140,7 +140,7 @@ const AdminPostJobPage = () => {
           />
         </div>
         <div>
-          <label htmlFor="salary" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="salary" className="block text-sm font-medium text-gray-700 ">
             Salary
           </label>
           <input
@@ -153,7 +153,7 @@ const AdminPostJobPage = () => {
           />
         </div>
         <div>
-          <label htmlFor="job_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="job_type" className="block text-sm font-medium text-gray-700 ">
             Job Type
           </label>
           <select

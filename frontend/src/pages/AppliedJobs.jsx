@@ -67,7 +67,7 @@ const AppliedJobs = () => {
   if (loading) {
     return (
       <div className="p-4 max-w-7xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4 dark:text-gray-200">
+        <h2 className="text-2xl font-bold mb-4 ">
           Applied Jobs
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -82,10 +82,10 @@ const AppliedJobs = () => {
   if (error) {
     return (
       <div className="p-4 text-center">
-        <p className="text-red-500 dark:text-red-400">{error}</p>
+        <p className="text-red-500 ">{error}</p>
         <Link
           to="/home"
-          className="text-blue-600 hover:underline mt-4 inline-block dark:text-blue-400"
+          className="text-blue-600 hover:underline mt-4 inline-block "
         >
           ← Back to Home
         </Link>
@@ -95,7 +95,7 @@ const AppliedJobs = () => {
 
   return (
     <div className="p-4 max-w-7xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 dark:text-gray-200">
+      <h2 className="text-2xl font-bold mb-4 ">
         Applied Jobs
       </h2>
       {applications.length === 0 ? (
@@ -108,8 +108,8 @@ const AppliedJobs = () => {
         />
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
-            <thead className="bg-gray-200 dark:bg-gray-700">
+          <table className="min-w-full bg-white  rounded-lg shadow-md">
+            <thead className="bg-gray-200 ">
               <tr>
                 <th className="p-4 text-left cursor-pointer" onClick={() => requestSort('job.title')}>
                   Job Title {sortConfig.key === 'job.title' ? (sortConfig.direction === 'ascending' ? <SortAscendingIcon className="inline-block h-5 w-5" /> : <SortDescendingIcon className="inline-block h-5 w-5" />) : <SelectorIcon className="inline-block h-5 w-5" />}
@@ -130,23 +130,37 @@ const AppliedJobs = () => {
               {sortedApplications
                 .filter((app) => app.job) // Add this line to filter out null jobs
                 .map((app) => (
-                <tr key={app._id} className="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
-                  <td className="p-4">{app.job.title}</td>
+                <tr key={app._id} className="border-b  hover:bg-gray-100 ">
+                  <td className="p-4">
+                    <div className="font-medium">{app.job.title}</div>
+                    {['Closed', 'Draft', 'Archived'].includes(app.job.status) && (
+                      <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full mt-1 inline-block border border-gray-300 uppercase font-bold">
+                        Inactive / Closed
+                      </span>
+                    )}
+                  </td>
                   <td className="p-4">{app.job.company}</td>
                   <td className="p-4">{new Date(app.date).toLocaleDateString()}</td>
                   <td className="p-4">
                     <span
                       className={`text-sm px-3 py-1 rounded capitalize ${
-                        {
-                          Submitted: 'bg-blue-100 text-blue-600 border border-blue-300',
-                          'In Review': 'bg-yellow-100 text-yellow-600 border border-yellow-300',
-                          Interviewing: 'bg-purple-100 text-purple-600 border border-purple-300',
-                          Offered: 'bg-green-100 text-green-600 border border-green-300',
-                          Rejected: 'bg-red-100 text-red-600 border border-red-300',
-                        }[app.status] || 'bg-gray-100 text-gray-600 border border-gray-300'
+                        (() => {
+                          const status = ['Submitted', 'In Review', 'Screening', 'Candidate Identified'].includes(app.status) ? 'Submitted' :
+                                         app.status === 'Interviewing' ? 'Interviewing' :
+                                         ['Offered', 'Rejected'].includes(app.status) ? app.status : 'Submitted';
+
+                          return {
+                            Submitted: 'bg-blue-100 text-blue-600 border border-blue-300',
+                            Interviewing: 'bg-purple-100 text-purple-600 border border-purple-300',
+                            Offered: 'bg-green-100 text-green-600 border border-green-300',
+                            Rejected: 'bg-red-100 text-red-600 border border-red-300',
+                          }[status] || 'bg-gray-100 text-gray-600 border border-gray-300';
+                        })()
                       }`}
                     >
-                      {app.status}
+                      {['Submitted', 'In Review', 'Screening', 'Candidate Identified'].includes(app.status) ? 'Submitted' :
+                       app.status === 'Interviewing' ? 'Interviewing' :
+                       app.status}
                     </span>
                   </td>
                   <td className="p-4 text-center">

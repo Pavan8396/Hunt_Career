@@ -35,6 +35,34 @@ exports.createReview = async (req, res) => {
   }
 };
 
+// @desc    Update a review
+// @route   PUT /api/employers/:employerId/reviews/:reviewId
+// @access  Private (User)
+exports.updateReview = async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    const { reviewId } = req.params;
+    const userId = req.user._id;
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    if (review.user.toString() !== userId.toString()) {
+      return res.status(403).json({ message: 'Not authorized to update this review' });
+    }
+
+    if (rating) review.rating = rating;
+    if (comment) review.comment = comment;
+
+    await review.save();
+    res.json(review);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Get all reviews for an employer
 // @route   GET /api/employers/:employerId/reviews
 // @access  Public
